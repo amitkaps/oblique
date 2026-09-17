@@ -196,6 +196,36 @@ UI (not `safaridriver` automation) would be the way to get a trustworthy
 manual reading in the meantime, matching vizchitra-fonts/docs/compat.md's
 own reason for keeping a manual `/compat` page alongside automated tests.
 
+## Existing WPT coverage
+
+_Audited 2026-09-18 — see [`docs/coverage.md`](coverage.md) (generated from
+[`docs/coverage.json`](coverage.json)) for the full catalog, and
+[`results/upstream-matrix.md`](../results/upstream-matrix.md) for live
+per-engine results sourced from [wpt.fyi](https://wpt.fyi)._
+
+This repo's original plan (spec.md v2) assumed WPT had little coverage of
+oblique/`slnt` matching and planned to write new tests across five
+categories from scratch. A direct walk of the vendored `css/css-fonts` tree
+(not a search-snippet sample) found that assumption wrong: **29 existing
+upstream tests** touch `slnt`, oblique matching, or closely related
+synthesis/parsing — several (`slnt-variable.html`, `slnt-backslant-variable.html`,
+`font-slant-1/2a/2b/2c/3.html`, `synthetic-oblique-out-of-capabilities-range.html`)
+plausibly probe the same signed-angle failure mode WebKit #209565 documents.
+
+The same audit confirmed the inverse for `ital`: **zero** existing WPT tests
+anywhere under `css/css-fonts/` reference the `ital` variation axis in any
+form (search method and result logged in `docs/coverage.json`'s
+`ital_axis_gap` field). This is now the repo's primary reason to author new
+tests at all — `tests/ital-axis/` fills a real, confirmed gap, rather than
+duplicating coverage that already exists.
+
+Given this, the repo's ongoing value shifts from "write new tests broadly"
+to: track existing WPT coverage's live status via wpt.fyi
+(`scripts/sync-wpt-results.py`, scheduled daily,
+`results/upstream-matrix.md`), and keep authoring new tests specifically
+for the `ital`-axis gap. See `docs/spec.md`'s "Scope update (v3)" section
+and README.md's "Live coverage dashboard" section for the mechanics.
+
 ## 3. Proposed Interop scope statement
 
 Scope: variable-font style matching for both the `slnt` and `ital` axes,

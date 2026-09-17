@@ -1,0 +1,216 @@
+{
+  "$schema_note": "Source of truth for the WPT coverage catalog. docs/coverage.md is rendered from this file — edit here, not there. Populated by manual audit of the css/css-fonts WPT tree on 2026-09-18 (see method notes below); results.json (produced by scripts/sync-wpt-results.py) is the separate, live per-test pass/fail data keyed by the same `path` values.",
+  "audited_at": "2026-09-18",
+  "audit_method": "Local sparse WPT checkout (.wpt/css/css-fonts, vendored per scripts/setup-wpt.sh) was walked directly with `find`/`grep`, not GitHub search or wpt.fyi's browse UI, since search snippets are not exhaustive. Every *.html file under css/css-fonts/{, variations/, animations/, matching/, parsing/} was grepped for slnt/ital/oblique in filename and body (`'slnt'`/`'ital'` as font-variation-settings axis literals, plus oblique/italic in title/assert text) to build this list.",
+  "tests": [
+    {
+      "path": "css/css-fonts/variations/slnt-variable.html",
+      "title": "CSS Test: Variable fonts with slant axis",
+      "axis": "slnt",
+      "probes_209565": true,
+      "notes": "Direct slnt axis activation via variable font; community reference test (arrowtype/vf-slnt-test lineage)."
+    },
+    {
+      "path": "css/css-fonts/variations/slnt-backslant-variable.html",
+      "title": "CSS Test: Variable fonts with slant axis",
+      "axis": "slnt",
+      "probes_209565": true,
+      "notes": "Negative (backslant) slnt values specifically — directly exercises the signed-angle handling #209565 documents as mishandled."
+    },
+    {
+      "path": "css/css-fonts/variations/font-slant-1.html",
+      "title": "CSS test: mapping of font-style:oblique to opentype 'slnt' axis",
+      "axis": "slnt",
+      "probes_209565": true,
+      "notes": "Bare font-style:oblique to slnt mapping."
+    },
+    {
+      "path": "css/css-fonts/variations/font-slant-2a.html",
+      "title": "CSS test: mapping of font-style:oblique to opentype 'slnt' axis",
+      "axis": "slnt",
+      "probes_209565": true,
+      "notes": "Variant of font-slant-1 with a different angle/setup."
+    },
+    {
+      "path": "css/css-fonts/variations/font-slant-2b.html",
+      "title": "CSS test: mapping of font-style:oblique to opentype 'slnt' axis",
+      "axis": "slnt",
+      "probes_209565": true,
+      "notes": "Variant of font-slant-1 with a different angle/setup."
+    },
+    {
+      "path": "css/css-fonts/variations/font-slant-2c.html",
+      "title": "CSS test: mapping of font-style:oblique to opentype 'slnt' axis",
+      "axis": "slnt",
+      "probes_209565": true,
+      "notes": "Variant of font-slant-1 with a different angle/setup."
+    },
+    {
+      "path": "css/css-fonts/variations/font-slant-3.html",
+      "title": "CSS test: mapping of font-style:oblique to opentype 'slnt' axis",
+      "axis": "slnt",
+      "probes_209565": true,
+      "notes": "Explicit oblique <angle> to slnt mapping."
+    },
+    {
+      "path": "css/css-fonts/variations/at-font-face-font-matching.html",
+      "title": "Testing @font-face font matching logic introduced in CSS Fonts level 4",
+      "axis": "neither",
+      "probes_209565": false,
+      "notes": "General CSS Fonts 4 @font-face matching algorithm, not slnt/ital specific."
+    },
+    {
+      "path": "css/css-fonts/variations/font-style-parsing.html",
+      "title": "Testing the new font-style values introduced in CSS Fonts level 4",
+      "axis": "neither",
+      "probes_209565": false,
+      "notes": "Parsing-only: valid/invalid font-style syntax, not axis activation or rendering."
+    },
+    {
+      "path": "css/css-fonts/variations/font-style-interpolation.html",
+      "title": "Testing the interpolation of new font-style values introduced in CSS Fonts level 4",
+      "axis": "slnt",
+      "probes_209565": false,
+      "notes": "Interpolates oblique <angle> values via CSS Transitions; exercises slnt-adjacent computed-value machinery but not the matching algorithm itself."
+    },
+    {
+      "path": "css/css-fonts/animations/font-style-interpolation.html",
+      "title": "font-style interpolation",
+      "axis": "slnt",
+      "probes_209565": false,
+      "notes": "Web Animations API counterpart to variations/font-style-interpolation.html; same scope, different animation entry point."
+    },
+    {
+      "path": "css/css-fonts/font-face-style-auto-variable.html",
+      "title": "CSS Test: Support for font-style: auto in @font-face",
+      "axis": "slnt",
+      "probes_209565": false,
+      "notes": "font-style:auto applying the font's automatic slant range in @font-face — slnt-adjacent, not a direct activation test."
+    },
+    {
+      "path": "css/css-fonts/font-face-style-default-variable.html",
+      "title": "CSS Test: Support for font-style: auto in @font-face",
+      "axis": "slnt",
+      "probes_209565": false,
+      "notes": "Confirms auto is the default font-style value in @font-face for variable fonts."
+    },
+    {
+      "path": "css/css-fonts/font-variation-settings-descriptor-01.html",
+      "title": "CSS Test: font-variation-settings descriptor",
+      "axis": "slnt",
+      "probes_209565": false,
+      "notes": "Explicit 'slnt' -20 via @font-face font-variation-settings descriptor — direct axis value, not font-style-driven matching."
+    },
+    {
+      "path": "css/css-fonts/parsing/font-variation-settings-valid.html",
+      "title": "CSS Fonts Module Level 4: parsing font-variation-settings with valid values",
+      "axis": "slnt",
+      "probes_209565": false,
+      "notes": "Parsing-only: 'slnt' appears as an example axis tag in a generic grammar test, not a semantic slnt test."
+    },
+    {
+      "path": "css/css-fonts/synthetic-oblique-out-of-capabilities-range.html",
+      "title": "Tests that font-style with angle outside of the 'slnt' range support by the font does not synthesize oblique faces.",
+      "axis": "slnt",
+      "probes_209565": true,
+      "notes": "Angle-range clamping against the font's slnt capabilities — directly relevant to #209565's signed/ranged-angle mishandling."
+    },
+    {
+      "path": "css/css-fonts/font-style-angle.html",
+      "title": "Testing font-style angle's unit type consideration",
+      "axis": "neither",
+      "probes_209565": false,
+      "notes": "Parsing-only: angle unit handling (deg/grad/rad/turn), not axis activation."
+    },
+    {
+      "path": "css/css-fonts/font-style-sign-function.html",
+      "title": "CSS Fonts test: font-style with CSS sign() function",
+      "axis": "neither",
+      "probes_209565": false,
+      "notes": "Parsing/computation of the CSS sign() function inside oblique <angle>, not axis matching."
+    },
+    {
+      "path": "css/css-fonts/test-synthetic-italic.html",
+      "title": "CSS Test: Test for synthetic italic rendering",
+      "axis": "neither",
+      "probes_209565": false,
+      "notes": "Synthesis on a static (non-variable) font family — relevant background for the synthesis half of #209565 but not axis-specific."
+    },
+    {
+      "path": "css/css-fonts/test-synthetic-italic-2.html",
+      "title": "CSS Test: Test for synthetic italics in vertical upright mode",
+      "axis": "neither",
+      "probes_209565": false,
+      "notes": "Vertical-writing-mode variant of test-synthetic-italic.html."
+    },
+    {
+      "path": "css/css-fonts/test-synthetic-italic-3.html",
+      "title": "CSS Test: Test for synthetic italics in vertical upright mode",
+      "axis": "neither",
+      "probes_209565": false,
+      "notes": "Further vertical-writing-mode synthesis variant."
+    },
+    {
+      "path": "css/css-fonts/font-synthesis-style.html",
+      "title": "CSS Test: font-synthesis-style: none disables fake italic/oblique",
+      "axis": "neither",
+      "probes_209565": false,
+      "notes": "font-synthesis-style:none suppression on a static font — general synthesis control, not variable-axis specific."
+    },
+    {
+      "path": "css/css-fonts/font-synthesis-style-oblique-only.html",
+      "title": "CSS font-synthesis-style:oblique-only test",
+      "axis": "neither",
+      "probes_209565": false,
+      "notes": "font-synthesis-style:oblique-only blocking italic-to-oblique fallback — face selection, not variable-axis activation."
+    },
+    {
+      "path": "css/css-fonts/font-synthesis-style-binary.html",
+      "title": "CSS Test: font-synthesis-style: none disables fake italic/oblique",
+      "axis": "neither",
+      "probes_209565": false,
+      "notes": "Same assertion as font-synthesis-style.html, against a base64-encoded font."
+    },
+    {
+      "path": "css/css-fonts/italic-oblique-fallback.html",
+      "title": "CSS Fonts testcase: oblique/italic fallback",
+      "axis": "neither",
+      "probes_209565": false,
+      "notes": "A request for 'oblique' style must not fall back to a face labelled 'italic' — static face selection, not a variable axis."
+    },
+    {
+      "path": "css/css-fonts/oblique-last-resort-weight-selection.html",
+      "title": "CSS Fonts: weight selection among last-resort oblique faces",
+      "axis": "neither",
+      "probes_209565": false,
+      "notes": "Weight-tiebreak among synthesized oblique last-resort candidates, not axis activation."
+    },
+    {
+      "path": "css/css-fonts/oblique-request-italic-only-family-no-crash.html",
+      "title": "CSS Fonts: oblique request with italic-only family does not crash",
+      "axis": "neither",
+      "probes_209565": false,
+      "notes": "Crash-safety regression test for oblique-vs-italic-only-family resolution, not a variable axis test."
+    },
+    {
+      "path": "css/css-fonts/matching/style-ranges-over-weight-direction.html",
+      "title": "(no <meta name=assert> — see file)",
+      "axis": "neither",
+      "probes_209565": false,
+      "notes": "General font-style range vs. font-weight matching precedence; not slnt/ital axis specific."
+    },
+    {
+      "path": "css/css-fonts/matching/range-descriptor-reversed.html",
+      "title": "CSS Fonts Module Level 3: Property descriptor ranges",
+      "axis": "neither",
+      "probes_209565": false,
+      "notes": "Reversed-range normalization for @font-face descriptors in general (weight/stretch/style), not slnt/ital specific."
+    }
+  ],
+  "ital_axis_gap": {
+    "claim": "No existing WPT test under css/css-fonts/ exercises the OpenType 'ital' variation axis in any form.",
+    "search_method": "find css/css-fonts -name '*.html' | xargs grep -l \"'ital'\" (and the double-quoted form) across the full sparse-checked-out tree (top level, variations/, animations/, matching/, parsing/), plus a filename-only grep for the 'ital' token, distinct from 'italic'/'oblique' substrings.",
+    "result": "The only matches anywhere in the tree are this repo's own tests under css/css-fonts/variable-oblique-interop/ital-axis/ (copied there by scripts/setup-wpt.sh, not upstream WPT content). Zero matches upstream.",
+    "verified_at": "2026-09-18"
+  }
+}

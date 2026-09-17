@@ -1,11 +1,41 @@
 # Oblique 
-variable font oblique interop — Build Spec (v2)
+variable font oblique interop — Build Spec (v2, superseded in part — see
+"Scope update (v3)" below)
 
 ## Purpose
 Independent research/test repo turning CSS Fonts 4 findings from the VizChitra
 font compatibility investigation into reproducible, upstreamable
 interoperability tests, feeding an Interop proposal. Font- and vendor-neutral.
 Cairo/VizChitra is the motivating case, not the subject.
+
+## Scope update (v3)
+
+The v2 spec below assumed WPT had little to no coverage of oblique/`slnt`
+matching, and planned five new test categories accordingly (see "Coverage
+checklist"). A full audit of WPT's `css/css-fonts` tree
+([`docs/coverage.json`](coverage.json), rendered as
+[`docs/coverage.md`](coverage.md)) found that assumption wrong for `slnt`:
+WPT already has substantial, actively-run coverage there. It confirmed the
+opposite gap for `ital`: **zero** existing WPT tests touch the `ital` axis
+at all.
+
+This repo's scope is now, in priority order:
+
+1. Catalog and continuously track existing WPT `slnt`/oblique coverage
+   against wpt.fyi's live results (`docs/coverage.md` +
+   `results/upstream-matrix.md`, kept current by
+   `scripts/sync-wpt-results.py` — see README.md's "Live coverage
+   dashboard").
+2. Supply the tests WPT is missing for the confirmed `ital`-axis gap
+   (`tests/ital-axis/`) — this is the one place this repo still authors new
+   coverage rather than tracking existing coverage.
+
+The two worked examples under `tests/font-style-oblique/` stay as-is (they
+predate this scope update and remain valid, reviewed evidence — see
+`docs/findings.md`), but the "Coverage checklist" below is no longer a plan
+to write all 13 items as new tests; most of that ground is already covered
+upstream per `docs/coverage.md`. Treat the checklist as historical context
+for what v2 considered in scope, not a current task list.
 
 Reference: https://fonts.vizchitra.com/compat
 Available on GitHub: https://github.com/vizchitra/fonts

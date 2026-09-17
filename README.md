@@ -1,16 +1,31 @@
 # Oblique
 
-Variable font oblique interop — reproducible, upstreamable interoperability
-tests for `slnt`/`ital` axis handling and font synthesis, feeding a future
+Variable font oblique interop — font- and vendor-neutral tracking of CSS
+Fonts 4 `slnt`/`ital` axis matching interoperability, feeding a future
 [web-platform-tests/interop](https://github.com/web-platform-tests/interop)
-proposal. Font- and vendor-neutral: the VizChitra/Cairo font compatibility
-investigation ([fonts.vizchitra.com/compat](https://fonts.vizchitra.com/compat),
+proposal. The VizChitra/Cairo font compatibility investigation
+([fonts.vizchitra.com/compat](https://fonts.vizchitra.com/compat),
 [github.com/vizchitra/fonts](https://github.com/vizchitra/fonts)) is the
 motivating case, not the subject.
 
+This repo does two things:
+
+1. **Catalogs and continuously tracks existing WPT coverage** of
+   oblique/`slnt`/`ital` matching — [`docs/coverage.md`](docs/coverage.md)
+   lists every relevant upstream test, and
+   [`results/upstream-matrix.md`](results/upstream-matrix.md) has their live
+   per-engine pass/fail, synced from [wpt.fyi](https://wpt.fyi) on a
+   schedule (see "Live coverage dashboard" below). Turns out WPT already
+   covers `slnt` fairly well; it covers `ital` **not at all**.
+2. **Supplies the tests upstream WPT is missing** for that confirmed
+   `ital`-axis gap — a small set of novel tests under `tests/ital-axis/`,
+   staged for upstreaming, following the same worked-example methodology as
+   the rest of this repo.
+
 Full build spec: [`docs/spec.md`](docs/spec.md). Execution plan:
 [`docs/plan.md`](docs/plan.md). Prior-art status and results:
-[`docs/findings.md`](docs/findings.md).
+[`docs/findings.md`](docs/findings.md). Coverage catalog:
+[`docs/coverage.md`](docs/coverage.md).
 
 ## Non-goals
 
@@ -170,27 +185,82 @@ convention) — e.g. `--real-device --notes "iPhone XR, Safari 18.7"`. Desktop
 Safari via `safaridriver` is not a real device; see the caveat above before
 recording anything from it at all.
 
+## Live coverage dashboard
+
+[`docs/coverage.json`](docs/coverage.json) catalogs every existing upstream
+WPT test relevant to oblique/`slnt`/`ital` (path, spec assertion, which axis
+it touches, whether it plausibly probes WebKit #209565's documented failure
+modes), built by walking the vendored `css/css-fonts` tree directly — not
+sampled from search results. It also records the confirmed absence of any
+`ital`-axis test anywhere upstream, with the search method used.
+
+`scripts/sync-wpt-results.py` queries [wpt.fyi's public API](https://wpt.fyi/api)
+for the latest-stable Chrome/Firefox/Safari run and writes structured,
+per-test results to `results/upstream.json` — this is the **only** path
+results enter the repo for upstream tests; nothing here is hand-transcribed.
+It fails loudly (non-zero exit) on any API error rather than publish
+partial or stale data as current.
+
+`scripts/render-coverage-docs.py` renders `docs/coverage.md` and
+`results/upstream-matrix.md` from that JSON, and copies both JSON files into
+`docs/dashboard/data/` for the static dashboard page
+(`docs/dashboard/index.html`) to fetch client-side. The dashboard groups
+tests by axis, shows current pass/fail per engine, and — importantly —
+states the `ital`-axis gap explicitly rather than leaving it as something a
+reader has to infer from an empty section. It reads only committed JSON
+snapshots (never calls wpt.fyi live from the browser), so staleness is
+visible via a prominent last-synced timestamp rather than silently assumed
+current.
+
+A scheduled GitHub Actions workflow
+([`.github/workflows/sync-wpt-results.yml`](.github/workflows/sync-wpt-results.yml))
+re-runs both scripts daily and commits the refreshed data. To run the sync
+manually:
+
+```
+uv run scripts/sync-wpt-results.py
+uv run scripts/render-coverage-docs.py
+```
+
+`results/upstream-matrix.md` (wpt.fyi-sourced, continuous, for pre-existing
+upstream tests) is intentionally kept separate from
+`results/browser-matrix.md` (this repo's own local WPT-runner results, for
+its own novel tests) — one is "wpt.fyi ran this continuously upstream," the
+other is "we ran this ourselves"; merging them would misrepresent
+provenance.
+
 ## Repo structure
 
 ```
 oblique/
 ├── LICENSE                  # BSD-3-Clause (required for WPT upstreaming)
 ├── README.md
+├── .github/workflows/
+│   └── sync-wpt-results.yml # daily wpt.fyi sync, commits refreshed data
 ├── scripts/
-│   ├── setup-wpt.sh         # vendors a scoped, gitignored .wpt/ checkout
-│   └── record-results.py    # parses wptreport JSON into browser-matrix.md
+│   ├── setup-wpt.sh          # vendors a scoped, gitignored .wpt/ checkout
+│   ├── record-results.py     # parses wptreport JSON into browser-matrix.md
+│   ├── sync-wpt-results.py   # pulls live upstream results from wpt.fyi
+│   └── render-coverage-docs.py  # renders coverage.md/upstream-matrix.md/dashboard data
 ├── tests/
 │   ├── font-style-oblique/
 │   ├── oblique-range/
 │   ├── synthesis/
 │   ├── variation-settings/
-│   └── ital-axis/
+│   └── ital-axis/            # the confirmed WPT gap this repo fills
 ├── docs/
 │   ├── spec.md
 │   ├── plan.md
-│   └── findings.md
+│   ├── findings.md
+│   ├── coverage.md           # generated — see coverage.json
+│   ├── coverage.json         # source of truth for the coverage catalog
+│   └── dashboard/
+│       ├── index.html        # static live-coverage dashboard
+│       └── data/              # generated copies of coverage.json/upstream.json
 └── results/
-    └── browser-matrix.md
+    ├── browser-matrix.md      # this repo's own local WPT-runner results
+    ├── upstream-matrix.md     # generated — see upstream.json
+    └── upstream.json          # wpt.fyi-synced data, source of truth for the above
 ```
 
 No WPT checkout is committed to this repo — WPT is external test-runner

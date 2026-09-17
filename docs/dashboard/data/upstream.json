@@ -1,0 +1,515 @@
+{
+  "synced_at": "2026-09-17T22:55:45.234045+00:00",
+  "run_metadata": {
+    "chrome": {
+      "id": 5204236987269120,
+      "browser_version": "153.0.8010.47",
+      "created_at": "2026-09-17T10:45:37.574586Z"
+    },
+    "firefox": {
+      "id": 5096862033117184,
+      "browser_version": "156.0",
+      "created_at": "2026-09-17T10:21:18.768848Z"
+    },
+    "safari": {
+      "id": 6240852912635904,
+      "browser_version": "27.0 (22625.1.29.11.27)",
+      "created_at": "2026-09-17T11:11:40.777977Z"
+    }
+  },
+  "tests": [
+    {
+      "path": "css/css-fonts/variations/slnt-variable.html",
+      "results": {
+        "chrome": {
+          "status": "PASS",
+          "browser_version": "153.0.8010.47"
+        },
+        "firefox": {
+          "status": "PASS",
+          "browser_version": "156.0"
+        },
+        "safari": {
+          "status": "PASS",
+          "browser_version": "27.0 (22625.1.29.11.27)"
+        }
+      }
+    },
+    {
+      "path": "css/css-fonts/variations/slnt-backslant-variable.html",
+      "results": {
+        "chrome": {
+          "status": "PASS",
+          "browser_version": "153.0.8010.47"
+        },
+        "firefox": {
+          "status": "PASS",
+          "browser_version": "156.0"
+        },
+        "safari": {
+          "status": "PASS",
+          "browser_version": "27.0 (22625.1.29.11.27)"
+        }
+      }
+    },
+    {
+      "path": "css/css-fonts/variations/font-slant-1.html",
+      "results": {
+        "chrome": {
+          "status": "PASS",
+          "browser_version": "153.0.8010.47"
+        },
+        "firefox": {
+          "status": "PASS",
+          "browser_version": "156.0"
+        },
+        "safari": {
+          "status": "PASS",
+          "browser_version": "27.0 (22625.1.29.11.27)"
+        }
+      }
+    },
+    {
+      "path": "css/css-fonts/variations/font-slant-2a.html",
+      "results": {
+        "chrome": {
+          "status": "PASS",
+          "browser_version": "153.0.8010.47"
+        },
+        "firefox": {
+          "status": "PASS",
+          "browser_version": "156.0"
+        },
+        "safari": {
+          "status": "PASS",
+          "browser_version": "27.0 (22625.1.29.11.27)"
+        }
+      }
+    },
+    {
+      "path": "css/css-fonts/variations/font-slant-2b.html",
+      "results": {
+        "chrome": {
+          "status": "PASS",
+          "browser_version": "153.0.8010.47"
+        },
+        "firefox": {
+          "status": "PASS",
+          "browser_version": "156.0"
+        },
+        "safari": {
+          "status": "PASS",
+          "browser_version": "27.0 (22625.1.29.11.27)"
+        }
+      }
+    },
+    {
+      "path": "css/css-fonts/variations/font-slant-2c.html",
+      "results": {
+        "chrome": {
+          "status": "PASS",
+          "browser_version": "153.0.8010.47"
+        },
+        "firefox": {
+          "status": "PASS",
+          "browser_version": "156.0"
+        },
+        "safari": {
+          "status": "PASS",
+          "browser_version": "27.0 (22625.1.29.11.27)"
+        }
+      }
+    },
+    {
+      "path": "css/css-fonts/variations/font-slant-3.html",
+      "results": {
+        "chrome": {
+          "status": "PASS",
+          "browser_version": "153.0.8010.47"
+        },
+        "firefox": {
+          "status": "PASS",
+          "browser_version": "156.0"
+        },
+        "safari": {
+          "status": "PASS",
+          "browser_version": "27.0 (22625.1.29.11.27)"
+        }
+      }
+    },
+    {
+      "path": "css/css-fonts/variations/at-font-face-font-matching.html",
+      "results": {
+        "chrome": {
+          "status": "OK",
+          "browser_version": "153.0.8010.47"
+        },
+        "firefox": {
+          "status": "OK",
+          "browser_version": "156.0"
+        },
+        "safari": {
+          "status": "OK",
+          "browser_version": "27.0 (22625.1.29.11.27)"
+        }
+      }
+    },
+    {
+      "path": "css/css-fonts/variations/font-style-parsing.html",
+      "results": {
+        "chrome": {
+          "status": "OK",
+          "browser_version": "153.0.8010.47"
+        },
+        "firefox": {
+          "status": "OK",
+          "browser_version": "156.0"
+        },
+        "safari": {
+          "status": "OK",
+          "browser_version": "27.0 (22625.1.29.11.27)"
+        }
+      }
+    },
+    {
+      "path": "css/css-fonts/variations/font-style-interpolation.html",
+      "results": {
+        "chrome": {
+          "status": "OK",
+          "browser_version": "153.0.8010.47"
+        },
+        "firefox": {
+          "status": "OK",
+          "browser_version": "156.0"
+        },
+        "safari": {
+          "status": "OK",
+          "browser_version": "27.0 (22625.1.29.11.27)"
+        }
+      }
+    },
+    {
+      "path": "css/css-fonts/animations/font-style-interpolation.html",
+      "results": {
+        "chrome": {
+          "status": "OK",
+          "browser_version": "153.0.8010.47"
+        },
+        "firefox": {
+          "status": "OK",
+          "browser_version": "156.0"
+        },
+        "safari": {
+          "status": "OK",
+          "browser_version": "27.0 (22625.1.29.11.27)"
+        }
+      }
+    },
+    {
+      "path": "css/css-fonts/font-face-style-auto-variable.html",
+      "results": {
+        "chrome": {
+          "status": "PASS",
+          "browser_version": "153.0.8010.47"
+        },
+        "firefox": {
+          "status": "PASS",
+          "browser_version": "156.0"
+        },
+        "safari": {
+          "status": "PASS",
+          "browser_version": "27.0 (22625.1.29.11.27)"
+        }
+      }
+    },
+    {
+      "path": "css/css-fonts/font-face-style-default-variable.html",
+      "results": {
+        "chrome": {
+          "status": "PASS",
+          "browser_version": "153.0.8010.47"
+        },
+        "firefox": {
+          "status": "PASS",
+          "browser_version": "156.0"
+        },
+        "safari": {
+          "status": "PASS",
+          "browser_version": "27.0 (22625.1.29.11.27)"
+        }
+      }
+    },
+    {
+      "path": "css/css-fonts/font-variation-settings-descriptor-01.html",
+      "results": {
+        "chrome": {
+          "status": "PASS",
+          "browser_version": "153.0.8010.47"
+        },
+        "firefox": {
+          "status": "PASS",
+          "browser_version": "156.0"
+        },
+        "safari": {
+          "status": "FAIL",
+          "browser_version": "27.0 (22625.1.29.11.27)"
+        }
+      }
+    },
+    {
+      "path": "css/css-fonts/parsing/font-variation-settings-valid.html",
+      "results": {
+        "chrome": {
+          "status": "OK",
+          "browser_version": "153.0.8010.47"
+        },
+        "firefox": {
+          "status": "OK",
+          "browser_version": "156.0"
+        },
+        "safari": {
+          "status": "OK",
+          "browser_version": "27.0 (22625.1.29.11.27)"
+        }
+      }
+    },
+    {
+      "path": "css/css-fonts/synthetic-oblique-out-of-capabilities-range.html",
+      "results": {
+        "chrome": {
+          "status": "PASS",
+          "browser_version": "153.0.8010.47"
+        },
+        "firefox": {
+          "status": "PASS",
+          "browser_version": "156.0"
+        },
+        "safari": {
+          "status": "PASS",
+          "browser_version": "27.0 (22625.1.29.11.27)"
+        }
+      }
+    },
+    {
+      "path": "css/css-fonts/font-style-angle.html",
+      "results": {
+        "chrome": {
+          "status": "OK",
+          "browser_version": "153.0.8010.47"
+        },
+        "firefox": {
+          "status": "OK",
+          "browser_version": "156.0"
+        },
+        "safari": {
+          "status": "OK",
+          "browser_version": "27.0 (22625.1.29.11.27)"
+        }
+      }
+    },
+    {
+      "path": "css/css-fonts/font-style-sign-function.html",
+      "results": {
+        "chrome": {
+          "status": "OK",
+          "browser_version": "153.0.8010.47"
+        },
+        "firefox": {
+          "status": "OK",
+          "browser_version": "156.0"
+        },
+        "safari": {
+          "status": "OK",
+          "browser_version": "27.0 (22625.1.29.11.27)"
+        }
+      }
+    },
+    {
+      "path": "css/css-fonts/test-synthetic-italic.html",
+      "results": {
+        "chrome": {
+          "status": "PASS",
+          "browser_version": "153.0.8010.47"
+        },
+        "firefox": {
+          "status": "PASS",
+          "browser_version": "156.0"
+        },
+        "safari": {
+          "status": "PASS",
+          "browser_version": "27.0 (22625.1.29.11.27)"
+        }
+      }
+    },
+    {
+      "path": "css/css-fonts/test-synthetic-italic-2.html",
+      "results": {
+        "chrome": {
+          "status": "FAIL",
+          "browser_version": "153.0.8010.47"
+        },
+        "firefox": {
+          "status": "PASS",
+          "browser_version": "156.0"
+        },
+        "safari": {
+          "status": "FAIL",
+          "browser_version": "27.0 (22625.1.29.11.27)"
+        }
+      }
+    },
+    {
+      "path": "css/css-fonts/test-synthetic-italic-3.html",
+      "results": {
+        "chrome": {
+          "status": "FAIL",
+          "browser_version": "153.0.8010.47"
+        },
+        "firefox": {
+          "status": "FAIL",
+          "browser_version": "156.0"
+        },
+        "safari": {
+          "status": "FAIL",
+          "browser_version": "27.0 (22625.1.29.11.27)"
+        }
+      }
+    },
+    {
+      "path": "css/css-fonts/font-synthesis-style.html",
+      "results": {
+        "chrome": {
+          "status": "PASS",
+          "browser_version": "153.0.8010.47"
+        },
+        "firefox": {
+          "status": "PASS",
+          "browser_version": "156.0"
+        },
+        "safari": {
+          "status": "PASS",
+          "browser_version": "27.0 (22625.1.29.11.27)"
+        }
+      }
+    },
+    {
+      "path": "css/css-fonts/font-synthesis-style-oblique-only.html",
+      "results": {
+        "chrome": {
+          "status": "FAIL",
+          "browser_version": "153.0.8010.47"
+        },
+        "firefox": {
+          "status": "PASS",
+          "browser_version": "156.0"
+        },
+        "safari": {
+          "status": "FAIL",
+          "browser_version": "27.0 (22625.1.29.11.27)"
+        }
+      }
+    },
+    {
+      "path": "css/css-fonts/font-synthesis-style-binary.html",
+      "results": {
+        "chrome": {
+          "status": "PASS",
+          "browser_version": "153.0.8010.47"
+        },
+        "firefox": {
+          "status": "PASS",
+          "browser_version": "156.0"
+        },
+        "safari": {
+          "status": "PASS",
+          "browser_version": "27.0 (22625.1.29.11.27)"
+        }
+      }
+    },
+    {
+      "path": "css/css-fonts/italic-oblique-fallback.html",
+      "results": {
+        "chrome": {
+          "status": "FAIL",
+          "browser_version": "153.0.8010.47"
+        },
+        "firefox": {
+          "status": "PASS",
+          "browser_version": "156.0"
+        },
+        "safari": {
+          "status": "PASS",
+          "browser_version": "27.0 (22625.1.29.11.27)"
+        }
+      }
+    },
+    {
+      "path": "css/css-fonts/oblique-last-resort-weight-selection.html",
+      "results": {
+        "chrome": {
+          "status": "PASS",
+          "browser_version": "153.0.8010.47"
+        },
+        "firefox": {
+          "status": "FAIL",
+          "browser_version": "156.0"
+        },
+        "safari": {
+          "status": "PASS",
+          "browser_version": "27.0 (22625.1.29.11.27)"
+        }
+      }
+    },
+    {
+      "path": "css/css-fonts/oblique-request-italic-only-family-no-crash.html",
+      "results": {
+        "chrome": {
+          "status": "PASS",
+          "browser_version": "153.0.8010.47"
+        },
+        "firefox": {
+          "status": "PASS",
+          "browser_version": "156.0"
+        },
+        "safari": {
+          "status": "PASS",
+          "browser_version": "27.0 (22625.1.29.11.27)"
+        }
+      }
+    },
+    {
+      "path": "css/css-fonts/matching/style-ranges-over-weight-direction.html",
+      "results": {
+        "chrome": {
+          "status": "PASS",
+          "browser_version": "153.0.8010.47"
+        },
+        "firefox": {
+          "status": "PASS",
+          "browser_version": "156.0"
+        },
+        "safari": {
+          "status": "FAIL",
+          "browser_version": "27.0 (22625.1.29.11.27)"
+        }
+      }
+    },
+    {
+      "path": "css/css-fonts/matching/range-descriptor-reversed.html",
+      "results": {
+        "chrome": {
+          "status": "PASS",
+          "browser_version": "153.0.8010.47"
+        },
+        "firefox": {
+          "status": "PASS",
+          "browser_version": "156.0"
+        },
+        "safari": {
+          "status": "PASS",
+          "browser_version": "27.0 (22625.1.29.11.27)"
+        }
+      }
+    }
+  ]
+}

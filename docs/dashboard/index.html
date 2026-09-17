@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Oblique — WPT coverage dashboard</title>
+<style>
+  :root {
+    color-scheme: light dark;
+    --pass: #1a7f37;
+    --fail: #cf222e;
+    --other: #9a6700;
+    --border: #d0d7de;
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    max-width: 960px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    line-height: 1.5;
+  }
+  h1 { margin-bottom: 0.25rem; }
+  .subtitle { color: #666; margin-top: 0; }
+  .staleness {
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.75rem 1rem;
+    margin: 1rem 0;
+    font-size: 0.95rem;
+  }
+  .staleness.stale { border-color: var(--fail); background: color-mix(in srgb, var(--fail) 8%, transparent); }
+  .gap-callout {
+    border: 1px solid var(--other);
+    background: color-mix(in srgb, var(--other) 8%, transparent);
+    border-radius: 6px;
+    padding: 1rem;
+    margin: 1.5rem 0;
+  }
+  table { border-collapse: collapse; width: 100%; margin: 1rem 0; font-size: 0.9rem; }
+  th, td { border: 1px solid var(--border); padding: 0.4rem 0.6rem; text-align: left; }
+  th { background: color-mix(in srgb, currentColor 5%, transparent); }
+  code { font-size: 0.85em; }
+  .status-PASS, .status-OK { color: var(--pass); font-weight: 600; }
+  .status-FAIL, .status-ERROR, .status-CRASH, .status-TIMEOUT { color: var(--fail); font-weight: 600; }
+  .status-none { color: var(--other); }
+  .axis-group h2 { margin-top: 2.5rem; border-bottom: 2px solid var(--border); padding-bottom: 0.25rem; }
+  footer { margin-top: 3rem; color: #666; font-size: 0.85rem; }
+</style>
+</head>
+<body>
+  <h1>Oblique: WPT coverage dashboard</h1>
+  <p class="subtitle">
+    Live-tracked pass/fail for every existing WPT test touching
+    <code>font-style: oblique</code> / <code>slnt</code> / <code>ital</code>
+    axis matching, scoped specifically to that — not a general WPT browser
+    (that's <a href="https://wpt.fyi">wpt.fyi</a> itself). Source:
+    <a href="https://github.com/vizchitra/oblique">github.com/vizchitra/oblique</a>.
+  </p>
+
+  <div id="staleness" class="staleness">Loading…</div>
+
+  <div id="gap" class="gap-callout" hidden></div>
+
+  <div id="groups"></div>
+
+  <footer>
+    Data: <code>docs/coverage.json</code> (this repo's manual audit) +
+    <code>results/upstream.json</code> (synced from
+    <a href="https://wpt.fyi">wpt.fyi</a>'s public API by
+    <code>scripts/sync-wpt-results.py</code>, refreshed on a schedule — see
+    <code>.github/workflows/sync-wpt-results.yml</code>). This page reads
+    committed JSON snapshots, not a live client-side call to wpt.fyi.
+  </footer>
+
+<script>
+async function loadJSON(path) {
+  const res = await fetch(path);
+  if (!res.ok) throw new Error(`${path}: HTTP ${res.status}`);
+  return res.json();
+}
+
+function statusClass(status) {
+  if (!status) return "status-none";
+  return "status-" + status;
+}
+
+function renderStaleness(upstream) {
+  const el = document.getElementById("staleness");
+  if (!upstream) {
+    el.textContent = "No synced results yet — results/upstream.json has not been generated.";
+    el.classList.add("stale");
+    return;
+  }
+  const syncedAt = new Date(upstream.synced_at);
+  const ageHours = (Date.now() - syncedAt.getTime()) / 36e5;
+  const versions = Object.entries(upstream.run_metadata)
+    .map(([p, m]) => `${p} ${m.browser_version}`)
+    .join(", ");
+  el.textContent = `Last synced: ${syncedAt.toISOString()} (${ageHours.toFixed(1)}h ago) — ${versions}`;
+  if (ageHours > 24 * 8) {
+    el.classList.add("stale");
+    el.textContent += " — this looks stale; treat results below as unverified, not current.";
+  }
+}
+
+function renderGap(coverage) {
+  const el = document.getElementById("gap");
+  const gap = coverage.ital_axis_gap;
+  el.hidden = false;
+  el.innerHTML = `<strong>Confirmed gap:</strong> ${gap.claim} ` +
+    `(verified ${gap.verified_at}). No existing WPT test exercises the ` +
+    `<code>ital</code> axis at all — this repo's own tests under ` +
+    `<code>tests/ital-axis/</code> are the only coverage anywhere.`;
+}
+
+function resultsByPath(upstream) {
+  const map = new Map();
+  if (!upstream) return map;
+  for (const t of upstream.tests) map.set(t.path, t.results);
+  return map;
+}
+
+function renderGroups(coverage, upstream) {
+  const byPath = resultsByPath(upstream);
+  const groups = { slnt: [], ital: [], both: [], neither: [] };
+  for (const t of coverage.tests) groups[t.axis].push(t);
+
+  const container = document.getElementById("groups");
+  const order = ["slnt", "ital", "both", "neither"];
+  const labels = {
+    slnt: "slnt axis",
+    ital: "ital axis",
+    both: "both axes",
+    neither: "neither axis (parsing / general matching)",
+  };
+
+  for (const axis of order) {
+    const tests = groups[axis];
+    if (tests.length === 0) continue;
+    const section = document.createElement("div");
+    section.className = "axis-group";
+    const rows = tests.map(t => {
+      const r = byPath.get(t.path);
+      const chrome = r ? r.chrome.status : null;
+      const firefox = r ? r.firefox.status : null;
+      const safari = r ? r.safari.status : null;
+      return `<tr>
+        <td><code>${t.path}</code></td>
+        <td>${t.title}</td>
+        <td>${t.probes_209565 ? "yes" : "no"}</td>
+        <td class="${statusClass(chrome)}">${chrome || "—"}</td>
+        <td class="${statusClass(firefox)}">${firefox || "—"}</td>
+        <td class="${statusClass(safari)}">${safari || "—"}</td>
+      </tr>`;
+    }).join("");
+    section.innerHTML = `
+      <h2>${labels[axis]} (${tests.length})</h2>
+      <table>
+        <thead><tr>
+          <th>Test</th><th>Assertion</th><th>Probes #209565?</th>
+          <th>Chrome</th><th>Firefox</th><th>Safari</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>`;
+    container.appendChild(section);
+  }
+}
+
+(async () => {
+  try {
+    const coverage = await loadJSON("data/coverage.json");
+    let upstream = null;
+    try {
+      upstream = await loadJSON("data/upstream.json");
+    } catch (e) {
+      console.warn("upstream.json not available yet:", e);
+    }
+    renderStaleness(upstream);
+    renderGap(coverage);
+    renderGroups(coverage, upstream);
+  } catch (e) {
+    document.getElementById("staleness").textContent =
+      "Failed to load dashboard data: " + e.message;
+    document.getElementById("staleness").classList.add("stale");
+  }
+})();
+</script>
+</body>
+</html>
