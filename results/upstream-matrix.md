@@ -4,7 +4,7 @@ Generated from `results/upstream.json` by `scripts/render-coverage-docs.py` — 
 
 **This table is wpt.fyi's own continuous-integration data for pre-existing upstream WPT tests catalogued in [`docs/coverage.md`](../docs/coverage.md), fetched via `scripts/sync-wpt-results.py`.** It is a separate data source from [`results/browser-matrix.md`](browser-matrix.md), which records only tests *this repo* ran locally via the official WPT runner. Never merge the two — one is "we ran this ourselves," the other is "wpt.fyi ran this continuously upstream," and conflating them misrepresents provenance.
 
-**Last synced: 2026-09-17T22:55:45.234045+00:00** (chrome: 153.0.8010.47, firefox: 156.0, safari: 27.0 (22625.1.29.11.27)). If this timestamp looks old, the scheduled sync (see `.github/workflows/sync-wpt-results.yml`) may have stopped — treat stale data as unverified, not as current status.
+**Last synced: 2026-09-17T23:17:00.884814+00:00** (chrome: 153.0.8010.47, firefox: 156.0, safari: 27.0 (22625.1.29.11.27)). If this timestamp looks old, the scheduled sync (see `.github/workflows/sync-wpt-results.yml`) may have stopped — treat stale data as unverified, not as current status.
 
 | Path | Chrome | Firefox | Safari |
 |---|---|---|---|
@@ -37,3 +37,11 @@ Generated from `results/upstream.json` by `scripts/render-coverage-docs.py` — 
 | `css/css-fonts/oblique-request-italic-only-family-no-crash.html` | PASS | PASS | PASS |
 | `css/css-fonts/matching/style-ranges-over-weight-direction.html` | PASS | PASS | FAIL |
 | `css/css-fonts/matching/range-descriptor-reversed.html` | PASS | PASS | PASS |
+| `css/css-fonts/variations/font-variation-settings-inherit.html` | OK | OK | OK |
+| `css/css-fonts/variations/font-descriptor-range-reversed.html` | PASS | PASS | PASS |
+| `css/css-fonts/variations/font-descriptor-range-reversed-002.html` | PASS | PASS | PASS |
+| `css/css-fonts/variations/font-parse-numeric-stretch-style-weight.html` | OK | OK | OK |
+| `css/css-fonts/font-face-range-order.html` | OK | OK | OK |
+| `css/css-fonts/matching/fixed-stretch-style-over-weight.html` | PASS | PASS | FAIL |
+| `css/css-fonts/matching/stretch-distance-over-weight-distance.html` | PASS | PASS | FAIL |
+| `css/css-fonts/variations/font-shorthand.html` | OK | OK | OK |

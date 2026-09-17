@@ -206,11 +206,24 @@ per-engine results sourced from [wpt.fyi](https://wpt.fyi)._
 This repo's original plan (spec.md v2) assumed WPT had little coverage of
 oblique/`slnt` matching and planned to write new tests across five
 categories from scratch. A direct walk of the vendored `css/css-fonts` tree
-(not a search-snippet sample) found that assumption wrong: **29 existing
+(not a search-snippet sample) found that assumption wrong: **37 existing
 upstream tests** touch `slnt`, oblique matching, or closely related
 synthesis/parsing — several (`slnt-variable.html`, `slnt-backslant-variable.html`,
 `font-slant-1/2a/2b/2c/3.html`, `synthetic-oblique-out-of-capabilities-range.html`)
 plausibly probe the same signed-angle failure mode WebKit #209565 documents.
+
+`docs/coverage.json`'s `checklist_mapping` cross-references every one of
+spec.md's original 14-item coverage checklist against this catalog (broader
+than the `probes_209565` flag — an item can be fully covered without any
+single test targeting that specific bug). Result: **12 of 14 items are
+covered** (10 upstream, 2 by this repo's own `ital`-axis tests only). Two
+are confirmed, currently-open gaps, neither upstream nor here: no font
+anywhere exposes both a real `slnt` axis and a real `ital` axis together
+(needed to directly test #12836's independence claim in its strongest
+form), and no test pairs `font-style` with an explicit
+`font-variation-settings` axis override on the same declaration. Both are
+candidate next worked examples — see `docs/coverage.md`'s "Coverage
+checklist status" table for the full breakdown.
 
 The same audit confirmed the inverse for `ital`: **zero** existing WPT tests
 anywhere under `css/css-fonts/` reference the `ital` variation axis in any

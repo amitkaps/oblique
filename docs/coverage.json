@@ -205,6 +205,62 @@
       "axis": "neither",
       "probes_209565": false,
       "notes": "Reversed-range normalization for @font-face descriptors in general (weight/stretch/style), not slnt/ital specific."
+    },
+    {
+      "path": "css/css-fonts/variations/font-variation-settings-inherit.html",
+      "title": "Testing the inheritance of the font-variation-settings property",
+      "axis": "neither",
+      "probes_209565": false,
+      "notes": "font-variation-settings inheritance/replacement mechanics in general (any axis) — directly relevant to coverage-checklist item 'ancestor font-variation-settings inheritance/replacement behavior', not slnt/ital specific itself."
+    },
+    {
+      "path": "css/css-fonts/variations/font-descriptor-range-reversed.html",
+      "title": "CSS Test: Matching @font-face font-weight, font-style, and font-stretch descriptors with reversed ranges",
+      "axis": "neither",
+      "probes_209565": false,
+      "notes": "font-style ranges (among weight/stretch/style together) declared in @font-face with a reversed range — covers checklist item 'font-style ranges declared in @font-face' as part of a three-property test, not style-only."
+    },
+    {
+      "path": "css/css-fonts/variations/font-descriptor-range-reversed-002.html",
+      "title": "CSS Test: Matching @font-face font-weight, font-style, and font-stretch descriptors with reversed ranges",
+      "axis": "neither",
+      "probes_209565": false,
+      "notes": "Second variant of font-descriptor-range-reversed.html."
+    },
+    {
+      "path": "css/css-fonts/variations/font-parse-numeric-stretch-style-weight.html",
+      "title": "(no <title>/<meta assert> — see file)",
+      "axis": "slnt",
+      "probes_209565": false,
+      "notes": "Parses/validates oblique <angle> syntax including signed-angle boundary values (-90deg/-91deg, -100/100 in font shorthand) — parsing-level, not the runtime matching algorithm #209565 concerns, but the closest upstream test to signed-angle *syntax* correctness."
+    },
+    {
+      "path": "css/css-fonts/font-face-range-order.html",
+      "title": "CSS Fonts Module Level 3: Order of values in @font-face range descriptors",
+      "axis": "neither",
+      "probes_209565": false,
+      "notes": "Reverse-order range values allowed in @font-face descriptors generally (weight/stretch/style) — relevant to 'font-style ranges declared in @font-face' checklist item."
+    },
+    {
+      "path": "css/css-fonts/matching/fixed-stretch-style-over-weight.html",
+      "title": "(no <title>/<meta assert> — see file)",
+      "axis": "neither",
+      "probes_209565": false,
+      "notes": "Font-matching precedence test (stretch over style, style over weight) among multiple candidate faces — relevant to checklist item 'separate normal/oblique faces (ambiguous-match hazard)'."
+    },
+    {
+      "path": "css/css-fonts/matching/stretch-distance-over-weight-distance.html",
+      "title": "(no <title>/<meta assert> — see file)",
+      "axis": "neither",
+      "probes_209565": false,
+      "notes": "Same precedence family as fixed-stretch-style-over-weight.html, varying stretch distance instead."
+    },
+    {
+      "path": "css/css-fonts/variations/font-shorthand.html",
+      "title": "Testing font shorthand for new values introduced in CSS Fonts level 4",
+      "axis": "slnt",
+      "probes_209565": false,
+      "notes": "Parses oblique <angle> (including signed and out-of-range values) inside the font shorthand property specifically, not the font-style longhand."
     }
   ],
   "ital_axis_gap": {
@@ -212,5 +268,90 @@
     "search_method": "find css/css-fonts -name '*.html' | xargs grep -l \"'ital'\" (and the double-quoted form) across the full sparse-checked-out tree (top level, variations/, animations/, matching/, parsing/), plus a filename-only grep for the 'ital' token, distinct from 'italic'/'oblique' substrings.",
     "result": "The only matches anywhere in the tree are this repo's own tests under css/css-fonts/variable-oblique-interop/ital-axis/ (copied there by scripts/setup-wpt.sh, not upstream WPT content). Zero matches upstream.",
     "verified_at": "2026-09-18"
+  },
+  "checklist_mapping": {
+    "$note": "Maps docs/spec.md's 14-item 'Coverage checklist' to actual coverage — upstream WPT tests (by path, cross-referencing the `tests` array above), this repo's own tests, or neither. This is broader than the probes_209565 flag on individual tests: a test can fully satisfy a checklist item without ever touching #209565's specific failure modes.",
+    "audited_at": "2026-09-18",
+    "items": [
+      {
+        "item": "font-style: oblique matching a variable slnt axis",
+        "status": "covered-upstream",
+        "tests": ["css/css-fonts/variations/slnt-variable.html", "css/css-fonts/variations/font-slant-1.html"]
+      },
+      {
+        "item": "Explicit oblique <angle> matching",
+        "status": "covered-upstream",
+        "tests": ["css/css-fonts/variations/font-slant-2a.html", "css/css-fonts/variations/font-slant-2b.html", "css/css-fonts/variations/font-slant-2c.html", "css/css-fonts/variations/slnt-backslant-variable.html", "css/css-fonts/variations/font-parse-numeric-stretch-style-weight.html"]
+      },
+      {
+        "item": "font-style ranges declared in @font-face",
+        "status": "covered-upstream",
+        "tests": ["css/css-fonts/variations/font-descriptor-range-reversed.html", "css/css-fonts/variations/font-descriptor-range-reversed-002.html", "css/css-fonts/font-face-range-order.html", "css/css-fonts/matching/range-descriptor-reversed.html"],
+        "notes": "All are combined weight/stretch/style range tests, not style-only, but style is exercised in each."
+      },
+      {
+        "item": "Bare oblique / default-angle (14deg) matching",
+        "status": "covered-upstream",
+        "tests": ["css/css-fonts/variations/font-slant-1.html"],
+        "notes": "Also covered by this repo's own tests/font-style-oblique/slnt-axis-activation.html (see docs/findings.md)."
+      },
+      {
+        "item": "italic vs oblique resolution differences",
+        "status": "covered-upstream",
+        "tests": ["css/css-fonts/italic-oblique-fallback.html", "css/css-fonts/oblique-request-italic-only-family-no-crash.html"],
+        "notes": "Covered for static (non-variable) faces only; the variable-axis version of this question is items below (ital-axis specific), which are NOT covered upstream."
+      },
+      {
+        "item": "italic on a font with only an ital axis (no slnt) — sets ital=1",
+        "status": "covered-by-this-repo-only",
+        "tests": ["tests/ital-axis/italic-no-extra-synthesis.html"],
+        "notes": "Zero upstream WPT coverage — part of the confirmed ital_axis_gap."
+      },
+      {
+        "item": "oblique on a font with only an ital axis — must NOT touch ital (per #12836)",
+        "status": "covered-by-this-repo-only",
+        "tests": ["tests/ital-axis/independence.html"],
+        "notes": "Zero upstream WPT coverage — part of the confirmed ital_axis_gap."
+      },
+      {
+        "item": "Font exposing both slnt and ital — confirms independence per #12836",
+        "status": "gap",
+        "tests": [],
+        "notes": "No font anywhere in WPT's corpus or this repo's own resources exposes both a real slnt axis and a real ital axis together (confirmed by filename/content search of both .wpt/css/css-fonts font resources and tests/*/resources) — this is a genuine, currently-open gap, and the strongest direct test of #12836's independence claim would require building one. Candidate next worked example."
+      },
+      {
+        "item": "Single variable face covering normal + oblique",
+        "status": "covered-upstream",
+        "tests": ["css/css-fonts/font-face-style-auto-variable.html", "css/css-fonts/font-face-style-default-variable.html"]
+      },
+      {
+        "item": "Separate normal/oblique faces (ambiguous-match hazard)",
+        "status": "covered-upstream",
+        "tests": ["css/css-fonts/matching/style-ranges-over-weight-direction.html", "css/css-fonts/matching/fixed-stretch-style-over-weight.html", "css/css-fonts/matching/stretch-distance-over-weight-distance.html"]
+      },
+      {
+        "item": "Font synthesis fallback behavior (font-synthesis)",
+        "status": "covered-upstream",
+        "tests": ["css/css-fonts/font-synthesis-style.html", "css/css-fonts/font-synthesis-style-oblique-only.html", "css/css-fonts/font-synthesis-style-binary.html", "css/css-fonts/test-synthetic-italic.html", "css/css-fonts/oblique-last-resort-weight-selection.html"],
+        "notes": "Covers font-synthesis fallback generally; the specific ital-axis spurious-synthesis failure mode (#209565) is only covered by this repo's tests/ital-axis/italic-no-extra-synthesis.html — see the probes_209565 flag on individual tests above."
+      },
+      {
+        "item": "Explicit font-variation-settings: 'slnt' <val> / 'ital' <val>",
+        "status": "partially-covered-upstream",
+        "tests": ["css/css-fonts/font-variation-settings-descriptor-01.html"],
+        "notes": "'slnt' explicit-value case is covered upstream. No upstream (or, currently, this-repo) test sets 'ital' explicitly via font-variation-settings — part of the ital_axis_gap."
+      },
+      {
+        "item": "font-style + explicit axis value paired (recommended pattern)",
+        "status": "gap",
+        "tests": [],
+        "notes": "No test found, upstream or in this repo, that pairs font-style with an explicit font-variation-settings axis override on the same declaration and checks the resulting precedence/consistency. Candidate next worked example."
+      },
+      {
+        "item": "Ancestor font-variation-settings inheritance/replacement behavior",
+        "status": "covered-upstream",
+        "tests": ["css/css-fonts/variations/font-variation-settings-inherit.html"]
+      }
+    ]
   }
 }

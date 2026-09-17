@@ -62,6 +62,43 @@ def render_coverage_md(coverage: dict) -> str:
         "filling a real gap in it.",
         "",
     ]
+
+    mapping = coverage.get("checklist_mapping")
+    if mapping:
+        lines += [
+            "## Coverage checklist status",
+            "",
+            "Cross-references every item in `docs/spec.md`'s 14-item "
+            "\"Coverage checklist\" against actual coverage — upstream WPT "
+            "tests, this repo's own tests, or neither. Broader than the "
+            "`probes_209565` flag above: an item can be fully covered "
+            "without any single test specifically probing #209565's "
+            "documented failure modes.",
+            "",
+            f"Audited {mapping['audited_at']}.",
+            "",
+            "| Checklist item | Status | Test(s) |",
+            "|---|---|---|",
+        ]
+        status_labels = {
+            "covered-upstream": "✅ covered (upstream WPT)",
+            "covered-by-this-repo-only": "🟡 covered (this repo only)",
+            "partially-covered-upstream": "🟡 partial (upstream WPT)",
+            "gap": "❌ gap",
+        }
+        for entry in mapping["items"]:
+            status = status_labels.get(entry["status"], entry["status"])
+            test_list = (
+                "<br>".join(f"`{t}`" for t in entry["tests"])
+                if entry["tests"]
+                else "—"
+            )
+            row = f"| {entry['item']} | {status} | {test_list} |"
+            lines.append(row)
+            if entry.get("notes"):
+                lines.append(f"| | | _{entry['notes']}_ |")
+        lines.append("")
+
     return "\n".join(lines)
 
 

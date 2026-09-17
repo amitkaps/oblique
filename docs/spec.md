@@ -33,7 +33,7 @@ This repo's scope is now, in priority order:
 The two worked examples under `tests/font-style-oblique/` stay as-is (they
 predate this scope update and remain valid, reviewed evidence — see
 `docs/findings.md`), but the "Coverage checklist" below is no longer a plan
-to write all 13 items as new tests; most of that ground is already covered
+to write all 14 items as new tests; most of that ground is already covered
 upstream per `docs/coverage.md`. Treat the checklist as historical context
 for what v2 considered in scope, not a current task list.
 

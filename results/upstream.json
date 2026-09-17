@@ -1,5 +1,5 @@
 {
-  "synced_at": "2026-09-17T22:55:45.234045+00:00",
+  "synced_at": "2026-09-17T23:17:00.884814+00:00",
   "run_metadata": {
     "chrome": {
       "id": 5204236987269120,
@@ -507,6 +507,142 @@
         },
         "safari": {
           "status": "PASS",
+          "browser_version": "27.0 (22625.1.29.11.27)"
+        }
+      }
+    },
+    {
+      "path": "css/css-fonts/variations/font-variation-settings-inherit.html",
+      "results": {
+        "chrome": {
+          "status": "OK",
+          "browser_version": "153.0.8010.47"
+        },
+        "firefox": {
+          "status": "OK",
+          "browser_version": "156.0"
+        },
+        "safari": {
+          "status": "OK",
+          "browser_version": "27.0 (22625.1.29.11.27)"
+        }
+      }
+    },
+    {
+      "path": "css/css-fonts/variations/font-descriptor-range-reversed.html",
+      "results": {
+        "chrome": {
+          "status": "PASS",
+          "browser_version": "153.0.8010.47"
+        },
+        "firefox": {
+          "status": "PASS",
+          "browser_version": "156.0"
+        },
+        "safari": {
+          "status": "PASS",
+          "browser_version": "27.0 (22625.1.29.11.27)"
+        }
+      }
+    },
+    {
+      "path": "css/css-fonts/variations/font-descriptor-range-reversed-002.html",
+      "results": {
+        "chrome": {
+          "status": "PASS",
+          "browser_version": "153.0.8010.47"
+        },
+        "firefox": {
+          "status": "PASS",
+          "browser_version": "156.0"
+        },
+        "safari": {
+          "status": "PASS",
+          "browser_version": "27.0 (22625.1.29.11.27)"
+        }
+      }
+    },
+    {
+      "path": "css/css-fonts/variations/font-parse-numeric-stretch-style-weight.html",
+      "results": {
+        "chrome": {
+          "status": "OK",
+          "browser_version": "153.0.8010.47"
+        },
+        "firefox": {
+          "status": "OK",
+          "browser_version": "156.0"
+        },
+        "safari": {
+          "status": "OK",
+          "browser_version": "27.0 (22625.1.29.11.27)"
+        }
+      }
+    },
+    {
+      "path": "css/css-fonts/font-face-range-order.html",
+      "results": {
+        "chrome": {
+          "status": "OK",
+          "browser_version": "153.0.8010.47"
+        },
+        "firefox": {
+          "status": "OK",
+          "browser_version": "156.0"
+        },
+        "safari": {
+          "status": "OK",
+          "browser_version": "27.0 (22625.1.29.11.27)"
+        }
+      }
+    },
+    {
+      "path": "css/css-fonts/matching/fixed-stretch-style-over-weight.html",
+      "results": {
+        "chrome": {
+          "status": "PASS",
+          "browser_version": "153.0.8010.47"
+        },
+        "firefox": {
+          "status": "PASS",
+          "browser_version": "156.0"
+        },
+        "safari": {
+          "status": "FAIL",
+          "browser_version": "27.0 (22625.1.29.11.27)"
+        }
+      }
+    },
+    {
+      "path": "css/css-fonts/matching/stretch-distance-over-weight-distance.html",
+      "results": {
+        "chrome": {
+          "status": "PASS",
+          "browser_version": "153.0.8010.47"
+        },
+        "firefox": {
+          "status": "PASS",
+          "browser_version": "156.0"
+        },
+        "safari": {
+          "status": "FAIL",
+          "browser_version": "27.0 (22625.1.29.11.27)"
+        }
+      }
+    },
+    {
+      "path": "css/css-fonts/variations/font-shorthand.html",
+      "results": {
+        "chrome": {
+          "status": "OK",
+          "browser_version": "153.0.8010.47"
+        },
+        "firefox": {
+          "status": "OK",
+          "browser_version": "156.0"
+        },
+        "safari": {
+          "status": "OK",
           "browser_version": "27.0 (22625.1.29.11.27)"
         }
       }

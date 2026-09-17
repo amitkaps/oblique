@@ -44,6 +44,12 @@
   .status-FAIL, .status-ERROR, .status-CRASH, .status-TIMEOUT { color: var(--fail); font-weight: 600; }
   .status-none { color: var(--other); }
   .axis-group h2 { margin-top: 2.5rem; border-bottom: 2px solid var(--border); padding-bottom: 0.25rem; }
+  #checklist h2 { margin-top: 2.5rem; border-bottom: 2px solid var(--border); padding-bottom: 0.25rem; }
+  .checklist-note { color: #666; font-size: 0.85rem; }
+  .pill { display: inline-block; padding: 0.1rem 0.5rem; border-radius: 999px; font-size: 0.8rem; font-weight: 600; }
+  .pill-covered { background: color-mix(in srgb, var(--pass) 15%, transparent); color: var(--pass); }
+  .pill-partial { background: color-mix(in srgb, var(--other) 15%, transparent); color: var(--other); }
+  .pill-gap { background: color-mix(in srgb, var(--fail) 15%, transparent); color: var(--fail); }
   footer { margin-top: 3rem; color: #666; font-size: 0.85rem; }
 </style>
 </head>
@@ -62,6 +68,8 @@
   <div id="gap" class="gap-callout" hidden></div>
 
   <div id="groups"></div>
+
+  <div id="checklist"></div>
 
   <footer>
     Data: <code>docs/coverage.json</code> (this repo's manual audit) +
@@ -166,6 +174,50 @@ function renderGroups(coverage, upstream) {
   }
 }
 
+function pillClass(status) {
+  if (status === "gap") return "pill pill-gap";
+  if (status === "covered-upstream" || status === "covered-by-this-repo-only") return "pill pill-covered";
+  return "pill pill-partial";
+}
+
+function pillLabel(status) {
+  return {
+    "covered-upstream": "covered — upstream WPT",
+    "covered-by-this-repo-only": "covered — this repo only",
+    "partially-covered-upstream": "partial — upstream WPT",
+    "gap": "gap",
+  }[status] || status;
+}
+
+function renderChecklist(coverage) {
+  const mapping = coverage.checklist_mapping;
+  const container = document.getElementById("checklist");
+  if (!mapping) { container.hidden = true; return; }
+
+  const rows = mapping.items.map(entry => {
+    const tests = entry.tests.length
+      ? entry.tests.map(t => `<code>${t}</code>`).join("<br>")
+      : "—";
+    const note = entry.notes ? `<div class="checklist-note">${entry.notes}</div>` : "";
+    return `<tr>
+      <td>${entry.item}</td>
+      <td><span class="${pillClass(entry.status)}">${pillLabel(entry.status)}</span></td>
+      <td>${tests}${note}</td>
+    </tr>`;
+  }).join("");
+
+  container.innerHTML = `
+    <h2>Coverage checklist status (${mapping.audited_at})</h2>
+    <p class="checklist-note">Every item from docs/spec.md's 14-item coverage
+      checklist, cross-referenced against actual test coverage — broader
+      than "probes #209565": an item can be fully covered without any
+      single test targeting that specific bug's failure modes.</p>
+    <table>
+      <thead><tr><th>Checklist item</th><th>Status</th><th>Test(s)</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+}
+
 (async () => {
   try {
     const coverage = await loadJSON("data/coverage.json");
@@ -178,6 +230,7 @@ function renderGroups(coverage, upstream) {
     renderStaleness(upstream);
     renderGap(coverage);
     renderGroups(coverage, upstream);
+    renderChecklist(coverage);
   } catch (e) {
     document.getElementById("staleness").textContent =
       "Failed to load dashboard data: " + e.message;
