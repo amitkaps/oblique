@@ -107,15 +107,25 @@ def render_coverage_md(coverage: dict) -> str:
             "Narrower than a raw checklist-item miss — each of these states "
             "exactly which combination of factors is untested, confirmed by "
             "reading the actual content of the closest candidate tests, not "
-            "by title or filename alone.",
+            "by title or filename alone. Ordered by priority: not all gaps "
+            "carry equal weight as motivating evidence — a gap traced to a "
+            "live, documented production bug is stronger evidence than "
+            "spec-completeness with no known real-world instance.",
             "",
             f"Audited {gaps['audited_at']}.",
             "",
         ]
-        for g in gaps["gaps"]:
+        sorted_gaps = sorted(
+            gaps["gaps"], key=lambda g: g.get("priority", 999)
+        )
+        for g in sorted_gaps:
+            priority = g.get("priority")
+            tier = g.get("evidence_tier")
+            heading = f"### {priority}. {g['id']}" if priority else f"### {g['id']}"
+            lines += [heading, ""]
+            if tier:
+                lines += [f"**Evidence tier:** {tier}", ""]
             lines += [
-                f"### {g['id']}",
-                "",
                 g["summary"],
                 "",
                 f"**Why it matters:** {g['why_it_matters']}",

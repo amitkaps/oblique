@@ -225,9 +225,11 @@ function renderConfirmedGaps(coverage) {
   const container = document.getElementById("confirmed-gaps");
   if (!data) { container.hidden = true; return; }
 
-  const cards = data.gaps.map(g => `
+  const sorted = [...data.gaps].sort((a, b) => (a.priority || 999) - (b.priority || 999));
+  const cards = sorted.map(g => `
     <div class="gap-callout" style="margin-top:1rem;">
-      <strong>${g.id}</strong>
+      <strong>${g.priority ? g.priority + ". " : ""}${g.id}</strong>
+      ${g.evidence_tier ? `<div class="checklist-note"><em>Evidence tier:</em> ${g.evidence_tier}</div>` : ""}
       <p>${g.summary}</p>
       <p><em>Why it matters:</em> ${g.why_it_matters}</p>
       <p><em>Candidate test:</em> ${g.candidate_test}</p>

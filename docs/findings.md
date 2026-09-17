@@ -264,8 +264,36 @@ Given this, the repo's ongoing value shifts from "write new tests broadly"
 to: track existing WPT coverage's live status via wpt.fyi
 (`scripts/sync-wpt-results.py`, scheduled daily,
 `results/upstream-matrix.md`), and keep authoring new tests specifically
-for the `ital`-axis gap. See `docs/spec.md`'s "Scope update (v3)" section
+for the confirmed gaps. See `docs/spec.md`'s "Scope update (v3)" section
 and README.md's "Live coverage dashboard" section for the mechanics.
+
+### Evidence tiers for the Interop proposal
+
+Not every gap carries equal weight as motivating evidence, and the proposal
+should say so explicitly rather than treat all findings as equally strong:
+
+1. **Proven, reproducible, live today:** `ital`-axis spurious synthesis —
+   `tests/ital-axis/italic-no-extra-synthesis.html` fails on Chrome 153,
+   passes on Firefox 156, dated and recorded in
+   `results/browser-matrix.md`.
+2. **Proven gap, root cause traced to a real font's real bug:** the
+   `auto-range-default-angle` gap (`docs/coverage.json`'s `confirmed_gaps`,
+   priority 1) — directly Cairo's own documented failure mode
+   (vizchitra-fonts/docs/compat.md), not yet a written test, but the
+   closest upstream test (`font-slant-1.html`) was checked and confirmed
+   not to cover it.
+3. **Confirmed gap, plausible real impact, not yet demonstrated live:**
+   the `font-style-plus-explicit-axis-pairing` gap (priority 2) — the
+   spec's own recommended author pattern is untested anywhere.
+4. **Confirmed absent, spec-completeness, no known real-world instance:**
+   the `combined-slnt-ital-font` gap (priority 3) — no shipping font is
+   known to expose both axes together; worth closing for completeness, not
+   as evidence of impact.
+
+Priority order for the next worked examples follows this tiering: write
+`auto-range-default-angle` first (tier 2, directly traceable to Cairo),
+then `font-style-plus-explicit-axis-pairing` (tier 3), and deprioritize
+`combined-slnt-ital-font` (tier 4) accordingly.
 
 ## 3. Proposed Interop scope statement
 
