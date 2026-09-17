@@ -1,2 +1,199 @@
-# oblique
-Variable Fonts Oblique Interop
+# Oblique
+
+Variable font oblique interop — reproducible, upstreamable interoperability
+tests for `slnt`/`ital` axis handling and font synthesis, feeding a future
+[web-platform-tests/interop](https://github.com/web-platform-tests/interop)
+proposal. Font- and vendor-neutral: the VizChitra/Cairo font compatibility
+investigation ([fonts.vizchitra.com/compat](https://fonts.vizchitra.com/compat),
+[github.com/vizchitra/fonts](https://github.com/vizchitra/fonts)) is the
+motivating case, not the subject.
+
+Full build spec: [`docs/spec.md`](docs/spec.md). Execution plan:
+[`docs/plan.md`](docs/plan.md). Prior-art status and results:
+[`docs/findings.md`](docs/findings.md).
+
+## Non-goals
+
+- Not a general compatibility framework.
+- Not a permanent home for tests — everything here is staged to graduate
+  into WPT.
+- No opinions on whether a feature *should* exist — only whether behavior
+  is interoperable per spec.
+
+## Prior art
+
+- Interop proposal: https://github.com/web-platform-tests/interop/issues/64
+  (2022, closed without acceptance — lacked WPT test coverage; this repo
+  supplies it)
+- WebKit bug: https://bugs.webkit.org/show_bug.cgi?id=209565
+- Chromium bug: https://issues.chromium.org/issues/40681464
+- Spec ambiguity, now resolved: https://github.com/w3c/csswg-drafts/issues/12836
+- Original spec ambiguity (superseded by #12836): https://github.com/w3c/csswg-drafts/issues/3125
+- Community test suite: https://arrowtype.github.io/vf-slnt-test/ (reference
+  behavior, not upstreamable itself)
+
+Current verified status of each of the above is in
+[`docs/findings.md`](docs/findings.md) — do not treat this list's parenthetical
+notes as current; re-check findings.md, which is dated.
+
+## Methodology
+
+1. Identify one CSS Fonts 4 normative requirement (cite spec section +
+   prior-art issue).
+2. Write one focused, WPT-compatible test (reftest or testharness) for it.
+3. Run via the official WPT runner (not custom Playwright/vitest).
+4. Record result in `results/browser-matrix.md` using the fixed schema.
+5. Once stable and reviewed, upstream the test file(s) to WPT via PR.
+6. Aggregate upstreamed + accepted tests into an Interop proposal draft in
+   `docs/findings.md`.
+
+## Running the tests
+
+A minimal, scoped WPT checkout can be vendored locally (fetched
+infrastructure, gitignored, never committed — see
+[`scripts/setup-wpt.sh`](scripts/setup-wpt.sh)):
+
+```
+./scripts/setup-wpt.sh
+mkdir -p .wpt/css/css-fonts/variable-oblique-interop/font-style-oblique
+cp -r tests/font-style-oblique/*.html tests/font-style-oblique/resources \
+  .wpt/css/css-fonts/variable-oblique-interop/font-style-oblique/
+mkdir -p .wpt/css/css-fonts/variable-oblique-interop/ital-axis
+cp -r tests/ital-axis/*.html tests/ital-axis/resources \
+  .wpt/css/css-fonts/variable-oblique-interop/ital-axis/
+cd .wpt
+./wpt install chrome webdriver --channel stable
+./wpt install firefox webdriver
+./wpt run chrome css/css-fonts/variable-oblique-interop/ --log-wptreport=../results/latest-chrome.json
+./wpt run firefox css/css-fonts/variable-oblique-interop/ --log-wptreport=../results/latest-firefox.json
+```
+
+Both `resources/` subdirectories (each test's font files) must be copied
+alongside their `*.html`, not just the HTML — each test's `@font-face src`
+is a relative `url('resources/...')`, so the test breaks silently without
+its font. Don't pass `--install-fonts` unless a test specifically needs a
+system-installed font (ours don't — they use embedded `@font-face` web
+fonts): on macOS it can stall indefinitely waiting on a permission
+interaction that never resolves in a non-interactive shell.
+
+If you already have Chrome or Firefox installed system-wide, point at it
+directly instead of `./wpt install <product> browser` (which downloads a
+separate copy):
+
+```
+./wpt run chrome css/css-fonts/variable-oblique-interop/ \
+  --binary="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \
+  --webdriver-binary=_venv3/bin/chrome/chromedriver \
+  --log-wptreport=../results/latest-chrome.json
+
+./wpt run --yes firefox css/css-fonts/variable-oblique-interop/ \
+  --binary="/Applications/Firefox.app/Contents/MacOS/firefox" \
+  --webdriver-binary=_venv3/bin/geckodriver \
+  --log-wptreport=../results/latest-firefox.json
+```
+
+`--yes` is needed on Firefox's first run — without it, `wpt run` prompts
+interactively to install the OpenH264 GMP plugin (irrelevant to these
+tests) and hangs forever in a non-interactive shell.
+
+**Known issue on some machines:** `./wpt run`'s first invocation bootstraps
+its own Python venv and can fail building the `cryptography` package from
+source (`error: failed to run custom build command for openssl-sys`) on
+machines with no Rust/OpenSSL dev toolchain — reproduced on an Intel Mac in
+this environment (no Homebrew available either). Pre-installing a
+wheel-backed `cryptography` version into `.wpt/_venv3` does **not** help —
+wpt's own installer force-upgrades past it regardless. What does work,
+confirmed in this environment: cap the version with a `PIP_CONSTRAINT` file
+before running, so pip's resolver never reaches for the unwheeled release:
+
+```
+echo "cryptography<=48.0.1" > /tmp/wpt-constraints.txt
+PIP_CONSTRAINT=/tmp/wpt-constraints.txt ./wpt run chrome ...
+```
+
+(`cryptography` does publish prebuilt wheels — confirmed a `cp311-abi3`
+universal2 wheel, forward-compatible with newer CPython via the stable ABI,
+exists as of `48.0.1` — the underlying cause is that whatever *newer*
+version wpt's dependency chain resolves to at install time has no wheel yet
+for this platform, forcing a source build that then fails for lack of
+Rust/OpenSSL.) Installing an older Python via `mise` does not help either —
+abi3 wheels are forward-compatible across CPython versions, so the version
+lacking a wheel lacks it regardless of which CPython minor version runs it.
+
+Safari (macOS only, requires two one-time setup steps beyond Chrome/
+Firefox — `wpt run` exempts chrome/firefox from the second one, but not
+safari):
+
+1. Enable Develop → "Allow Remote Automation" in Safari (or
+   `sudo /usr/bin/safaridriver --enable`, which needs an interactive
+   password prompt).
+2. Add WPT's test subdomains to `/etc/hosts` (this is a real, if low-risk,
+   edit to a shared system file — dozens of `127.0.0.1 *.test` aliases,
+   nothing that touches real DNS or existing entries):
+   ```
+   cd .wpt
+   ./wpt make-hosts-file | sudo tee -a /etc/hosts
+   ```
+
+```
+./wpt run safari css/css-fonts/variable-oblique-interop/ \
+  --webdriver-binary=/usr/bin/safaridriver \
+  --log-wptreport=../results/latest-safari.json
+```
+
+**Before trusting a Safari result, read `docs/findings.md`'s "Safari —
+attempted, no reliable result" section.** In this environment, `wpt run`
+reported all three tests FAIL identically across four runs. This is *not*
+a font-validity problem (an early theory blaming `fontTools`-generated
+fonts was investigated and disproved) — isolating WPT's own pristine
+official test font alone, with no custom font of ours involved, still
+FAILs under `wpt run safari`. Three identical trials driving `safaridriver`
+directly (same page, same fresh-session setup, same wait) produced two
+different outcomes. This is genuine nondeterminism in Safari/WebKit's
+font-loading-to-compositor pipeline under WebDriver automation, not
+something fixable from this repo. Don't trust a single `wpt run safari`
+result in either direction; a real physical device running Safari's actual
+UI (not `safaridriver`) is the trustworthy path, per
+vizchitra-fonts/docs/compat.md's own reason for keeping a manual `/compat`
+page.
+
+Then record results into `results/browser-matrix.md` — never hand-transcribe:
+
+```
+uv run scripts/record-results.py results/latest-chrome.json
+uv run scripts/record-results.py results/latest-firefox.json
+```
+
+`--real-device` is for a genuine physical-device run (e.g. `--webdriver-binary`
+pointed at a real iPhone's Safari, matching vizchitra-fonts/docs/compat.md's
+convention) — e.g. `--real-device --notes "iPhone XR, Safari 18.7"`. Desktop
+Safari via `safaridriver` is not a real device; see the caveat above before
+recording anything from it at all.
+
+## Repo structure
+
+```
+oblique/
+├── LICENSE                  # BSD-3-Clause (required for WPT upstreaming)
+├── README.md
+├── scripts/
+│   ├── setup-wpt.sh         # vendors a scoped, gitignored .wpt/ checkout
+│   └── record-results.py    # parses wptreport JSON into browser-matrix.md
+├── tests/
+│   ├── font-style-oblique/
+│   ├── oblique-range/
+│   ├── synthesis/
+│   ├── variation-settings/
+│   └── ital-axis/
+├── docs/
+│   ├── spec.md
+│   ├── plan.md
+│   └── findings.md
+└── results/
+    └── browser-matrix.md
+```
+
+No WPT checkout is committed to this repo — WPT is external test-runner
+infrastructure. `scripts/setup-wpt.sh` vendors a minimal, scoped copy into
+a gitignored `.wpt/` for anyone who clones this repo to run tests locally;
+see "Running the tests" above.

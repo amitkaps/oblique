@@ -141,3 +141,18 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
+
+# Python / uv
+.venv/
+__pycache__/
+*.pyc
+
+# Vendored WPT checkout (fetched infrastructure, not repo content —
+# see scripts/setup-wpt.sh)
+.wpt/
+
+# Raw wptreport run logs — regenerable via scripts/record-results.py,
+# which is the only thing that should write to results/browser-matrix.md.
+# Only that curated file is tracked, per docs/spec.md's repo structure.
+results/latest-*.json
+results/latest-*.txt

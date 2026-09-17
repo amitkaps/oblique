@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en" class="reftest-wait">
+<meta charset="utf-8" />
+<title>CSS Test: bare `font-style: oblique` activates a variable font's `slnt` axis (reference)</title>
+<!--
+  Reference rendering: sets the slnt axis explicitly via
+  font-variation-settings, bypassing automatic font-style matching entirely
+  — this is the "known good" rendering the test's automatic-mapping path is
+  checked against. Bare `oblique` resolves to the spec default of 14deg,
+  clamped into this face's declared 0deg-15deg range, which this font's own
+  slnt axis expresses as -14 (OpenType's slnt sign convention is inverted
+  relative to CSS oblique angles — the same reconciliation WPT's own
+  slnt-variable-ref.html performs against this font).
+-->
+<style>
+  @font-face {
+    font-family: "slnt test font";
+    src: url('resources/FontStyleTest-slnt-VF.woff2');
+    font-style: oblique 0deg 15deg;
+  }
+
+  .test {
+    font-family: "slnt test font";
+    font-size: 3em;
+  }
+
+  .slnt14 {
+    font-variation-settings: 'slnt' -14;
+  }
+</style>
+<script>
+  document.fonts.ready.then(() => {
+    document.documentElement.classList.remove('reftest-wait');
+  });
+</script>
+
+<p class="test slnt14">varfont</p>

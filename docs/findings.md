@@ -1,0 +1,210 @@
+# Findings
+
+## 1. Prior Art Status
+
+_Verified 2026-09-18, directly against live sources (browser/tool fetches
+and a raw grep of the published spec text — not recalled from spec.md or
+from the vizchitra-fonts investigation)._
+
+### WebKit #209565 — STILL OPEN
+
+- **Status: NEW, unassigned.** Most recent activity: comment #6, 2025-03-05.
+- Covers both axes: for fonts with a `slnt` axis, `font-style: italic`
+  synthesizes slant instead of activating the axis, and `font-style: oblique`
+  mishandles signed angles; for fonts with an `ital` axis, `font-style:
+  italic` activates the axis but *also* applies a spurious 20° synthesized
+  slant on top, and `font-style: oblique` synthesizes slant instead of
+  consulting the axis at all.
+- Matches spec.md's caveat ("STILL OPEN as of last check") — confirmed
+  current, not stale.
+
+### Chromium #40681464 — In Progress (Accepted), not fixed, not shipped
+
+- **Title:** "font-style: italic doesn't activate the ital axis of variable
+  fonts."
+- **Identity confirmed, not just title-matched:** this is the *same* bug as
+  `bugs.chromium.org/p/chromium/issues/detail?id=1064756`, which
+  `vizchitra-fonts/docs/compat.md` cites separately as though it were a
+  different Chromium bug — it is not. Confirmed via the raw issue-tracker
+  JSON payload (`issues.chromium.org/issues/40681464`), independent of the
+  title match: the reporter (`st...@thundernixon.com` — Stephen Nixon, the
+  same individual who filed WebKit #209565 in 2020) is identical, the
+  `FoundIn-80/81/82/83` labels line up with the bug's original 2020 Chromium
+  version range, and the two CL numbers recorded on the issue
+  (`6965375`, `8179764`) are the same CLs referenced in the csswg-drafts
+  #12836 thread. Two independent sources naming identical CL numbers plus a
+  reporter match is stronger evidence than a title string alone. Cite this
+  as one bug with two historical tracker identifiers (Monorail `1064756` →
+  Buganizer `40681464`), never as two distinct bugs.
+- **Status: In Progress / Accepted** (priority P2, severity S4), assigned to
+  `hj...@gmail.com`, with two pending fix CLs (`6965375`, `8179764` — the
+  second explicitly reviving the first) neither of which has landed.
+  **Not fixed, not shipped in any Chrome version** — do not cite it as
+  fixed, per spec.md's own instruction. Last activity **2026-08-31**, the
+  same date csswg-drafts PR #14412 merged (below) — the spec clarification
+  and a renewed push on the Chromium fix are evidently coordinated, but the
+  fix itself remains outstanding.
+- **Cross-vendor visibility:** Microsoft (`se...@microsoft.com`, plus a
+  `msft-consider` label) is CC'd on the issue — worth noting in this repo's
+  eventual Interop proposal as evidence of existing cross-vendor interest,
+  not just a Chromium/WebKit-only concern.
+
+### csswg-drafts #12836 — RESOLVED, and the wording is live in the published spec
+
+- **Issue status:** closed, via merged PR
+  [w3c/csswg-drafts#14412](https://github.com/w3c/csswg-drafts/pull/14412),
+  merged **2026-08-31**.
+- **Confirmed independently**, not just from the PR description: fetched the
+  raw HTML of `https://drafts.csswg.org/css-fonts-4/` and grepped it
+  directly for the resolution wording. Both sentences are present in the
+  published draft today:
+  - Under the `font-style: italic` matching steps: *"For variable fonts with
+    an ital axis, a match is created by setting the ital value to 1."*
+  - Under the `oblique` matching steps: *"The ital axis is not used to
+    satisfy an oblique request."*
+- This confirms spec.md's framing exactly: `font-style: italic` sets `ital`
+  to 1; `font-style: oblique` sets `slnt` and leaves `ital` untouched. The
+  two are independent, and this is now normative spec text, not just an
+  agreed-but-unpublished issue resolution — the core premise this whole repo
+  is built on is sound and current as of today.
+
+### Practical implication for this repo
+
+The independence between `ital` and `slnt` is spec-confirmed and safe to
+test against as ground truth. Both engines' actual conformance is still
+catching up (WebKit: open, unassigned; Chromium: accepted and in progress,
+two pending CLs, not yet landed) — which is exactly the interoperability gap
+this repo exists to document with reproducible tests, not a reason to hold
+off writing them.
+
+## 2. Spec requirement → test → matrix result → upstream status → Interop relevance
+
+| Spec requirement | Test(s) | Matrix result | Upstream status | Interop relevance |
+|---|---|---|---|---|
+| Bare `font-style: oblique` activates a variable font's `slnt` axis, matching the value an equivalent explicit `font-variation-settings: 'slnt'` would produce (css-fonts-4 §5.2 oblique matching) | `tests/font-style-oblique/slnt-axis-activation.html` + `-ref.html` (reftest) | **PASS** — Chrome 153.0.8010.37, Firefox 156.0 — see `results/browser-matrix.md` | not yet upstreamed | core `slnt` claim; motivates re-opening web-platform-tests/interop#64 |
+| `font-style: oblique` must NOT activate a variable font's `ital` axis when the matched face exposes only `ital` (css-fonts-4 §5.2, per #12836's "the ital axis is not used to satisfy an oblique request") | `tests/ital-axis/independence.html` + `-ref.html` (reftest) | **PASS** — Chrome 153.0.8010.37, Firefox 156.0 — see `results/browser-matrix.md` | not yet upstreamed | half of the core interoperability claim for `ital`/`slnt` independence |
+| `font-style: italic` against a variable `ital`-axis face must set `ital`=1 and synthesize nothing further on top of that real match (css-fonts-4 §5.2 + general "don't synthesize when a face already matches" rule) | `tests/ital-axis/italic-no-extra-synthesis.html` + `-ref.html` (reftest) | **FAIL** on Chrome 153.0.8010.37, **PASS** on Firefox 156.0 — see `results/browser-matrix.md` | not yet upstreamed | **reproduces WebKit #209565's documented ital-axis failure mode live, in Chrome, while Firefox already conforms** — direct evidence Chromium #40681464's fix (in progress, two pending CLs per this doc's Prior Art Status) has not shipped, and that this is a real, currently-live two-out-of-three interop gap, not a hypothetical one |
+
+_Table grows as more worked examples are added. `italic-no-extra-synthesis`
+was added after review flagged that `independence.html` forces
+`font-synthesis: none`, which masks rather than probes the exact spurious-
+synthesis failure #209565 documents — see the note below._
+
+**Note on matrix rows:** all three tests above were run 2026-09-18 via the
+**official WPT test runner** (`./wpt run`, vendored locally per
+`scripts/setup-wpt.sh` — see README.md's "Running the tests"), against
+system Chrome (153.0.8010.37) and system Firefox (156.0) on this machine,
+and recorded via `scripts/record-results.py` directly from each run's
+`--log-wptreport` JSON — not hand-transcribed. Getting the runner working on
+this machine required a `PIP_CONSTRAINT` workaround for an unrelated
+`cryptography`-build failure in wpt's own venv bootstrap (documented in
+README.md) — this affects only wpt's own tooling, not this repo's tests.
+
+**The first two tests (PASS on both engines) do not, on their own, mean
+either engine fully implements the #12836 resolution.** Both were reviewed
+for what they actually probe: `slnt-axis-activation` checks a genuinely
+signed-angle case (bare `oblique` must resolve to the correct negative
+`slnt` value, not just any slant), so its PASS is meaningful. But the
+original `independence.html` only checks that `oblique` leaves `ital`
+untouched *with synthesis forced off* — it cannot distinguish "no synthesis
+was needed" from "synthesis was suppressed," so it does not probe WebKit
+#209565's specific documented ital-axis failure ("`italic` activates the
+[ital] axis but ALSO applies a spurious 20° synthesized slant on top").
+`italic-no-extra-synthesis.html` was added specifically to probe that,
+leaving `font-synthesis` at its default so any spurious synthesis is free
+to happen — and on Chrome, it does: **Chrome 153 fails it**, reproducing
+that exact failure mode live. **Firefox 156 passes it** — independently
+verified beyond the wptreport status by driving `geckodriver` directly and
+comparing screenshots pixel-for-pixel (the same purpose-built font showing
+its real parallelogram glyph, identical between test and reference — see
+"Safari" below for why that extra verification step matters and isn't
+paranoia). This gives a genuine, currently-live two-of-three interop split
+— Firefox conformant, Chrome's fix in progress but not shipped, WebKit's
+bug open and unassigned — exactly the kind of gap this repo exists to
+document with reproducible evidence rather than assert from memory.
+
+## Safari — attempted, no reliable result (root cause found: genuine flakiness, not a font bug)
+
+Safari was run via `./wpt run safari` (real Safari 27.0, via `safaridriver`,
+not Playwright's WebKit — see vizchitra-fonts/docs/compat.md's caveat that
+those are not the same engine). All three tests reported FAIL, identically
+across four separate `wpt run` invocations — but this section explains why
+**none of those three FAILs were recorded**. The investigation went through
+several wrong turns before landing on the actual cause; documented in full,
+including the wrong turns, because "measured, not assumed" (the standard
+vizchitra-fonts/docs/compat.md itself holds to) cuts both ways — a FAIL
+that isn't understood is not evidence, and neither is a first plausible
+explanation that turns out to be wrong.
+
+**Ruled out, in order** (kept as real fixes regardless — none was the
+actual cause, but none was wrong to do):
+
+1. **Font-loading race** — added the standard WPT `reftest-wait` +
+   `document.fonts.ready` pattern to all six test/ref files. No change.
+2. **Font MIME type** — `wpt serve` has no `.ttf`/`.woff2` entries in its
+   `content_types` table at all (confirmed by reading
+   `tools/wptserve/wptserve/constants.py`), so both fonts were served as
+   `application/octet-stream`. Added `.headers` sidecar files declaring
+   `font/ttf` / `font/woff2` (WPT's own convention). No change.
+3. **`STAT` table, `OS/2.fsType`, variable-font machinery, contour winding
+   direction** — each investigated and ruled out in turn (a static,
+   non-variable version of the glyph failed identically; a
+   clockwise-rewound version failed identically; WPT's own working font
+   turned out to share our font's `fsType` value, disproving that theory
+   outright).
+
+**What actually explains it, confirmed decisively:** isolating
+`slnt-axis-activation` alone (WPT's own official, pristine `FontStyleTest-
+slnt-VF.woff2` — no custom font of ours involved at all) through `wpt run
+safari` **still FAILs**, with the exact same screenshot hash as every
+previous run. That single fact already rules out every font-specific theory
+above — the font was never the problem. Driving `safaridriver` directly via
+raw WebDriver calls (bypassing `wpt run` entirely) to test the *same* page
+three times, identically (fresh session, fresh navigation, identical 3-second
+wait each time) produced **two different outcomes**: trial 1 rendered the
+wrong (system fallback) font, trials 2 and 3 rendered the correct custom
+font — byte-for-byte matching the reference either way. A longer, continuous
+19.5-second wait within a single un-renavigated session did not resolve a
+stuck wrong render, and forcing an explicit repaint (`window.resizeBy` +
+reading `offsetHeight`) didn't either. **This is genuine, real
+nondeterminism in Safari/WebKit's font-loading-to-compositor pipeline when
+driven via `safaridriver` WebDriver automation** — not a deterministic bug
+with a discoverable root cause. Four unlucky `wpt run` invocations in a row
+is well within what that kind of flakiness produces.
+
+**No Safari row is recorded in `results/browser-matrix.md` for any of the
+three tests.** A result that's genuinely a coin-flip under WebDriver
+automation isn't usable interoperability evidence in either direction —
+recording a FAIL would misrepresent Safari (which, per the passing trials,
+likely does the right thing), and recording a PASS from a single lucky run
+would be just as unfounded. **This also means the earlier framing in
+`README.md`'s "Known issue" section blaming `fontTools`-generated TTFs
+specifically was wrong and has been corrected** — that was one plausible
+theory built on too few trials before the isolation test (an unmodified
+WPT font, alone, still failing) disproved it.
+
+**For whoever picks this up next:** this looks like a real, reportable
+WebKit/`safaridriver` bug (font activation racing against the WebDriver
+screenshot command, independent of font validity) rather than anything
+fixable from this repo's side. Before spending more time on it: search
+`bugs.webkit.org` for existing reports of flaky/stale font rendering in
+`safaridriver` screenshots specifically (distinct from #209565, which is
+about which axis gets activated, not about rendering nondeterminism). If
+none exists, this trial data (3 identical trials, 2 different outcomes) is
+enough to file one. A real physical macOS device running the actual Safari
+UI (not `safaridriver` automation) would be the way to get a trustworthy
+manual reading in the meantime, matching vizchitra-fonts/docs/compat.md's
+own reason for keeping a manual `/compat` page alongside automated tests.
+
+## 3. Proposed Interop scope statement
+
+Scope: variable-font style matching for both the `slnt` and `ital` axes,
+scoped together on the basis that css-fonts-4 (per the resolution of
+[csswg-drafts#12836](https://github.com/w3c/csswg-drafts/issues/12836),
+merged into the published draft 2026-08-31) treats them as independent,
+well-defined axes with distinct matching rules — `italic` activates `ital`,
+`oblique` activates `slnt`, and neither touches the other. The original 2022
+Interop proposal ([web-platform-tests/interop#64](https://github.com/web-platform-tests/interop/issues/64))
+was closed without acceptance for lack of WPT test coverage; this repo's
+purpose is to supply that coverage, generically (not tied to any one font or
+vendor), so the proposal can be re-raised on firmer ground.
