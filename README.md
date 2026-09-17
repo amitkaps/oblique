@@ -203,14 +203,18 @@ partial or stale data as current.
 
 `scripts/render-coverage-docs.py` renders `docs/coverage.md` and
 `results/upstream-matrix.md` from that JSON, and copies both JSON files into
-`docs/dashboard/data/` for the static dashboard page
-(`docs/dashboard/index.html`) to fetch client-side. The dashboard groups
-tests by axis, shows current pass/fail per engine, and — importantly —
-states the `ital`-axis gap explicitly rather than leaving it as something a
-reader has to infer from an empty section. It reads only committed JSON
-snapshots (never calls wpt.fyi live from the browser), so staleness is
-visible via a prominent last-synced timestamp rather than silently assumed
-current.
+`docs/data/` for the static dashboard page (`docs/index.html`) to fetch
+client-side. The dashboard groups tests by axis, shows current pass/fail per
+engine, and — importantly — states the `ital`-axis gap explicitly rather
+than leaving it as something a reader has to infer from an empty section. It
+reads only committed JSON snapshots (never calls wpt.fyi live from the
+browser), so staleness is visible via a prominent last-synced timestamp
+rather than silently assumed current.
+
+The dashboard is published via GitHub Pages, serving the `docs/` folder,
+at **https://oblique.amitkaps.com** (`docs/CNAME`; requires a DNS `CNAME`
+record for that hostname pointing at `amitkaps.github.io`, set up outside
+this repo).
 
 A scheduled GitHub Actions workflow
 ([`.github/workflows/sync-wpt-results.yml`](.github/workflows/sync-wpt-results.yml))
@@ -248,15 +252,15 @@ oblique/
 │   ├── synthesis/
 │   ├── variation-settings/
 │   └── ital-axis/            # the confirmed WPT gap this repo fills
-├── docs/
+├── docs/                      # published as GitHub Pages (oblique.amitkaps.com)
+│   ├── index.html             # static live-coverage dashboard
+│   ├── CNAME                  # custom domain for GitHub Pages
+│   ├── data/                  # generated copies of coverage.json/upstream.json
 │   ├── spec.md
 │   ├── plan.md
 │   ├── findings.md
 │   ├── coverage.md           # generated — see coverage.json
-│   ├── coverage.json         # source of truth for the coverage catalog
-│   └── dashboard/
-│       ├── index.html        # static live-coverage dashboard
-│       └── data/              # generated copies of coverage.json/upstream.json
+│   └── coverage.json         # source of truth for the coverage catalog
 └── results/
     ├── browser-matrix.md      # this repo's own local WPT-runner results
     ├── upstream-matrix.md     # generated — see upstream.json

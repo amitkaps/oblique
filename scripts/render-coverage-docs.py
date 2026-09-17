@@ -16,7 +16,7 @@ COVERAGE_PATH = REPO_ROOT / "docs" / "coverage.json"
 UPSTREAM_JSON_PATH = REPO_ROOT / "results" / "upstream.json"
 COVERAGE_MD_PATH = REPO_ROOT / "docs" / "coverage.md"
 UPSTREAM_MD_PATH = REPO_ROOT / "results" / "upstream-matrix.md"
-DASHBOARD_DATA_DIR = REPO_ROOT / "docs" / "dashboard" / "data"
+DASHBOARD_DATA_DIR = REPO_ROOT / "docs" / "data"
 
 
 def render_coverage_md(coverage: dict) -> str:
