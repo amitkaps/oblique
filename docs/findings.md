@@ -267,33 +267,9 @@ to: track existing WPT coverage's live status via wpt.fyi
 for the confirmed gaps. See `docs/spec.md`'s "Scope update (v3)" section
 and README.md's "Live coverage dashboard" section for the mechanics.
 
-### Evidence tiers for the Interop proposal
-
-Not every gap carries equal weight as motivating evidence, and the proposal
-should say so explicitly rather than treat all findings as equally strong:
-
-1. **Proven, reproducible, live today:** `ital`-axis spurious synthesis —
-   `tests/ital-axis/italic-no-extra-synthesis.html` fails on Chrome 153,
-   passes on Firefox 156, dated and recorded in
-   `results/browser-matrix.md`.
-2. **Proven gap, root cause traced to a real font's real bug:** the
-   `auto-range-default-angle` gap (`docs/coverage.json`'s `confirmed_gaps`,
-   priority 1) — directly Cairo's own documented failure mode
-   (vizchitra-fonts/docs/compat.md), not yet a written test, but the
-   closest upstream test (`font-slant-1.html`) was checked and confirmed
-   not to cover it.
-3. **Confirmed gap, plausible real impact, not yet demonstrated live:**
-   the `font-style-plus-explicit-axis-pairing` gap (priority 2) — the
-   spec's own recommended author pattern is untested anywhere.
-4. **Confirmed absent, spec-completeness, no known real-world instance:**
-   the `combined-slnt-ital-font` gap (priority 3) — no shipping font is
-   known to expose both axes together; worth closing for completeness, not
-   as evidence of impact.
-
-Priority order for the next worked examples follows this tiering: write
-`auto-range-default-angle` first (tier 2, directly traceable to Cairo),
-then `font-style-plus-explicit-axis-pairing` (tier 3), and deprioritize
-`combined-slnt-ital-font` (tier 4) accordingly.
+See "4. Evidence tiers for the Interop proposal" below for how these
+findings — this section's and the earlier worked-example results — are
+weighted for the proposal, rather than treated as equally strong.
 
 ## 3. Proposed Interop scope statement
 
@@ -307,3 +283,73 @@ Interop proposal ([web-platform-tests/interop#64](https://github.com/web-platfor
 was closed without acceptance for lack of WPT test coverage; this repo's
 purpose is to supply that coverage, generically (not tied to any one font or
 vendor), so the proposal can be re-raised on firmer ground.
+
+The proposal leads with the tier-1 and tier-2 evidence below (already
+proven live, or root-caused and corroborated pending a written test) and
+explicitly excludes tier-3 findings from its scope — those are logged for
+completeness, not cited as impact evidence.
+
+## 4. Evidence tiers for the Interop proposal
+
+Not every finding in this repo carries equal weight as motivating evidence
+for the proposal above. `docs/coverage.json`'s top-level `evidence_tiers`
+field defines three tiers; every checklist item and confirmed gap in that
+file carries a `priority_tier` back-referencing this list, so an item's
+weight is stated, not left for a reader to infer from tone.
+
+**Tier 1 — proven, reproducible, live today.** A written test with a dated,
+recorded cross-engine result showing the failure actually happening:
+
+- `tests/ital-axis/italic-no-extra-synthesis.html` — **fails on Chrome
+  153.0.8010.37, passes on Firefox 156.0**, recorded 2026-09-18 in
+  `results/browser-matrix.md`. This is the strongest evidence this repo
+  has: a live, currently-reproducible interop gap.
+- `tests/ital-axis/independence.html` — passes on both Chrome and Firefox,
+  also dated and recorded, though (per section 2 above) its
+  `font-synthesis: none` setup makes the PASS less discriminating than
+  `italic-no-extra-synthesis.html`'s.
+
+**Tier 2 — proven gap, root cause traced to a real bug, test not yet
+written.** The failure mode is confirmed to exist, but no test demonstrates
+it yet:
+
+- **`auto-range-default-angle`** (`docs/coverage.json`'s `confirmed_gaps`,
+  priority 1 — the recommended next worked example). This is directly
+  Cairo's own documented real-world failure mode
+  (vizchitra-fonts/docs/compat.md: no `font-style` descriptor authored, so
+  the UA must derive the oblique range from Cairo's own `slnt` axis
+  (-11 to 11), and the default angle (14deg) falls outside it). The closest
+  upstream test, `font-slant-1.html`, was checked directly and confirmed
+  **not** to cover this — it tests the identical default-angle-outside-range
+  question, but only for an explicitly authored descriptor range, and
+  passes on all three engines. **Now two-font-corroborated**: WPT's own
+  `Inter-VF.subset.ttf` / `Inter.var.subset.ttf` independently have the same
+  shape (`slnt` range -10 to 0, verified via `fontTools` 2026-09-18),
+  confirming this isn't a single-vendor anecdote.
+- **`font-style-plus-explicit-axis-pairing`** (priority 2). A real,
+  spec-recommended author pattern (pairing `font-style` with an explicit
+  `font-variation-settings` override for fallback compatibility) that's
+  untested anywhere. Sits within tier 2 conceptually, but — unlike
+  `auto-range-default-angle` — has **no specific corroborating broken
+  font** behind it (`docs/coverage.json` marks this
+  `lacks_corroborating_font: true`). This is a different kind of gap
+  (recommended-pattern-untested vs. bug-with-known-cause) and should not
+  be read as carrying the same evidentiary weight as
+  `auto-range-default-angle`, even though both sit at tier 2.
+
+**Tier 3 — confirmed absent, spec-completeness, no known real-world
+instance.**
+
+- **`combined-slnt-ital-font`** (priority 3). No font anywhere — WPT's
+  corpus or this repo's own resources — exposes both a real `slnt` axis
+  and a real `ital` axis together (`docs/coverage.json` marks this
+  `real_world_font_exists: false`). Worth closing for completeness (it's
+  the strongest possible direct test of #12836's independence claim), but
+  it is **not evidence of real-world impact** and the proposal should not
+  cite it as such.
+
+**Priority order for the next worked examples** follows this tiering:
+`auto-range-default-angle` first (tier 2, two-font-corroborated, directly
+traceable to Cairo), then `font-style-plus-explicit-axis-pairing` (tier 2,
+no corroborating font), and `combined-slnt-ital-font` last (tier 3,
+spec-completeness only).

@@ -4,6 +4,14 @@ Generated from `docs/coverage.json` by `scripts/render-coverage-docs.py` — do 
 
 Audited 2026-09-18. Method: Local sparse WPT checkout (.wpt/css/css-fonts, vendored per scripts/setup-wpt.sh) was walked directly with `find`/`grep`, not GitHub search or wpt.fyi's browse UI, since search snippets are not exhaustive. Every *.html file under css/css-fonts/{, variations/, animations/, matching/, parsing/} was grepped for slnt/ital/oblique in filename and body (`'slnt'`/`'ital'` as font-variation-settings axis literals, plus oblique/italic in title/assert text) to build this list.
 
+## Evidence tiers
+
+Not every finding in this catalog carries equal weight as motivating evidence. `priority_tier` on individual items below refers back to these three tiers:
+
+**Tier 1:** Proven, reproducible, live today — a written test with a dated, recorded cross-engine result showing the failure actually happening.
+**Tier 2:** Proven gap, root cause traced to a real font's real bug, test not yet written — the failure mode is confirmed to exist (via a real shipping font or the spec's own text) but no test demonstrates it yet.
+**Tier 3:** Confirmed absent upstream, no known real-world font or pattern triggers it — spec-completeness, not evidence of real breakage; included for thoroughness, not prioritized.
+
 This catalogs every existing upstream WPT test that exercises oblique/slnt/ital matching, synthesis, or closely related parsing/animation, found by walking the vendored `css/css-fonts` tree directly (not by search-snippet sampling). Live pass/fail per engine, sourced from wpt.fyi, is in [`results/upstream-matrix.md`](../results/upstream-matrix.md) — kept separate because that data is refreshed on a schedule and this catalog is not.
 
 | Path | Axis | Probes #209565? | Assertion |
@@ -72,10 +80,10 @@ Audited 2026-09-18.
 | | | _Covered, and passing on all three engines, ONLY for the case where @font-face declares an EXPLICIT font-style descriptor range that excludes the default angle. The realistic deployment shape — no explicit descriptor at all (font-style:auto, the actual default), so the UA must derive the oblique range from the font's own fvar/STAT extremes, with a bare italic/oblique request whose default angle falls outside THAT auto-derived range — has zero upstream coverage. This is the precise shape of Cairo's real-world bug (per vizchitra-fonts/docs/compat.md): Cairo doesn't hand-author a font-style descriptor, so its usable range comes entirely from its own slnt axis (-11 to 11), and the UA default (14deg) falls outside it. See the standalone 'auto-range default-angle resolution' gap item below — reinstates Cairo as motivating evidence for a real, narrow, currently-unverified gap, not the general slnt story._ |
 | italic vs oblique resolution differences | ✅ covered (upstream WPT) | `css/css-fonts/italic-oblique-fallback.html`<br>`css/css-fonts/oblique-request-italic-only-family-no-crash.html` |
 | | | _Covered for static (non-variable) faces only; the variable-axis version of this question is items below (ital-axis specific), which are NOT covered upstream._ |
-| italic on a font with only an ital axis (no slnt) — sets ital=1 | 🟡 covered (this repo only) | `tests/ital-axis/italic-no-extra-synthesis.html` |
-| | | _Zero upstream WPT coverage — part of the confirmed ital_axis_gap._ |
-| oblique on a font with only an ital axis — must NOT touch ital (per #12836) | 🟡 covered (this repo only) | `tests/ital-axis/independence.html` |
-| | | _Zero upstream WPT coverage — part of the confirmed ital_axis_gap._ |
+| italic on a font with only an ital axis (no slnt) — sets ital=1 | 🟡 covered (this repo only) (tier 1) | `tests/ital-axis/italic-no-extra-synthesis.html` |
+| | | _Zero upstream WPT coverage — part of the confirmed ital_axis_gap. Tier 1 (see evidence_tiers): a dated, live cross-engine result exists — Chrome 153 FAILs, Firefox 156 PASSes, recorded in results/browser-matrix.md — not just a theoretical gap._ |
+| oblique on a font with only an ital axis — must NOT touch ital (per #12836) | 🟡 covered (this repo only) (tier 1) | `tests/ital-axis/independence.html` |
+| | | _Zero upstream WPT coverage — part of the confirmed ital_axis_gap. Tier 1: dated, recorded result (PASS on Chrome and Firefox), though per docs/findings.md its font-synthesis:none setup makes the PASS less discriminating than italic-no-extra-synthesis.html's._ |
 | Font exposing both slnt and ital — confirms independence per #12836 | ❌ gap | — |
 | | | _No font anywhere in WPT's corpus or this repo's own resources exposes both a real slnt axis and a real ital axis together (confirmed by filename/content search of both .wpt/css/css-fonts font resources and tests/*/resources) — this is a genuine, currently-open gap, and the strongest direct test of #12836's independence claim would require building one. Candidate next worked example._ |
 | Single variable face covering normal + oblique | ✅ covered (upstream WPT) | `css/css-fonts/font-face-style-auto-variable.html`<br>`css/css-fonts/font-face-style-default-variable.html` |
@@ -96,30 +104,45 @@ Audited 2026-09-18.
 
 ### 1. auto-range-default-angle
 
-**Evidence tier:** proven gap, root cause traced to a real font's real bug
+**Priority tier:** 2
+
+**Evidence tier:** proven gap, root cause traced to a real font's real bug, test not yet written
 
 No test combines an auto-derived (no explicit @font-face font-style descriptor) oblique range with a bare font-style:oblique or font-style:italic request (UA default angle, no explicit value) on a font whose actual fvar/STAT range excludes that default angle.
 
-**Why it matters:** This is the precise shape of Cairo's real-world bug (vizchitra-fonts/docs/compat.md): Cairo ships with no font-style descriptor, so the browser must derive its usable oblique range from Cairo's own slnt axis (-11 to 11), and the UA default angle (14deg) falls outside it. The closest upstream test, css/css-fonts/variations/font-slant-1.html, tests exactly this default-angle-outside-range scenario INCLUDING the bare italic keyword — but only for a font-style descriptor that was EXPLICITLY authored in the @font-face rule, and it PASSES on Chrome/Firefox/Safari today. The auto-derived-range version of the same question — the version that actually matches how most variable webfonts (including Cairo) ship — is untested anywhere. Verified by reading css/css-fonts/font-face-style-auto-variable.html and font-face-style-default-variable.html directly: both use only explicit oblique <angle> values (10deg/5deg/0deg), never a bare keyword. Highest-priority next worked example: unlike the other two gaps, this one traces directly to a live, documented production bug rather than spec-completeness.
+**Why it matters:** This is the precise shape of Cairo's real-world bug (vizchitra-fonts/docs/compat.md): Cairo ships with no font-style descriptor, so the browser must derive its usable oblique range from Cairo's own slnt axis (-11 to 11), and the UA default angle (14deg) falls outside it. The closest upstream test, css/css-fonts/variations/font-slant-1.html, tests exactly this default-angle-outside-range scenario INCLUDING the bare italic keyword — but only for a font-style descriptor that was EXPLICITLY authored in the @font-face rule, and it PASSES on Chrome/Firefox/Safari today. The auto-derived-range version of the same question — the version that actually matches how most variable webfonts (including Cairo) ship — is untested anywhere. Verified by reading css/css-fonts/font-face-style-auto-variable.html and font-face-style-default-variable.html directly: both use only explicit oblique <angle> values (10deg/5deg/0deg), never a bare keyword. This is now a two-font-corroborated gap (see corroborating_fonts), not a single-vendor anecdote — Inter's own slnt range independently exhibits the same excludes-the-default-angle shape as Cairo's, in a font already sitting in WPT's own corpus. Highest-priority next worked example: unlike the other two gaps, this one traces directly to a live, documented production bug rather than spec-completeness — but note it is tier 2, not tier 1: the failure mode is root-caused and corroborated, not yet demonstrated by a written, run test the way tier-1 findings are.
+
+**Corroborating fonts:**
+
+- **Cairo** — slnt range -11 to 11 (motivating case — the real-world bug this repo exists to document; source: vizchitra-fonts/docs/compat.md)
+- **Inter-VF.subset.ttf / Inter.var.subset.ttf (WPT's own corpus)** — slnt range -10 to 0 (independent corroboration — a second, unrelated real font with the same auto-derived-range-excludes-default-angle shape, already present in WPT's own test corpus; source: verified via fontTools fvar read, 2026-09-18)
 
 **Candidate test:** A reftest pairing a variable font with a real slnt axis whose range excludes 14deg (e.g. -11 to 11, matching Cairo, or the simpler -10 to 0 already present in WPT's Inter-VF.subset.ttf and Inter.var.subset.ttf — both verified via fontTools to have fvar slnt min=-10 max=0, confirmed 2026-09-18), NO explicit font-style descriptor in @font-face, and font-style: italic / font-style: oblique (bare) as the test declarations — checked against whatever angle the UA actually resolves the default to.
 
 ### 2. font-style-plus-explicit-axis-pairing
 
-**Evidence tier:** confirmed gap, plausible real impact (untested spec-recommended author pattern)
+**Priority tier:** 2
+
+**Evidence tier:** confirmed gap, plausible real impact (untested spec-recommended author pattern), no specific corroborating broken font
 
 No test pairs font-style with an explicit font-variation-settings axis override on the same declaration and checks the resulting precedence.
 
-**Why it matters:** The spec's recommended pattern for authors is to pair the two (e.g. font-style: italic; font-variation-settings: 'ital' 1;) for compatibility with non-variable fallback faces, but no test verifies engines resolve any conflict between them consistently. Anyone following the spec's own compatibility advice is currently on unverified ground.
+**Why it matters:** The spec's recommended pattern for authors is to pair the two (e.g. font-style: italic; font-variation-settings: 'ital' 1;) for compatibility with non-variable fallback faces, but no test verifies engines resolve any conflict between them consistently. Anyone following the spec's own compatibility advice is currently on unverified ground. Sits within tier 2 conceptually (a real, spec-recommended pattern, currently untested), but unlike auto-range-default-angle it has no specific corroborating broken font behind it (lacks_corroborating_font: true) — this is a genuinely different kind of gap (recommended-pattern-untested vs. bug-with-known-cause), and should not be read as carrying the same evidentiary weight.
+
+**No corroborating broken font** — unlike auto-range-default-angle, this gap is not tied to a specific known-broken font; it's a spec-recommended pattern that's simply untested.
 
 **Candidate test:** A reftest declaring font-style: oblique 10deg together with an explicit font-variation-settings: 'slnt' <different value> on the same rule, checking which wins (or whether they're required to agree).
 
 ### 3. combined-slnt-ital-font
 
+**Priority tier:** 3
+
 **Evidence tier:** confirmed absent, spec-completeness, no known real-world instance
 
 No font anywhere (WPT's corpus or this repo's own resources) exposes both a real slnt axis and a real ital axis together.
 
-**Why it matters:** The strongest direct test of #12836's independence claim (italic sets ital=1 and leaves slnt untouched; oblique sets slnt and leaves ital untouched) requires a single font where both axes are real and distinguishable, so a test can prove the OTHER axis stayed at its default rather than merely asserting an axis was never referenced. Deprioritized relative to the other two gaps: no shipping font is known to combine both axes, so this is spec-completeness rather than evidence of real-world impact.
+**Why it matters:** The strongest direct test of #12836's independence claim (italic sets ital=1 and leaves slnt untouched; oblique sets slnt and leaves ital untouched) requires a single font where both axes are real and distinguishable, so a test can prove the OTHER axis stayed at its default rather than merely asserting an axis was never referenced. Deprioritized relative to the other two gaps: no shipping font is known to combine both axes (real_world_font_exists: false), so this is spec-completeness rather than evidence of real-world impact.
+
+**No known real-world font exists** for this scenario — spec-completeness, not impact evidence.
 
 **Candidate test:** Extend tests/ital-axis/resources/build-font.py's approach (fontTools FontBuilder) to add a second gvar-driven axis, or find/build a WPT-compatible font exposing both.

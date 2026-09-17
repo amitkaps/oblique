@@ -28,6 +28,24 @@ def render_coverage_md(coverage: dict) -> str:
         "",
         f"Audited {coverage['audited_at']}. Method: {coverage['audit_method']}",
         "",
+    ]
+
+    tiers = coverage.get("evidence_tiers")
+    if tiers:
+        lines += [
+            "## Evidence tiers",
+            "",
+            "Not every finding in this catalog carries equal weight as "
+            "motivating evidence. `priority_tier` on individual items below "
+            "refers back to these three tiers:",
+            "",
+        ]
+        for n in ("1", "2", "3"):
+            if n in tiers:
+                lines.append(f"**Tier {n}:** {tiers[n]}")
+        lines.append("")
+
+    lines += [
         "This catalogs every existing upstream WPT test that exercises "
         "oblique/slnt/ital matching, synthesis, or closely related "
         "parsing/animation, found by walking the vendored `css/css-fonts` "
@@ -88,6 +106,8 @@ def render_coverage_md(coverage: dict) -> str:
         }
         for entry in mapping["items"]:
             status = status_labels.get(entry["status"], entry["status"])
+            if entry.get("priority_tier"):
+                status += f" (tier {entry['priority_tier']})"
             test_list = (
                 "<br>".join(f"`{t}`" for t in entry["tests"])
                 if entry["tests"]
@@ -120,9 +140,12 @@ def render_coverage_md(coverage: dict) -> str:
         )
         for g in sorted_gaps:
             priority = g.get("priority")
+            tier_num = g.get("priority_tier")
             tier = g.get("evidence_tier")
             heading = f"### {priority}. {g['id']}" if priority else f"### {g['id']}"
             lines += [heading, ""]
+            if tier_num:
+                lines += [f"**Priority tier:** {tier_num}", ""]
             if tier:
                 lines += [f"**Evidence tier:** {tier}", ""]
             lines += [
@@ -130,6 +153,31 @@ def render_coverage_md(coverage: dict) -> str:
                 "",
                 f"**Why it matters:** {g['why_it_matters']}",
                 "",
+            ]
+            corroborating = g.get("corroborating_fonts")
+            if corroborating:
+                lines += ["**Corroborating fonts:**", ""]
+                for f in corroborating:
+                    lines.append(
+                        f"- **{f['name']}** — slnt range {f['range']} "
+                        f"({f['role']}; source: {f['source']})"
+                    )
+                lines.append("")
+            if g.get("lacks_corroborating_font"):
+                lines += [
+                    "**No corroborating broken font** — unlike "
+                    "auto-range-default-angle, this gap is not tied to a "
+                    "specific known-broken font; it's a spec-recommended "
+                    "pattern that's simply untested.",
+                    "",
+                ]
+            if g.get("real_world_font_exists") is False:
+                lines += [
+                    "**No known real-world font exists** for this "
+                    "scenario — spec-completeness, not impact evidence.",
+                    "",
+                ]
+            lines += [
                 f"**Candidate test:** {g['candidate_test']}",
                 "",
             ]

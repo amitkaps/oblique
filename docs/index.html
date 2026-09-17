@@ -69,6 +69,8 @@
 
   <div id="groups"></div>
 
+  <div id="evidence-tiers"></div>
+
   <div id="checklist"></div>
 
   <div id="confirmed-gaps"></div>
@@ -191,6 +193,22 @@ function pillLabel(status) {
   }[status] || status;
 }
 
+function renderEvidenceTiers(coverage) {
+  const tiers = coverage.evidence_tiers;
+  const container = document.getElementById("evidence-tiers");
+  if (!tiers) { container.hidden = true; return; }
+  const rows = ["1", "2", "3"]
+    .filter(n => tiers[n])
+    .map(n => `<li><strong>Tier ${n}:</strong> ${tiers[n]}</li>`)
+    .join("");
+  container.innerHTML = `
+    <h2>Evidence tiers</h2>
+    <p class="checklist-note">Not every finding in this catalog carries
+      equal weight as motivating evidence. Tier numbers on items below
+      refer back to this list.</p>
+    <ul>${rows}</ul>`;
+}
+
 function renderChecklist(coverage) {
   const mapping = coverage.checklist_mapping;
   const container = document.getElementById("checklist");
@@ -201,9 +219,12 @@ function renderChecklist(coverage) {
       ? entry.tests.map(t => `<code>${t}</code>`).join("<br>")
       : "—";
     const note = entry.notes ? `<div class="checklist-note">${entry.notes}</div>` : "";
+    const tierBadge = entry.priority_tier
+      ? ` <span class="checklist-note">(tier ${entry.priority_tier})</span>`
+      : "";
     return `<tr>
       <td>${entry.item}</td>
-      <td><span class="${pillClass(entry.status)}">${pillLabel(entry.status)}</span></td>
+      <td><span class="${pillClass(entry.status)}">${pillLabel(entry.status)}</span>${tierBadge}</td>
       <td>${tests}${note}</td>
     </tr>`;
   }).join("");
@@ -226,14 +247,31 @@ function renderConfirmedGaps(coverage) {
   if (!data) { container.hidden = true; return; }
 
   const sorted = [...data.gaps].sort((a, b) => (a.priority || 999) - (b.priority || 999));
-  const cards = sorted.map(g => `
+  const cards = sorted.map(g => {
+    const fonts = g.corroborating_fonts
+      ? `<p><em>Corroborating fonts:</em></p><ul>${
+          g.corroborating_fonts.map(f =>
+            `<li><strong>${f.name}</strong> — slnt range ${f.range} (${f.role}; source: ${f.source})</li>`
+          ).join("")
+        }</ul>`
+      : "";
+    const lacksFont = g.lacks_corroborating_font
+      ? `<p><em>No corroborating broken font</em> — a spec-recommended pattern that's simply untested, not tied to a known-broken font.</p>`
+      : "";
+    const noRealFont = g.real_world_font_exists === false
+      ? `<p><em>No known real-world font exists</em> for this scenario — spec-completeness, not impact evidence.</p>`
+      : "";
+    return `
     <div class="gap-callout" style="margin-top:1rem;">
       <strong>${g.priority ? g.priority + ". " : ""}${g.id}</strong>
+      ${g.priority_tier ? `<div class="checklist-note">Priority tier ${g.priority_tier}</div>` : ""}
       ${g.evidence_tier ? `<div class="checklist-note"><em>Evidence tier:</em> ${g.evidence_tier}</div>` : ""}
       <p>${g.summary}</p>
       <p><em>Why it matters:</em> ${g.why_it_matters}</p>
+      ${fonts}${lacksFont}${noRealFont}
       <p><em>Candidate test:</em> ${g.candidate_test}</p>
-    </div>`).join("");
+    </div>`;
+  }).join("");
 
   container.innerHTML = `
     <h2>Confirmed gaps (precise, verified by reading test content)</h2>
@@ -256,6 +294,7 @@ function renderConfirmedGaps(coverage) {
     renderStaleness(upstream);
     renderGap(coverage);
     renderGroups(coverage, upstream);
+    renderEvidenceTiers(coverage);
     renderChecklist(coverage);
     renderConfirmedGaps(coverage);
   } catch (e) {
