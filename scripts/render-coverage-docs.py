@@ -99,6 +99,31 @@ def render_coverage_md(coverage: dict) -> str:
                 lines.append(f"| | | _{entry['notes']}_ |")
         lines.append("")
 
+    gaps = coverage.get("confirmed_gaps")
+    if gaps:
+        lines += [
+            "## Confirmed gaps (precise, verified by reading test content)",
+            "",
+            "Narrower than a raw checklist-item miss — each of these states "
+            "exactly which combination of factors is untested, confirmed by "
+            "reading the actual content of the closest candidate tests, not "
+            "by title or filename alone.",
+            "",
+            f"Audited {gaps['audited_at']}.",
+            "",
+        ]
+        for g in gaps["gaps"]:
+            lines += [
+                f"### {g['id']}",
+                "",
+                g["summary"],
+                "",
+                f"**Why it matters:** {g['why_it_matters']}",
+                "",
+                f"**Candidate test:** {g['candidate_test']}",
+                "",
+            ]
+
     return "\n".join(lines)
 
 

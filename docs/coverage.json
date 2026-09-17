@@ -22,35 +22,35 @@
       "title": "CSS test: mapping of font-style:oblique to opentype 'slnt' axis",
       "axis": "slnt",
       "probes_209565": true,
-      "notes": "Bare font-style:oblique to slnt mapping."
+      "notes": "Bare font-style:oblique and font-style:italic (default-angle) resolution against an EXPLICITLY declared @font-face font-style descriptor range ('oblique 0deg 10deg', which excludes the UA default 14deg) — the closest upstream test to Cairo's real failure shape, and it PASSES on Chrome/Firefox/Safari per results/upstream-matrix.md. Crucially, the range here comes from an explicit CSS descriptor, not from the font's own fvar/STAT extremes (auto) — see font-face-style-auto-variable.html's notes for why that distinction matters and remains an open gap."
     },
     {
       "path": "css/css-fonts/variations/font-slant-2a.html",
       "title": "CSS test: mapping of font-style:oblique to opentype 'slnt' axis",
       "axis": "slnt",
       "probes_209565": true,
-      "notes": "Variant of font-slant-1 with a different angle/setup."
+      "notes": "Variant of font-slant-1 with explicit angles ('slnt' 10, oblique 0deg, oblique -10deg) against the same explicit descriptor-range setup — no bare italic/oblique case."
     },
     {
       "path": "css/css-fonts/variations/font-slant-2b.html",
       "title": "CSS test: mapping of font-style:oblique to opentype 'slnt' axis",
       "axis": "slnt",
       "probes_209565": true,
-      "notes": "Variant of font-slant-1 with a different angle/setup."
+      "notes": "Variant of font-slant-1 including bare oblique/italic, still against an explicitly declared descriptor range (oblique -10deg 0deg), not an auto-derived one."
     },
     {
       "path": "css/css-fonts/variations/font-slant-2c.html",
       "title": "CSS test: mapping of font-style:oblique to opentype 'slnt' axis",
       "axis": "slnt",
-      "probes_209565": true,
-      "notes": "Variant of font-slant-1 with a different angle/setup."
+      "probes_209565": false,
+      "notes": "@font-face declares font-style:normal explicitly (opts this face out of oblique/italic matching entirely, despite having a real slnt axis) — tests descriptor override, not default-angle-vs-range resolution."
     },
     {
       "path": "css/css-fonts/variations/font-slant-3.html",
       "title": "CSS test: mapping of font-style:oblique to opentype 'slnt' axis",
       "axis": "slnt",
-      "probes_209565": true,
-      "notes": "Explicit oblique <angle> to slnt mapping."
+      "probes_209565": false,
+      "notes": "@font-face declares font-style:normal explicitly plus font-synthesis:style, testing that oblique/italic requests fall through to synthetic slant when the face is descriptor-locked to normal — not default-angle-vs-declared-range resolution."
     },
     {
       "path": "css/css-fonts/variations/at-font-face-font-matching.html",
@@ -85,14 +85,14 @@
       "title": "CSS Test: Support for font-style: auto in @font-face",
       "axis": "slnt",
       "probes_209565": false,
-      "notes": "font-style:auto applying the font's automatic slant range in @font-face — slnt-adjacent, not a direct activation test."
+      "notes": "font-style:auto (i.e. no descriptor — the realistic deployment shape, matching how Cairo/most webfonts ship) applying the font's own fvar-derived slant range — but only tested with EXPLICIT angle values (oblique 10deg/5deg/0deg), never bare font-style:oblique or font-style:italic. This is the one dimension genuinely missing upstream: no test combines an auto-derived (not explicitly declared) range with a bare/default-angle request — see checklist_mapping's 'auto-range default-angle resolution' gap."
     },
     {
       "path": "css/css-fonts/font-face-style-default-variable.html",
       "title": "CSS Test: Support for font-style: auto in @font-face",
       "axis": "slnt",
       "probes_209565": false,
-      "notes": "Confirms auto is the default font-style value in @font-face for variable fonts."
+      "notes": "Confirms auto is the default font-style value in @font-face for variable fonts — same explicit-angle-only scope as font-face-style-auto-variable.html, no bare oblique/italic."
     },
     {
       "path": "css/css-fonts/font-variation-settings-descriptor-01.html",
@@ -112,8 +112,8 @@
       "path": "css/css-fonts/synthetic-oblique-out-of-capabilities-range.html",
       "title": "Tests that font-style with angle outside of the 'slnt' range support by the font does not synthesize oblique faces.",
       "axis": "slnt",
-      "probes_209565": true,
-      "notes": "Angle-range clamping against the font's slnt capabilities — directly relevant to #209565's signed/ranged-angle mishandling."
+      "probes_209565": false,
+      "notes": "Confirmed by reading the file: only tests an EXPLICIT out-of-range angle (font-style: oblique 60deg against a font whose fvar slnt only spans -10 to 0), no font-style descriptor declared (so 'auto'). Does not use the bare italic/oblique keyword or the UA default angle at all — a distinct question (explicit-angle rejection) from Cairo's actual bug (default-angle silently falling outside an auto-derived range). Corrected from an earlier probes_209565:true — this was too generous a read of the title alone."
     },
     {
       "path": "css/css-fonts/font-style-angle.html",
@@ -291,9 +291,9 @@
       },
       {
         "item": "Bare oblique / default-angle (14deg) matching",
-        "status": "covered-upstream",
-        "tests": ["css/css-fonts/variations/font-slant-1.html"],
-        "notes": "Also covered by this repo's own tests/font-style-oblique/slnt-axis-activation.html (see docs/findings.md)."
+        "status": "partially-covered-upstream",
+        "tests": ["css/css-fonts/variations/font-slant-1.html", "css/css-fonts/variations/font-slant-2b.html"],
+        "notes": "Covered, and passing on all three engines, ONLY for the case where @font-face declares an EXPLICIT font-style descriptor range that excludes the default angle. The realistic deployment shape — no explicit descriptor at all (font-style:auto, the actual default), so the UA must derive the oblique range from the font's own fvar/STAT extremes, with a bare italic/oblique request whose default angle falls outside THAT auto-derived range — has zero upstream coverage. This is the precise shape of Cairo's real-world bug (per vizchitra-fonts/docs/compat.md): Cairo doesn't hand-author a font-style descriptor, so its usable range comes entirely from its own slnt axis (-11 to 11), and the UA default (14deg) falls outside it. See the standalone 'auto-range default-angle resolution' gap item below — reinstates Cairo as motivating evidence for a real, narrow, currently-unverified gap, not the general slnt story."
       },
       {
         "item": "italic vs oblique resolution differences",
@@ -351,6 +351,30 @@
         "item": "Ancestor font-variation-settings inheritance/replacement behavior",
         "status": "covered-upstream",
         "tests": ["css/css-fonts/variations/font-variation-settings-inherit.html"]
+      }
+    ]
+  },
+  "confirmed_gaps": {
+    "$note": "Precise, currently-open gaps found during this audit — not covered by any upstream WPT test or by this repo's own tests. Narrower than a raw checklist-item miss: each entry states exactly which combination of factors is untested, verified by reading test file content directly, not by title/filename alone.",
+    "audited_at": "2026-09-18",
+    "gaps": [
+      {
+        "id": "auto-range-default-angle",
+        "summary": "No test combines an auto-derived (no explicit @font-face font-style descriptor) oblique range with a bare font-style:oblique or font-style:italic request (UA default angle, no explicit value) on a font whose actual fvar/STAT range excludes that default angle.",
+        "why_it_matters": "This is the precise shape of Cairo's real-world bug (vizchitra-fonts/docs/compat.md): Cairo ships with no font-style descriptor, so the browser must derive its usable oblique range from Cairo's own slnt axis (-11 to 11), and the UA default angle (14deg) falls outside it. The closest upstream test, css/css-fonts/variations/font-slant-1.html, tests exactly this default-angle-outside-range scenario INCLUDING the bare italic keyword — but only for a font-style descriptor that was EXPLICITLY authored in the @font-face rule, and it PASSES on Chrome/Firefox/Safari today. The auto-derived-range version of the same question — the version that actually matches how most variable webfonts (including Cairo) ship — is untested anywhere. Verified by reading css/css-fonts/font-face-style-auto-variable.html and font-face-style-default-variable.html directly: both use only explicit oblique <angle> values (10deg/5deg/0deg), never a bare keyword.",
+        "candidate_test": "A reftest pairing a variable font with a real slnt axis whose range excludes 14deg (e.g. -11 to 11, matching Cairo, or the simpler -10 to 0 already present in WPT's Inter-VF.subset.ttf), NO explicit font-style descriptor in @font-face, and font-style: italic / font-style: oblique (bare) as the test declarations — checked against whatever angle the UA actually resolves the default to."
+      },
+      {
+        "id": "combined-slnt-ital-font",
+        "summary": "No font anywhere (WPT's corpus or this repo's own resources) exposes both a real slnt axis and a real ital axis together.",
+        "why_it_matters": "The strongest direct test of #12836's independence claim (italic sets ital=1 and leaves slnt untouched; oblique sets slnt and leaves ital untouched) requires a single font where both axes are real and distinguishable, so a test can prove the OTHER axis stayed at its default rather than merely asserting an axis was never referenced.",
+        "candidate_test": "Extend tests/ital-axis/resources/build-font.py's approach (fontTools FontBuilder) to add a second gvar-driven axis, or find/build a WPT-compatible font exposing both."
+      },
+      {
+        "id": "font-style-plus-explicit-axis-pairing",
+        "summary": "No test pairs font-style with an explicit font-variation-settings axis override on the same declaration and checks the resulting precedence.",
+        "why_it_matters": "The spec's recommended pattern for authors is to pair the two (e.g. font-style: italic; font-variation-settings: 'ital' 1;) for compatibility with non-variable fallback faces, but no test verifies engines resolve any conflict between them consistently.",
+        "candidate_test": "A reftest declaring font-style: oblique 10deg together with an explicit font-variation-settings: 'slnt' <different value> on the same rule, checking which wins (or whether they're required to agree)."
       }
     ]
   }

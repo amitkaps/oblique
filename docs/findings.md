@@ -208,22 +208,50 @@ oblique/`slnt` matching and planned to write new tests across five
 categories from scratch. A direct walk of the vendored `css/css-fonts` tree
 (not a search-snippet sample) found that assumption wrong: **37 existing
 upstream tests** touch `slnt`, oblique matching, or closely related
-synthesis/parsing — several (`slnt-variable.html`, `slnt-backslant-variable.html`,
-`font-slant-1/2a/2b/2c/3.html`, `synthetic-oblique-out-of-capabilities-range.html`)
-plausibly probe the same signed-angle failure mode WebKit #209565 documents.
+synthesis/parsing.
 
 `docs/coverage.json`'s `checklist_mapping` cross-references every one of
 spec.md's original 14-item coverage checklist against this catalog (broader
 than the `probes_209565` flag — an item can be fully covered without any
 single test targeting that specific bug). Result: **12 of 14 items are
-covered** (10 upstream, 2 by this repo's own `ital`-axis tests only). Two
-are confirmed, currently-open gaps, neither upstream nor here: no font
-anywhere exposes both a real `slnt` axis and a real `ital` axis together
-(needed to directly test #12836's independence claim in its strongest
-form), and no test pairs `font-style` with an explicit
-`font-variation-settings` axis override on the same declaration. Both are
-candidate next worked examples — see `docs/coverage.md`'s "Coverage
-checklist status" table for the full breakdown.
+covered** (10 upstream, 2 by this repo's own `ital`-axis tests only).
+
+**Three confirmed, currently-open gaps** were found — logged in
+`docs/coverage.json`'s `confirmed_gaps` field, more precise than a raw
+checklist-item miss because each was verified by reading the actual content
+of the closest candidate test, not its title:
+
+1. **`auto-range-default-angle`** — no test combines an *auto-derived*
+   oblique range (no explicit `@font-face font-style` descriptor — the
+   realistic deployment shape) with a *bare* `font-style: oblique` or
+   `font-style: italic` request on a font whose real range excludes the UA
+   default angle. This is the precise shape of Cairo's real-world bug
+   (vizchitra-fonts/docs/compat.md): Cairo ships with no `font-style`
+   descriptor, so its usable range comes entirely from its own `slnt` axis
+   (-11 to 11), and the default angle (14deg) falls outside it. Initial
+   review of this catalog credited `font-slant-1.html` and
+   `synthetic-oblique-out-of-capabilities-range.html` with covering this —
+   **that was wrong**, corrected after checking the actual test content:
+   `font-slant-1.html` tests the identical default-angle-outside-range
+   scenario (including the bare `italic` keyword) but only for an
+   *explicitly declared* `font-style` descriptor range, and it **passes on
+   Chrome/Firefox/Safari today**; `synthetic-oblique-out-of-capabilities-range.html`
+   only tests an explicit, author-supplied out-of-range angle, never a bare
+   keyword or the UA default. Neither is the auto-derived-range case. This
+   reinstates Cairo as legitimate motivating evidence for a real, narrow,
+   currently-unverified gap — not the general `slnt` story spec.md v2
+   originally framed it as.
+2. **`combined-slnt-ital-font`** — no font anywhere (WPT's corpus or this
+   repo's own resources) exposes both a real `slnt` axis and a real `ital`
+   axis together, needed to test #12836's independence claim in its
+   strongest form.
+3. **`font-style-plus-explicit-axis-pairing`** — no test pairs `font-style`
+   with an explicit `font-variation-settings` axis override on the same
+   declaration and checks the resulting precedence.
+
+All three are candidate next worked examples — see `docs/coverage.md`'s
+"Confirmed gaps" section for the full detail, including candidate test
+designs for each.
 
 The same audit confirmed the inverse for `ital`: **zero** existing WPT tests
 anywhere under `css/css-fonts/` reference the `ital` variation axis in any
