@@ -19,44 +19,17 @@
     <p class="synced-banner"><!--SYNCED_BANNER--></p>
   </header>
 
-  <section class="algorithm-diagram" aria-label="Simplified font-style matching algorithm">
-    <h2>How a browser picks the angle (CSS Fonts 4 §5.2, simplified)</h2>
-    <div class="diagram">
-      <div class="d-box d-start">Requested <code>font-style: oblique</code>/<code>italic</code></div>
-      <div class="d-arrow">↓</div>
-      <div class="d-box d-decision">Does <code>@font-face</code> declare an explicit <code>font-style</code> range?</div>
-      <div class="d-branches">
-        <div class="d-branch">
-          <div class="d-branch-label">yes</div>
-          <div class="d-arrow">↓</div>
-          <div class="d-box">Use the declared range</div>
-        </div>
-        <div class="d-branch">
-          <div class="d-branch-label">no (auto)</div>
-          <div class="d-arrow">↓</div>
-          <div class="d-box">Use the font's own <code>fvar</code>/<code>STAT</code>-derived range</div>
-        </div>
-      </div>
-      <div class="d-arrow">↓</div>
-      <div class="d-box d-decision">Is the requested/default angle inside that range?</div>
-      <div class="d-branches">
-        <div class="d-branch">
-          <div class="d-branch-label">yes</div>
-          <div class="d-arrow">↓</div>
-          <div class="d-box d-end">Use it directly</div>
-        </div>
-        <div class="d-branch">
-          <div class="d-branch-label">no</div>
-          <div class="d-arrow">↓</div>
-          <div class="d-box d-end">Clamp to the nearest boundary</div>
-        </div>
-      </div>
-    </div>
-    <p class="diagram-note">
-      The "auto range, angle outside it" path (right-then-right above) is
-      exactly Cairo's real-world bug shape — see the
-      <a href="#card-auto-range-default-angle">auto-range-default-angle</a> card.
+  <section class="coverage-matrix" aria-label="Font shape by use-site CSS test coverage">
+    <h2>Test coverage: font shape × use-site CSS</h2>
+    <p class="matrix-intro">
+      Rows group this project's own test fonts by their <code>slnt</code>/<code>ital</code>
+      shape, with a sub-row per <code>@font-face</code> loading technique tried
+      on that font. Columns are what's requested at the use site — including
+      the <code>font-synthesis</code> setting, since that turned out to matter.
+      <strong>A blank cell means untested</strong> — not passing, not failing,
+      just never tried. Click a font shape to expand it.
     </p>
+    <!--MATRIX-->
   </section>
 
   <section class="card-section card-section-upstream">
