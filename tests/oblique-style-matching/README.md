@@ -51,7 +51,7 @@ comment — this table is a locator, not a restatement.
 | `font-style: oblique`, angle ≥ 11deg (exact boundary) | `boundary-11deg-ascending.html` |
 | `font-style: oblique`, angle ≤ -11deg (exact boundary) | `boundary-11deg-descending.html` |
 | `font-style: oblique`, angle in [0deg, 11deg) | `explicit-descriptor-range-clamp.html` (bare-angle default clamps within this branch) |
-| `font-style: oblique`, angle in (-11deg, 0deg] | `auto-derived-range-clamp.html` (bare-angle default clamps within this branch, negative side per this project's sign convention) |
+| `font-style: oblique`, angle in (-11deg, 0deg] | `auto-derived-range-clamp.html` (bare-angle default clamps within this branch, negative side per this project's sign convention), `auto-derived-range-clamp-cairo-symmetric.html` (same branch, re-verified on Cairo's exact -11..11 range — see docs/coverage.json's `auto-range-default-angle` gap) |
 | `font-style: italic`, full 4-stage fallback chain (italic search → oblique ≥11deg search → italic ≤0 search → oblique ≤0deg search) | `multi-branch-fallback-chain.html` |
 | `font-style: italic`, single-stage real `ital`-axis match | `independence.html`, `italic-no-extra-synthesis.html` |
 | `font-style: normal`, 3-stage fallback (oblique ≥0 ascending → italic ≥0 ascending → oblique <0 descending) | `boundary-0deg-normal-fallback.html` |

@@ -513,3 +513,46 @@ no reliable result" above, same root cause, same discipline):
 The other 10 files in the folder (including the four moved/consolidated
 tests) pass on both Chrome and Firefox. Full per-file results:
 [`results/browser-matrix.md`](../results/browser-matrix.md).
+
+## 6. Re-verifying `auto-derived-range-clamp` on Cairo's exact range shape (2026-09-19)
+
+`auto-derived-range-clamp.html` (section 5) closed the general WPT coverage
+gap for "bare `oblique`/`italic` against an auto-derived `slnt` range that
+excludes the UA default angle" — but `docs/coverage.json` flagged an
+explicit caveat: the test font, Inter, has a one-sided range (`-10..0`),
+not Cairo's real symmetric range (`-11..11`), so the PASS result didn't
+independently confirm or refute whether Cairo's own real-world bug
+(`vizchitra-fonts/docs/compat.md`) still reproduces.
+
+That follow-up is now done:
+[`auto-derived-range-clamp-cairo-symmetric.html`](../tests/oblique-style-matching/auto-derived-range-clamp-cairo-symmetric.html)
+uses `resources/oblique-symmetric.ttf` (already built during the 2026-09-18
+consolidation for the boundary-value tests), whose `fvar` `slnt` axis is
+exactly `-11..11` — verified via fontTools, matching Cairo's documented
+range precisely rather than just sharing its "excludes 14deg" shape.
+
+**Result: PASS on both Chrome and Firefox** — identical outcome to the
+Inter-range test. Range shape alone does not explain Cairo's original
+real-device finding; if that bug still reproduces today, something other
+than the auto-derived-range-clamping mechanism itself (Cairo's specific
+`STAT` table, a different browser version, or some other Cairo-specific
+factor) would have to account for it. `docs/coverage.json`'s
+`auto-range-default-angle` gap now carries two independent, dated,
+cross-engine PASS results — one per range shape — rather than one.
+
+**A test-construction mistake caught before recording any result:** the
+first draft of this test copied its rendered text ("slant") from the
+Inter-based test. `oblique-symmetric.ttf` is a purpose-built font whose
+`setupCharacterMap` only maps the letter `'A'`
+(`resources/build-fonts.py:86`) — it has no glyphs for `s`, `l`, `n`, or
+`t`. That draft silently fell back to a system font on both the test page
+and its reference (same fallback on both sides), and `wpt run` reported
+FAIL on both Chrome and Firefox with a 2932-pixel diff. Before trusting
+that as a real finding, a standalone probe page comparing bare
+`oblique`/`italic` against explicit `font-variation-settings: 'slnt' -11`
+made it obvious the custom font wasn't rendering distinctly at all in any
+of the five variants — confirming a construction bug, not a genuine
+divergence from the Inter-range result. Fixed by rendering `'A'` instead
+of `'slant'`; both engines then PASS. Not corrected silently — recorded
+here per this project's "measured, not assumed" discipline, same as the
+two mistakes caught in section 5.

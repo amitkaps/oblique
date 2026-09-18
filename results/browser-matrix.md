@@ -35,6 +35,8 @@ run via the official WPT runner — see `docs/spec.md`'s Methodology.
 | multi-branch-fallback-chain | firefox | 156.0 | no (emulated/Playwright) | pass | wpt status: PASS |
 | slnt-axis-activation | firefox | 156.0 | no (emulated/Playwright) | pass | wpt status: PASS |
 | style-plus-explicit-variation-settings | firefox | 156.0 | no (emulated/Playwright) | pass | wpt status: PASS |
+| auto-derived-range-clamp-cairo-symmetric | chrome | 153.0.8010.48 | no (emulated/Playwright) | pass | wpt status: PASS |
+| auto-derived-range-clamp-cairo-symmetric | firefox | 156.0 | no (emulated/Playwright) | pass | wpt status: PASS |
 
 `result` ∈ `pass` / `fail` / `synthesis-fallback` / `untested`.
 `real_device` ∈ `yes` / `no (emulated/Playwright)`.
