@@ -58,6 +58,7 @@ comment — this table is a locator, not a restatement.
 | `font-style: oblique 11deg` against an italic-only family (the oblique≥11deg branch's own "italic values ≥1" fallback step) | `italic-oblique-equivalence.html` |
 | §7.2 "Feature and variation precedence" — `font-variation-settings` property vs. `font-style`'s implied variation | `style-plus-explicit-variation-settings.html` |
 | `slnt`/`ital` independence on a font with both axes present (csswg-drafts#12836) | `ital-slnt-independence-dual-axis.html` |
+| §2.8.2 "font-synthesis-style" — does the UA ALSO synthesize a skew on top of an already-correctly-clamped axis, on a face that does not lack an oblique face | `explicit-range-bare-keyword-synthesis-stacking.html` |
 
 **Not separately covered here** (documented as still open, not silently
 dropped): the "angle in [0,11) vs (-11,0]" branches' own internal

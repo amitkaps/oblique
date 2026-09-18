@@ -556,3 +556,73 @@ divergence from the Inter-range result. Fixed by rendering `'A'` instead
 of `'slant'`; both engines then PASS. Not corrected silently — recorded
 here per this project's "measured, not assumed" discipline, same as the
 two mistakes caught in section 5.
+
+## 7. A different bug shape found by reading a sibling project's own browser tests (2026-09-19)
+
+Reviewing `vizchitra-fonts/docs/compat.md` and
+`vizchitra-fonts/src/lib/fonts/slant.browser.test.ts` directly (a separate,
+real production codebase's own measured cross-engine matrix, not a third-
+party bug report) surfaced that Cairo's deployment has moved on since this
+repo's earlier citations: it no longer ships with no `font-style`
+descriptor. It now declares an **explicit** range matching its own true
+`slnt` bounds exactly — `font-style: oblique -11deg 11deg` — specifically
+because the bare/auto-derived shape turned out to have its own separate
+trap (see below).
+
+That sibling project's own measured matrix documents a bug this repo's
+existing tests structurally cannot see: **once the `slnt` axis is
+correctly clamped to a declared range's boundary, Chromium separately
+stacks an additional synthetic skew on top of it.** Requesting bare
+`font-style: oblique` (implied 14deg, outside the declared -11..11 range)
+against Cairo measures shear ≈0.44 in Chromium instead of the correct
+≈0.194 — roughly double, because the axis clamp itself is correct but an
+extra synthetic skew is added on top. WebKit fails the same case a
+different way (discards the axis, synthesizes instead). Only Firefox
+measures correct.
+
+**Why none of this repo's prior range-clamp tests caught this:**
+`auto-derived-range-clamp.html`, `auto-derived-range-clamp-cairo-
+symmetric.html`, and `explicit-descriptor-range-clamp.html` all set
+`font-synthesis: none` — a deliberate isolation choice, to answer "did
+automatic `slnt` matching alone pick the right value?" independent of
+synthesis. That isolation is exactly what makes Chromium's stacking
+mechanism impossible to trigger. It's not a per-font or per-range-shape
+gap like section 6's — it's structural to every test in this folder that
+suppresses synthesis.
+
+**New test:**
+[`explicit-range-bare-keyword-synthesis-stacking.html`](../tests/oblique-style-matching/explicit-range-bare-keyword-synthesis-stacking.html)
+reproduces the shape faithfully: `resources/oblique-symmetric.ttf`
+(already built for section 6's test) with an **explicit** `font-style:
+oblique -11deg 11deg` descriptor matching its own true bounds, bare
+`oblique`/`italic` requested, `font-synthesis` deliberately left at its
+default (the first test in this folder to do so). Grounded in CSS Fonts 4
+§2.8.2 (`font-synthesis-style`): synthesis of oblique faces is specified to
+apply "when a font family lacks oblique faces" (fetched from the raw spec
+HTML, 2026-09-19) — this family does not lack one.
+
+**Result: FAIL on Chrome, PASS on Firefox** — verified with pixel
+measurement before trusting it (same discipline as every other finding in
+this file): a probe page comparing bare `oblique` under default synthesis
+against the same request under `font-synthesis: none` and against an
+explicit `font-variation-settings: 'slnt' -11` showed 36px of top-vs-bottom
+shear for the default-synthesis case, vs. 20px (identical) for the other
+two — a real, visible ~1.8× over-slant, not a test-construction artifact.
+This exactly matches the independently-measured Chrome-FAIL/Firefox-PASS
+pattern in `vizchitra-fonts`' own test suite, despite using a completely
+different (synthetic, purpose-built) font. Safari attempted, `safaridriver`
+binary unavailable in this environment — not recorded, per this project's
+established Safari policy.
+
+**Two related findings surfaced but not yet built as tests here**, flagged
+rather than silently dropped: `vizchitra-fonts`' own matrix separately
+measures (1) a third, distinct WebKit failure mode for the `italic`
+variant of this same shape (a pure ~14deg synthetic skew with **no** axis
+contribution at all, unlike Chromium's stack-on-top-of-a-correct-axis
+shape) — not independently confirmed here, since Safari/WebKit could not
+be run; and (2) a live, measured reproduction of this repo's still-open
+`normal-plus-bare-oblique-same-family` gap (§5.2's bare-oblique-on-a-
+same-family-with-a-normal-sibling hazard) — Chromium and WebKit pick the
+wrong, upright face entirely in that case. Both are now cited as
+corroborating evidence in `docs/coverage.json`, neither has a test in this
+repo yet.

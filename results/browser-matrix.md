@@ -37,6 +37,8 @@ run via the official WPT runner — see `docs/spec.md`'s Methodology.
 | style-plus-explicit-variation-settings | firefox | 156.0 | no (emulated/Playwright) | pass | wpt status: PASS |
 | auto-derived-range-clamp-cairo-symmetric | chrome | 153.0.8010.48 | no (emulated/Playwright) | pass | wpt status: PASS |
 | auto-derived-range-clamp-cairo-symmetric | firefox | 156.0 | no (emulated/Playwright) | pass | wpt status: PASS |
+| explicit-range-bare-keyword-synthesis-stacking | chrome | 153.0.8010.48 | no (emulated/Playwright) | fail | wpt status: FAIL |
+| explicit-range-bare-keyword-synthesis-stacking | firefox | 156.0 | no (emulated/Playwright) | pass | wpt status: PASS |
 
 `result` ∈ `pass` / `fail` / `synthesis-fallback` / `untested`.
 `real_device` ∈ `yes` / `no (emulated/Playwright)`.

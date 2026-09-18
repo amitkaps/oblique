@@ -271,6 +271,15 @@ THIS_REPO_CARDS = [
         "test_file": "tests/oblique-style-matching/auto-derived-range-clamp-cairo-symmetric.html", "badge": _UPSTREAMING,
     },
     {
+        "id": "explicit-range-bare-keyword-synthesis-stacking",
+        "plain_name": "Explicit true-bounds range + bare keyword stacks a synthetic skew",
+        "one_liner": "Once slnt is correctly clamped to a declared range's boundary, Chrome ALSO synthesizes an extra skew on top of it.",
+        "why_it_matters": "Reproduces a real, independently-measured production bug (vizchitra-fonts) — Chrome FAILs, Firefox PASSes, matching that measurement exactly.",
+        "spec_link": "https://drafts.csswg.org/css-fonts-4/#font-synthesis-style",
+        "tier": 1, "test_id": "explicit-range-bare-keyword-synthesis-stacking",
+        "test_file": "tests/oblique-style-matching/explicit-range-bare-keyword-synthesis-stacking.html", "badge": _UPSTREAMING,
+    },
+    {
         "id": "explicit-descriptor-range-clamp",
         "plain_name": "Explicit-descriptor range + bare oblique/italic",
         "one_liner": "Same clamp logic as above, but with an explicitly declared @font-face font-style range — the contrast case.",
