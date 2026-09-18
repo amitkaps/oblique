@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" class="reftest-wait">
+<meta charset="utf-8" />
+<title>CSS Test: font-style: italic (bare, binary) + font-style: normal</title>
+<!--
+  Coverage-matrix cell: @font-face descriptor = "font-style: italic (bare, binary)", use-site CSS
+  = "font-style: normal". Part of a systematic 5-descriptor x 7-use-site
+  enumeration built for this folder's font-shape x use-site coverage matrix
+  (see ../../scripts/generate-site-data.py's MATRIX_FONT_SHAPES /
+  MATRIX_USE_SITE_COLUMNS, and docs/investigation-log.md for the full
+  session this batch was built in).
+  Surprising but consistent on both engines: a normal request against a family whose only face is declared italic still renders slanted — once this face is selected as the only candidate (via the normal branch's own italic>=0 fallback stage), its own declared style is applied via the real axis regardless of the original request. Measured identically on Chrome and Firefox.
+-->
+<link rel="help" href="https://drafts.csswg.org/css-fonts-4/#font-style-matching" />
+<link rel="help" href="https://drafts.csswg.org/css-fonts-4/#descdef-font-face-font-style" />
+<link rel="match" href="matrix-italic-r7-italic-ref.html">
+<meta name="assert"
+  content="A face declared 'font-style: italic (bare, binary)', requested with 'font-style: normal',
+  must render the same as the reference, which sets 'slnt' -11 directly." />
+<link rel="stylesheet" href="oblique-matching.css">
+<!-- Font: resources/oblique-symmetric.ttf (Cairo's shape, slnt -11..11, no ital) — see README.md's font shape table. -->
+<style>
+  @font-face {
+    font-family: "matrix test font";
+    src: url('resources/oblique-symmetric.ttf');
+    font-style: italic;
+  }
+  .test {
+    font-family: "matrix test font";
+  }
+</style>
+<script>
+  document.fonts.ready.then(() => {
+    document.documentElement.classList.remove('reftest-wait');
+  });
+</script>
+
+<p class="test" style="font-style: normal; font-synthesis: none;">A</p>

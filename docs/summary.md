@@ -30,6 +30,7 @@ terse version; the live dashboard is
 | `oblique 11deg` against an italic-only face falls back correctly, but doesn't match explicit `ital=1` | ❌ FAIL | ❌ FAIL | not run | [`results/browser-matrix.md`](../results/browser-matrix.md) — fails on both engines; root cause not fully isolated per-engine, recorded honestly as such |
 | Three `matching/` precedence tests (stretch/weight/style search direction) | ✅ PASS | ✅ PASS | ❌ FAIL | wpt.fyi CI, see [`results/upstream-matrix.md`](../results/upstream-matrix.md) — a live, dated, cross-engine finding, not a coverage gap |
 | Bare `oblique`/`italic` against a face whose *explicit* range matches its own true `slnt` bounds — axis clamps correctly, but Chrome *also* stacks a synthetic skew on top | ❌ FAIL | ✅ PASS | not run | [`results/browser-matrix.md`](../results/browser-matrix.md) — reproduces a real, independently-measured production bug (a sibling project's own browser test suite), matching its Chrome-FAIL/Firefox-PASS result exactly |
+| `<em>` (implicit italic) against a face declared bare `font-style: italic` on a `slnt`-only font (no `ital` axis) — Chrome activates the real axis anyway | ❌ FAIL | ✅ PASS | not run | [`results/browser-matrix.md`](../results/browser-matrix.md) — 1 of 25 tests in a systematic descriptor × use-site enumeration; same polarity as `italic-no-extra-synthesis.html`, reproduced independently on a different font shape |
 
 ## `ital`-axis upstream coverage
 

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en" class="reftest-wait">
+<meta charset="utf-8" />
+<title>CSS Test: no font-style descriptor (auto) + font-style: normal</title>
+<!--
+  Coverage-matrix cell: @font-face descriptor = "no font-style descriptor (auto)", use-site CSS
+  = "font-style: normal". Part of a systematic 5-descriptor x 7-use-site
+  enumeration built for this folder's font-shape x use-site coverage matrix
+  (see ../../scripts/generate-site-data.py's MATRIX_FONT_SHAPES /
+  MATRIX_USE_SITE_COLUMNS, and docs/investigation-log.md for the full
+  session this batch was built in).
+  normal request against an auto-derived (undeclared) single face resolves to the face's own default (upright), since 0deg is within the auto-derived range.
+-->
+<link rel="help" href="https://drafts.csswg.org/css-fonts-4/#font-style-matching" />
+<link rel="help" href="https://drafts.csswg.org/css-fonts-4/#descdef-font-face-font-style" />
+<link rel="match" href="matrix-auto-r7-auto-ref.html">
+<meta name="assert"
+  content="A face declared 'no font-style descriptor (auto)', requested with 'font-style: normal',
+  must render the same as the reference (this same face's default, untouched rendering — upright)." />
+<link rel="stylesheet" href="oblique-matching.css">
+<!-- Font: resources/oblique-symmetric.ttf (Cairo's shape, slnt -11..11, no ital) — see README.md's font shape table. -->
+<style>
+  @font-face {
+    font-family: "matrix test font";
+    src: url('resources/oblique-symmetric.ttf');
+  }
+  .test {
+    font-family: "matrix test font";
+  }
+</style>
+<script>
+  document.fonts.ready.then(() => {
+    document.documentElement.classList.remove('reftest-wait');
+  });
+</script>
+
+<p class="test" style="font-style: normal;">A</p>

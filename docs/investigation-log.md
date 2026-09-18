@@ -626,3 +626,73 @@ same-family-with-a-normal-sibling hazard) — Chromium and WebKit pick the
 wrong, upright face entirely in that case. Both are now cited as
 corroborating evidence in `docs/coverage.json`, neither has a test in this
 repo yet.
+
+## 8. A systematic 5-descriptor × 7-use-site enumeration against one font (2026-09-19)
+
+Prompted by comparing this project's coverage matrix design against
+`vizchitra-fonts`' own `/compat` page (which cross-tabs `@font-face`
+declaration × use-site CSS), this session worked through a full,
+principled enumeration: every `@font-face font-style` descriptor value
+(`auto`, `normal`, `italic`, bare `oblique`, `oblique <range>`) crossed with
+every distinct use-site CSS pattern this repo's own tests actually
+exercise (bare `italic`, bare `oblique` with default synthesis, explicit
+`oblique <angle>`, bare `oblique` with synthesis off, `<em>`, direct
+`font-variation-settings: 'slnt'`, and `normal`) — 35 cells total, 10
+already covered by existing tests, 25 new. All 25 use
+`resources/oblique-symmetric.ttf` (Cairo's shape) to keep the batch
+comparable.
+
+**Methodology, not guesswork.** Before writing any reference, every cell's
+expected rendering was measured directly: a diagnostic probe page covering
+all 35 combinations, screenshotted in both Chrome and Firefox, then
+pixel-measured (top-vs-bottom edge shear, same technique as every prior
+finding this session) for the ambiguous cells — particularly to determine
+whether an observed "sheared" cell was real-axis movement, synthetic skew,
+or the section-7 stacking bug. One spec ambiguity surfaced along the way:
+CSS Fonts 4 §4.4 states `font-style: auto` is "selected as if the
+appropriate normal value is chosen" for selection purposes, which read in
+isolation seems to contradict this project's own already-measured,
+already-passing `auto-derived-range-clamp.html` — resolved by trusting the
+empirical, already-verified result over a single ambiguous paragraph,
+consistent with this project's own discipline.
+
+**A real construction bug caught before trusting any result:** the first
+draft of `matrix-italic-r5-italic-ref.html`'s "upright" reference relied on
+implicit/default font-style (no explicit override) — but this face
+(declared `font-style: italic`) turned out to render SHEARED even for a
+plain, unstyled paragraph, on both engines (matching a separate, deliberate
+finding in this same batch — `matrix-italic-r7-italic.html`, where an
+*explicit* `font-style: normal` request against this same face also
+renders slanted). The first pass at that test therefore silently PASSED on
+Chrome for the wrong reason (test and reference both sheared, coincidentally
+matching) and FAILED on Firefox — the *opposite* of the intended,
+measured result. Caught by screenshotting the actual formal test and
+reference files directly (not just the informal probe) before trusting the
+`wpt run` output. Fixed by forcing the reference to genuinely-upright via
+an explicit `font-variation-settings: 'slnt' 0` instead of relying on
+implicit styling — the only reliable technique given this face's behavior.
+
+**Result: 24 of 25 new tests PASS on both Chrome and Firefox. Exactly one
+diverges** —
+[`matrix-italic-r5-italic.html`](../tests/oblique-style-matching/matrix-italic-r5-italic.html):
+a face declared `font-style: italic` (bare, binary — no numeric angle), on
+a font with only a `slnt` axis (no `ital` axis), requested via `<em>`
+(implicit italic) with `font-synthesis: none`. Chrome activates the real
+`slnt` axis (renders sheared); Firefox renders genuinely upright. This is
+the same Chrome-over-applies/Firefox-correct polarity
+`italic-no-extra-synthesis.html` already documents — but reproduced here
+independently, on a completely different font shape (`slnt`-only instead
+of `ital`-only), via a different trigger (`<em>` instead of explicit CSS).
+Grounded in CSS Fonts 4 §5.2: the italic branch's axis-setting sentence is
+explicitly scoped to "variable fonts with an ital axis" — this face has
+none, so Chrome's behavior is not obviously licensed by that text.
+
+The other 24 are confirmed-consistent, non-divergent coverage — including
+two intentionally "surprising but consistent" results locked in as
+expected behavior on both engines: a `font-style: normal` request against
+a single-face family declared `italic` (or bare `oblique`) still renders
+slanted (`matrix-italic-r7-italic.html`, `matrix-obliquebare-r7-oblique-bare.html`)
+— once that face is selected as the only available candidate, its own
+declared style is applied via the real axis regardless of what was
+originally requested. Full per-file results:
+[`results/browser-matrix.md`](../results/browser-matrix.md).

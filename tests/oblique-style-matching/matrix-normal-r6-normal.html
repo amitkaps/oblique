@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" class="reftest-wait">
+<meta charset="utf-8" />
+<title>CSS Test: font-style: normal + explicit font-variation-settings, bypassing font-style matching</title>
+<!--
+  Coverage-matrix cell: @font-face descriptor = "font-style: normal", use-site CSS
+  = "explicit font-variation-settings, bypassing font-style matching". Part of a systematic 5-descriptor x 7-use-site
+  enumeration built for this folder's font-shape x use-site coverage matrix
+  (see ../../scripts/generate-site-data.py's MATRIX_FONT_SHAPES /
+  MATRIX_USE_SITE_COLUMNS, and docs/investigation-log.md for the full
+  session this batch was built in).
+  Direct axis override works regardless of the declared font-style descriptor — sanity/completeness check.
+-->
+<link rel="help" href="https://drafts.csswg.org/css-fonts-4/#font-style-matching" />
+<link rel="help" href="https://drafts.csswg.org/css-fonts-4/#descdef-font-face-font-style" />
+<link rel="match" href="matrix-normal-r6-normal-ref.html">
+<meta name="assert"
+  content="A face declared 'font-style: normal', requested with 'explicit font-variation-settings, bypassing font-style matching',
+  must render the same as the reference, which sets 'slnt' -11 directly." />
+<link rel="stylesheet" href="oblique-matching.css">
+<!-- Font: resources/oblique-symmetric.ttf (Cairo's shape, slnt -11..11, no ital) — see README.md's font shape table. -->
+<style>
+  @font-face {
+    font-family: "matrix test font";
+    src: url('resources/oblique-symmetric.ttf');
+    font-style: normal;
+  }
+  .test {
+    font-family: "matrix test font";
+  }
+</style>
+<script>
+  document.fonts.ready.then(() => {
+    document.documentElement.classList.remove('reftest-wait');
+  });
+</script>
+
+<p class="test" style="font-variation-settings: 'slnt' -11;">A</p>

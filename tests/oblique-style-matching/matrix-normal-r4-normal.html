@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" class="reftest-wait">
+<meta charset="utf-8" />
+<title>CSS Test: font-style: normal + bare font-style: oblique, synthesis off</title>
+<!--
+  Coverage-matrix cell: @font-face descriptor = "font-style: normal", use-site CSS
+  = "bare font-style: oblique, synthesis off". Part of a systematic 5-descriptor x 7-use-site
+  enumeration built for this folder's font-shape x use-site coverage matrix
+  (see ../../scripts/generate-site-data.py's MATRIX_FONT_SHAPES /
+  MATRIX_USE_SITE_COLUMNS, and docs/investigation-log.md for the full
+  session this batch was built in).
+  Same as normal-r3, bare keyword.
+-->
+<link rel="help" href="https://drafts.csswg.org/css-fonts-4/#font-style-matching" />
+<link rel="help" href="https://drafts.csswg.org/css-fonts-4/#descdef-font-face-font-style" />
+<link rel="match" href="matrix-normal-r4-normal-ref.html">
+<meta name="assert"
+  content="A face declared 'font-style: normal', requested with 'bare font-style: oblique, synthesis off',
+  must render the same as the reference (this same face's default, untouched rendering — upright)." />
+<link rel="stylesheet" href="oblique-matching.css">
+<!-- Font: resources/oblique-symmetric.ttf (Cairo's shape, slnt -11..11, no ital) — see README.md's font shape table. -->
+<style>
+  @font-face {
+    font-family: "matrix test font";
+    src: url('resources/oblique-symmetric.ttf');
+    font-style: normal;
+  }
+  .test {
+    font-family: "matrix test font";
+  }
+</style>
+<script>
+  document.fonts.ready.then(() => {
+    document.documentElement.classList.remove('reftest-wait');
+  });
+</script>
+
+<p class="test" style="font-style: oblique; font-synthesis: none;">A</p>

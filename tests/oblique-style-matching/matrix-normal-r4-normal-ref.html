@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en" class="reftest-wait">
+<meta charset="utf-8" />
+<title>CSS Test: font-style: normal + bare font-style: oblique, synthesis off (reference)</title>
+<!--
+  Reference: same face, default (untouched) rendering — upright.
+-->
+<link rel="stylesheet" href="oblique-matching.css">
+<style>
+  @font-face {
+    font-family: "matrix test font";
+    src: url('resources/oblique-symmetric.ttf');
+    font-style: normal;
+  }
+  .test {
+    font-family: "matrix test font";
+  }
+</style>
+<script>
+  document.fonts.ready.then(() => {
+    document.documentElement.classList.remove('reftest-wait');
+  });
+</script>
+
+<p class="test">A</p>

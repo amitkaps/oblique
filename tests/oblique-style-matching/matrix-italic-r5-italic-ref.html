@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en" class="reftest-wait">
+<meta charset="utf-8" />
+<title>CSS Test: font-style: italic (bare, binary) + <em> (implicit italic via the UA stylesheet), font-synthesis: none (reference)</title>
+<!--
+  Reference: same face, font-variation-settings: 'slnt' 0;.
+-->
+<link rel="stylesheet" href="oblique-matching.css">
+<style>
+  @font-face {
+    font-family: "matrix test font";
+    src: url('resources/oblique-symmetric.ttf');
+    font-style: italic;
+  }
+  .test {
+    font-family: "matrix test font";
+    font-variation-settings: 'slnt' 0;
+  }
+</style>
+<script>
+  document.fonts.ready.then(() => {
+    document.documentElement.classList.remove('reftest-wait');
+  });
+</script>
+
+<p class="test">A</p>

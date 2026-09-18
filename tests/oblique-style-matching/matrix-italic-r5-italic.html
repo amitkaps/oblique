@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" class="reftest-wait">
+<meta charset="utf-8" />
+<title>CSS Test: font-style: italic (bare, binary) + <em> (implicit italic via the UA stylesheet), font-synthesis: none</title>
+<!--
+  Coverage-matrix cell: @font-face descriptor = "font-style: italic (bare, binary)", use-site CSS
+  = "<em> (implicit italic via the UA stylesheet), font-synthesis: none". Part of a systematic 5-descriptor x 7-use-site
+  enumeration built for this folder's font-shape x use-site coverage matrix
+  (see ../../scripts/generate-site-data.py's MATRIX_FONT_SHAPES /
+  MATRIX_USE_SITE_COLUMNS, and docs/investigation-log.md for the full
+  session this batch was built in).
+  Cleaner re-isolation (via <em>, synthesis explicitly off) of the same divergence italic-no-extra-synthesis.html already documents for a DIFFERENT font shape (ital-axis-only). IMPORTANT construction note: an 'upright' reference built via implicit/default font-style (no override at all) is NOT reliable for this descriptor — verified directly that even an unstyled paragraph against this italic-declared face renders SHEARED on both engines (matching italic-r7's finding that this face's own declared identity gets applied regardless of the actual request). The reference here instead forces genuinely upright via an explicit font-variation-settings: 'slnt' 0, the only reliable way to pin this baseline. Measured: Chrome renders sheared for the em request (always applies this face's axis, matching its own italic identity, regardless of request — the same behavior italic-r7 documents for a plain 'normal' request too). Firefox renders upright specifically for an italic-style request (exact descriptor match needs no further axis work) even though it ALSO shears for a normal request against the same face (see italic-r7) — a narrower, request-specific distinction than a blanket 'Firefox never touches this axis' rule. EXPECTED TO FAIL ON CHROME.
+-->
+<link rel="help" href="https://drafts.csswg.org/css-fonts-4/#font-style-matching" />
+<link rel="help" href="https://drafts.csswg.org/css-fonts-4/#descdef-font-face-font-style" />
+<link rel="match" href="matrix-italic-r5-italic-ref.html">
+<meta name="assert"
+  content="A face declared 'font-style: italic (bare, binary)', requested with '<em> (implicit italic via the UA stylesheet), font-synthesis: none',
+  must render the same as the reference, which forces genuinely upright via explicit font-variation-settings: 'slnt' 0 (not implicit default styling — see this cell's own comment for why)." />
+<link rel="stylesheet" href="oblique-matching.css">
+<!-- Font: resources/oblique-symmetric.ttf (Cairo's shape, slnt -11..11, no ital) — see README.md's font shape table. -->
+<style>
+  @font-face {
+    font-family: "matrix test font";
+    src: url('resources/oblique-symmetric.ttf');
+    font-style: italic;
+  }
+  .test {
+    font-family: "matrix test font";
+  }
+</style>
+<script>
+  document.fonts.ready.then(() => {
+    document.documentElement.classList.remove('reftest-wait');
+  });
+</script>
+
+<p class="test" style="font-synthesis: none"><em>A</em></p>
