@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en" class="reftest-wait">
+<meta charset="utf-8" />
+<title>CSS Test: `font-style: italic` against an all-oblique-negative family falls through all four fallback stages</title>
+<!--
+  Algorithm step: CSS Fonts 4 §5.2 "Matching font styles", the `italic`
+  branch's full fallback chain, quoted verbatim: "If the value of
+  font-style is italic: [stage 1] ... [try italic values] ... If no match
+  is found, oblique values greater than or equal to 11deg are checked in
+  ascending order followed by oblique values below 11deg in descending
+  order, until 0 is hit. [stage 2] ... If no match is found, italic values
+  less than or equal to 0 are checked in descending order until a match is
+  found. [stage 3] If no match is found, oblique values less than or equal
+  to 0deg are checked in descending order until a match is found. [stage 4]"
+  This is boundary-0deg-normal-fallback.html's deeper sibling: same family
+  (one face, `font-style: oblique -20deg -5deg`, no italic face — see
+  resources/oblique-nozero.ttf and README.md), but requesting `italic`
+  instead of `normal` forces all FOUR stages to run, not three: stage 1
+  (italic search) misses because there is no italic-declared face at all;
+  stage 2 (oblique >=11 ascending then <11 descending, but only down to
+  0deg) misses because this face's entire range is below 0deg, outside
+  that stage's search floor; stage 3 (italic <=0 descending) misses for
+  the same reason as stage 1; stage 4 (oblique <=0deg descending) is where
+  it actually resolves, landing on the same -5deg boundary as
+  boundary-0deg-normal-fallback.html.
+  Pass means: the "italic" paragraph renders identically to the reference,
+  which sets 'slnt' to 5 directly — proving the engine walked the full
+  chain to stage 4 rather than stopping early (which would leave the face
+  unstyled/upright) or matching some other stage.
+-->
+<link rel="help" href="https://drafts.csswg.org/css-fonts-4/#font-style-matching" />
+<link rel="match" href="multi-branch-fallback-chain-ref.html">
+<meta name="assert"
+  content="'font-style: italic' against a family with no italic-declared
+  face and a single oblique face entirely below 0deg (-20deg to -5deg)
+  must fall through italic search, the oblique >=11deg search, and the
+  italic <=0 search — all of which have no candidate — before resolving
+  via the fourth stage (oblique <=0deg descending) to 'slnt' 5." />
+<link rel="stylesheet" href="oblique-matching.css">
+<!-- Font: resources/oblique-nozero.ttf — same face declaration as boundary-0deg-normal-fallback.html; see that file and README.md. -->
+<style>
+  @font-face {
+    font-family: "nozero fallback test";
+    src: url('resources/oblique-nozero.ttf');
+    font-style: oblique -20deg -5deg;
+  }
+  .test {
+    font-synthesis: none;
+    font-family: "nozero fallback test";
+  }
+</style>
+<script>
+  document.fonts.ready.then(() => {
+    document.documentElement.classList.remove('reftest-wait');
+  });
+</script>
+
+<p class="test" style="font-style: italic">A</p>

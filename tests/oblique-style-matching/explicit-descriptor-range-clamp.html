@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en" class="reftest-wait">
+<meta charset="utf-8" />
+<title>CSS Test: bare `oblique` default angle clamps into an EXPLICITLY DECLARED `slnt` range</title>
+<!--
+  Algorithm step: CSS Fonts 4 §5.2 "Matching font styles" — the contrast
+  case to auto-derived-range-clamp.html in this same folder: here the
+  @font-face declares an EXPLICIT `font-style: oblique 0deg 10deg`
+  descriptor (rather than leaving font-style at its default `auto`), and
+  the bare `oblique`/`italic` UA default angle (conventionally 14deg,
+  outside this declared 0-10deg range) must clamp to the declared range's
+  boundary. This mirrors what upstream's
+  css/css-fonts/variations/font-slant-1.html already tests (see
+  docs/coverage.json) — reproduced here, not to duplicate upstream
+  coverage, but so this suite's own README boundary-value table has both
+  the auto and explicit cases side by side in one place, sourced from the
+  same font-building pipeline.
+  Pass means: both the "oblique" and "italic" paragraphs render
+  identically to the reference, which sets 'slnt' to -10 directly via
+  font-variation-settings — the declared range's boundary closest to the
+  default angle, not the unclamped default itself and not 0.
+-->
+<link rel="help" href="https://drafts.csswg.org/css-fonts-4/#font-style-matching" />
+<link rel="help" href="https://drafts.csswg.org/css-fonts-4/#font-prop-desc" />
+<link rel="match" href="explicit-descriptor-range-clamp-ref.html">
+<meta name="assert"
+  content="Bare 'oblique' and bare 'italic' requests against a face whose
+  @font-face declares an EXPLICIT font-style: oblique 0deg 10deg
+  descriptor clamp the UA default angle to the declared range's boundary
+  (slnt -10), the same clamp mechanism as auto-derived-range-clamp.html
+  but for a declared, not auto-derived, range." />
+<link rel="stylesheet" href="oblique-matching.css">
+<!--
+  Font: resources/oblique-onesided-neg.ttf (this suite's purpose-built
+  font, slnt range -10..0 — same shape as upstream's Inter.var.subset.ttf,
+  see README.md's font table). Declared descriptor range 0deg 10deg maps
+  onto the font's slnt -10..0 by negation, the same convention already
+  confirmed passing in slnt-axis-activation.html and upstream's
+  font-slant-1.html.
+-->
+<style>
+  @font-face {
+    font-family: "explicit range test";
+    src: url('resources/oblique-onesided-neg.ttf');
+    font-style: oblique 0deg 10deg;
+  }
+  .test {
+    font-synthesis: none;
+    font-family: "explicit range test";
+  }
+</style>
+<script>
+  document.fonts.ready.then(() => {
+    document.documentElement.classList.remove('reftest-wait');
+  });
+</script>
+
+<p class="test" style="font-style: oblique">A</p>
+<p class="test" style="font-style: italic">A</p>

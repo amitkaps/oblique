@@ -17,7 +17,7 @@ vizchitra-fonts/docs/compat.md and used by WPT's own slnt-variable-ref.html,
 generalized here to the `ital` axis so a reftest can tell upright from
 italic-activated apart pixel-for-pixel.
 
-Run from the repo root: uv run tests/ital-axis/resources/build-font.py
+Run from the repo root: uv run tests/oblique-style-matching/resources/build-ident-ital-font.py
 """
 
 import os

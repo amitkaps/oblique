@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" class="reftest-wait">
+<meta charset="utf-8" />
+<title>CSS Test: explicit `oblique -11deg` at the -11deg branch boundary sets `slnt` with the correct sign</title>
+<!--
+  Algorithm step: CSS Fonts 4 §5.2 "Matching font styles" — "If the value of
+  font-style is oblique and the requested angle is less than or equal to
+  -11deg, follow the steps above [the >=11deg branch], except with the
+  negated values and opposite directions." Sign-symmetry twin of
+  boundary-11deg-ascending.html, same font, same reasoning, opposite sign —
+  together these check WebKit #209565's documented signed-angle mishandling
+  in both directions, not just one.
+  Pass means: the "oblique -11deg" paragraph renders identically to the
+  reference, which sets 'slnt' to +11 directly (negation of
+  boundary-11deg-ascending.html's -11, per this suite's sign convention).
+-->
+<link rel="help" href="https://drafts.csswg.org/css-fonts-4/#font-style-matching" />
+<link rel="help" href="https://bugs.webkit.org/show_bug.cgi?id=209565" />
+<link rel="match" href="boundary-11deg-descending-ref.html">
+<meta name="assert"
+  content="'font-style: oblique -11deg', requested at the exact -11deg
+  branch boundary against a variable font whose auto-derived slnt range
+  directly includes it, sets 'slnt' to +11 — the mirror image of
+  boundary-11deg-ascending.html, not a repeat of the same sign." />
+<link rel="stylesheet" href="oblique-matching.css">
+<!-- Font: resources/oblique-symmetric.ttf — see boundary-11deg-ascending.html and README.md. -->
+<style>
+  @font-face {
+    font-family: "boundary test font";
+    src: url('resources/oblique-symmetric.ttf');
+  }
+  .test {
+    font-synthesis: none;
+    font-family: "boundary test font";
+  }
+</style>
+<script>
+  document.fonts.ready.then(() => {
+    document.documentElement.classList.remove('reftest-wait');
+  });
+</script>
+
+<p class="test" style="font-style: oblique -11deg">A</p>

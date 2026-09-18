@@ -85,10 +85,10 @@ off writing them.
 
 | Spec requirement | Test(s) | Matrix result | Upstream status | Interop relevance |
 |---|---|---|---|---|
-| Bare `font-style: oblique` activates a variable font's `slnt` axis, matching the value an equivalent explicit `font-variation-settings: 'slnt'` would produce (css-fonts-4 §5.2 oblique matching) | `tests/font-style-oblique/slnt-axis-activation.html` + `-ref.html` (reftest) | **PASS** — Chrome 153.0.8010.37, Firefox 156.0 — see `results/browser-matrix.md` | not yet upstreamed | core `slnt` claim; motivates re-opening web-platform-tests/interop#64 |
-| `font-style: oblique` must NOT activate a variable font's `ital` axis when the matched face exposes only `ital` (css-fonts-4 §5.2, per #12836's "the ital axis is not used to satisfy an oblique request") | `tests/ital-axis/independence.html` + `-ref.html` (reftest) | **PASS** — Chrome 153.0.8010.37, Firefox 156.0 — see `results/browser-matrix.md` | not yet upstreamed | half of the core interoperability claim for `ital`/`slnt` independence |
-| `font-style: italic` against a variable `ital`-axis face must set `ital`=1 and synthesize nothing further on top of that real match (css-fonts-4 §5.2 + general "don't synthesize when a face already matches" rule) | `tests/ital-axis/italic-no-extra-synthesis.html` + `-ref.html` (reftest) | **FAIL** on Chrome 153.0.8010.37, **PASS** on Firefox 156.0 — see `results/browser-matrix.md` | not yet upstreamed | **reproduces WebKit #209565's documented ital-axis failure mode live, in Chrome, while Firefox already conforms** — direct evidence Chromium #40681464's fix (in progress, two pending CLs per this doc's Prior Art Status) has not shipped, and that this is a real, currently-live two-out-of-three interop gap, not a hypothetical one |
-| Bare `font-style: oblique`/`italic` (UA default angle) resolves against an AUTO-DERIVED `slnt` range (no explicit `@font-face font-style` descriptor) by clamping into the font's own fvar-declared range — the precise shape of Cairo's real-world bug (vizchitra-fonts/docs/compat.md) | `tests/font-style-oblique/auto-range-default-angle.html` + `-ref.html` (reftest) | **PASS** on Chrome 153.0.8010.48 and Firefox 156.0 (2026-09-18); Safari not attempted | not yet upstreamed | **closes `docs/coverage.json`'s `auto-range-default-angle` confirmed gap for upstream-coverage purposes** — both engines correctly clamp on this font shape (Inter, one-sided `-10..0` range). Does **not** independently re-confirm or refute Cairo's own exact bug, which used a symmetric `-11..11` range — see the caveat in `docs/coverage.json`'s updated gap entry before citing this as evidence Cairo's bug no longer reproduces |
+| Bare `font-style: oblique` activates a variable font's `slnt` axis, matching the value an equivalent explicit `font-variation-settings: 'slnt'` would produce (css-fonts-4 §5.2 oblique matching) | `tests/oblique-style-matching/slnt-axis-activation.html` + `-ref.html` (reftest) | **PASS** — Chrome 153.0.8010.37, Firefox 156.0 — see `results/browser-matrix.md` | not yet upstreamed | core `slnt` claim; motivates re-opening web-platform-tests/interop#64 |
+| `font-style: oblique` must NOT activate a variable font's `ital` axis when the matched face exposes only `ital` (css-fonts-4 §5.2, per #12836's "the ital axis is not used to satisfy an oblique request") | `tests/oblique-style-matching/independence.html` + `-ref.html` (reftest) | **PASS** — Chrome 153.0.8010.37, Firefox 156.0 — see `results/browser-matrix.md` | not yet upstreamed | half of the core interoperability claim for `ital`/`slnt` independence |
+| `font-style: italic` against a variable `ital`-axis face must set `ital`=1 and synthesize nothing further on top of that real match (css-fonts-4 §5.2 + general "don't synthesize when a face already matches" rule) | `tests/oblique-style-matching/italic-no-extra-synthesis.html` + `-ref.html` (reftest) | **FAIL** on Chrome 153.0.8010.37, **PASS** on Firefox 156.0 — see `results/browser-matrix.md` | not yet upstreamed | **reproduces WebKit #209565's documented ital-axis failure mode live, in Chrome, while Firefox already conforms** — direct evidence Chromium #40681464's fix (in progress, two pending CLs per this doc's Prior Art Status) has not shipped, and that this is a real, currently-live two-out-of-three interop gap, not a hypothetical one |
+| Bare `font-style: oblique`/`italic` (UA default angle) resolves against an AUTO-DERIVED `slnt` range (no explicit `@font-face font-style` descriptor) by clamping into the font's own fvar-declared range — the precise shape of Cairo's real-world bug (vizchitra-fonts/docs/compat.md) | `tests/oblique-style-matching/auto-derived-range-clamp.html` + `-ref.html` (reftest) | **PASS** on Chrome 153.0.8010.48 and Firefox 156.0 (2026-09-18); Safari not attempted | not yet upstreamed | **closes `docs/coverage.json`'s `auto-range-default-angle` confirmed gap for upstream-coverage purposes** — both engines correctly clamp on this font shape (Inter, one-sided `-10..0` range). Does **not** independently re-confirm or refute Cairo's own exact bug, which used a symmetric `-11..11` range — see the caveat in `docs/coverage.json`'s updated gap entry before citing this as evidence Cairo's bug no longer reproduces |
 
 _Table grows as more worked examples are added. `italic-no-extra-synthesis`
 was added after review flagged that `independence.html` forces
@@ -245,7 +245,7 @@ of the closest candidate test, not its title:
    `font-slant-1.html` and `synthetic-oblique-out-of-capabilities-range.html`
    with covering this — **that was wrong**, corrected after checking the
    actual test content. A test now exists
-   (`tests/font-style-oblique/auto-range-default-angle.html`) and passes on
+   (`tests/oblique-style-matching/auto-derived-range-clamp.html`) and passes on
    Chrome/Firefox — see §2 and "Evidence tiers" below for the full,
    caveated result.
 2. **`normal-plus-bare-oblique-same-family`** — no test constructs a
@@ -296,7 +296,7 @@ that Safari currently doesn't correctly implement the stretch-over-style-
 over-weight search-direction precedence rule these three tests check. It's
 tier-1-grade evidence (a written test, a dated cross-engine result, a real
 currently-live failure) by the same standard as
-`tests/ital-axis/italic-no-extra-synthesis.html`, just discovered via
+`tests/oblique-style-matching/italic-no-extra-synthesis.html`, just discovered via
 wpt.fyi sync rather than a test this repo authored. Same Safari-provenance
 caveat as elsewhere in this document applies: this is wpt.fyi's own CI
 run, not this repo's flaky local `safaridriver` investigation, so it's
@@ -306,7 +306,7 @@ The same audit confirmed the inverse for `ital`: **zero** existing WPT tests
 anywhere under `css/css-fonts/` reference the `ital` variation axis in any
 form (search method and result logged in `docs/coverage.json`'s
 `ital_axis_gap` field). This is now the repo's primary reason to author new
-tests at all — `tests/ital-axis/` fills a real, confirmed gap, rather than
+tests at all — `tests/oblique-style-matching/` fills a real, confirmed gap, rather than
 duplicating coverage that already exists.
 
 Given this, the repo's ongoing value shifts from "write new tests broadly"
@@ -353,15 +353,15 @@ weight is stated, not left for a reader to infer from tone.
 **Tier 1 — proven, reproducible, live today.** A written test with a dated,
 recorded cross-engine result showing the failure actually happening:
 
-- `tests/ital-axis/italic-no-extra-synthesis.html` — **fails on Chrome
+- `tests/oblique-style-matching/italic-no-extra-synthesis.html` — **fails on Chrome
   153.0.8010.37, passes on Firefox 156.0**, recorded 2026-09-18 in
   `results/browser-matrix.md`. This is the strongest evidence this repo
   has: a live, currently-reproducible interop gap.
-- `tests/ital-axis/independence.html` — passes on both Chrome and Firefox,
+- `tests/oblique-style-matching/independence.html` — passes on both Chrome and Firefox,
   also dated and recorded, though (per section 2 above) its
   `font-synthesis: none` setup makes the PASS less discriminating than
   `italic-no-extra-synthesis.html`'s.
-- **`tests/font-style-oblique/auto-range-default-angle.html`** — added
+- **`tests/oblique-style-matching/auto-derived-range-clamp.html`** — added
   2026-09-18 to close the `auto-range-default-angle` gap (below). Passes
   on Chrome 153.0.8010.48 and Firefox 156.0. **This graduated the gap from
   tier 2 to tier 1**, but note the result is a clean PASS, not a
@@ -412,7 +412,7 @@ to exist, but no test demonstrates it yet:
 **Tier 1, with a caveat — `auto-range-default-angle`, now closed but not
 confirmatory.** `docs/coverage.json`'s `confirmed_gaps` (priority 4, now
 that it's done) — this **was** the recommended next worked example and now
-has one: `tests/font-style-oblique/auto-range-default-angle.html`. This is
+has one: `tests/oblique-style-matching/auto-derived-range-clamp.html`. This is
 directly Cairo's own documented real-world failure mode
 (vizchitra-fonts/docs/compat.md: no `font-style` descriptor authored, so
 the UA must derive the oblique range from Cairo's own `slnt` axis (-11 to
@@ -451,12 +451,65 @@ instance.**
 1. ~~`auto-range-default-angle`~~ — **done**, see above (Chrome/Firefox
    PASS; Cairo's exact symmetric range still unverified if worth
    revisiting).
-2. **`normal-plus-bare-oblique-same-family`** — next up. Equally strong
-   corroboration to `auto-range-default-angle` (a real, documented
-   production hazard, just first-party rather than third-party), and a
-   simpler test shape: two `@font-face` blocks, one family, no variable
-   font or axis machinery required.
-3. `font-style-plus-explicit-axis-pairing` — real but uncorroborated
-   spec-recommended pattern.
-4. `combined-slnt-ital-font` — deprioritized, spec-completeness only, no
-   known real-world instance.
+2. **`normal-plus-bare-oblique-same-family`** — still the only one of the
+   four original confirmed gaps not yet closed. Explicitly **not**
+   addressed by the `tests/oblique-style-matching/` consolidation below —
+   flagged in that folder's own README rather than left ambiguous.
+3. ~~`font-style-plus-explicit-axis-pairing`~~ — **done**, see §5 below.
+4. ~~`combined-slnt-ital-font`~~ — **done**, see §5 below — closing it
+   surfaced a real, dated Chrome-only finding, not a clean pass.
+
+## 5. `tests/oblique-style-matching/` — consolidation and two new findings (2026-09-18)
+
+This project's own tests were consolidated from their earlier scattered
+locations (`tests/font-style-oblique/`, `tests/ital-axis/`, both now
+removed) into a single `tests/oblique-style-matching/` folder — the
+candidate for a future WPT PR — and extended with 8 new test files covering
+the CSS Fonts 4 §5.2 boundary-value table and §7.2 precedence question that
+weren't tested anywhere before. Full design rationale, the boundary-value
+table, and the font-shape table are in
+[`tests/oblique-style-matching/README.md`](../tests/oblique-style-matching/README.md),
+not duplicated here.
+
+Every new spec claim was grounded by fetching CSS Fonts 4's raw HTML
+directly (`https://drafts.csswg.org/css-fonts-4/`) and extracting the exact
+normative text for §5.2 "Matching font styles" and §7.2 "Feature and
+variation precedence" — not paraphrased from memory or from this project's
+own earlier, less precise summaries.
+
+Two genuine, dated, cross-engine findings came out of writing and running
+these 8 new tests (Chrome 153.0.8010.48, Firefox 156.0; Safari attempted
+twice via local `safaridriver` and not recorded — see "Safari — attempted,
+no reliable result" above, same root cause, same discipline):
+
+- **`ital-slnt-independence-dual-axis.html` FAILS on Chrome, PASSES on
+  Firefox.** `resources/oblique-dual-axis.ttf` is this project's first font
+  with both a real `slnt` axis and a real `ital` axis. Before trusting this
+  as a real finding, it was isolated directly: forcing
+  `font-variation-settings: 'slnt' 0` on top of Chrome's automatic
+  `font-style: italic` collapses the rendering to a plain unsheared
+  rectangle, and forcing `'ital' 1` instead restores full shear matching
+  the explicit reference. That means Chrome's automatic `italic`
+  resolution is driving the `slnt` axis on this font, not purely `ital` —
+  a fresh, reverse-direction instance of the same class of axis-crosstalk
+  bug WebKit #209565 documents.
+- **`italic-oblique-equivalence.html` FAILS on BOTH Chrome and Firefox.**
+  An earlier draft of this test added a decoy `font-style: normal` face to
+  the family, reasoning a wrong-face selection would then be visually
+  unmistakable — that was a genuine test-construction mistake, not a
+  Chrome finding: a `normal`-declared face implicitly carries an oblique
+  value of 0, reachable by the oblique&ge;11deg branch's own first search
+  stage ("...until 0 is hit") before the italic fallback step is ever
+  reached, so the decoy changed which branch stage resolved the request.
+  Corrected (decoy removed, confirmed via isolation that the fallback step
+  itself works correctly on Chrome). After that fix, the test still fails
+  on both engines — the fallback step works, but the resulting render
+  doesn't match explicit `'ital' 1`, the same under-sheared/offset
+  signature as the dual-axis finding above. Unlike that finding, this
+  one's root cause is **not** fully isolated per-engine — recorded
+  honestly as a live, dated, two-engine finding, not a fully diagnosed
+  one, per this project's own "don't guess" discipline.
+
+The other 10 files in the folder (including the four moved/consolidated
+tests) pass on both Chrome and Firefox. Full per-file results:
+[`results/browser-matrix.md`](../results/browser-matrix.md).

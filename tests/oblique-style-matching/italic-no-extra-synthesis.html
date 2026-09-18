@@ -10,7 +10,7 @@
   with an ital axis, a match is created by setting the ital value to 1" —
   that match is real, so nothing should be layered on top of it.
   Prior art: WebKit #209565's SPECIFIC documented failure for ital-axis
-  fonts (not the oblique/slnt direction tests/ital-axis/independence.html
+  fonts (not the oblique/slnt direction independence.html
   already covers): "for fonts with an ital axis, font-style:italic
   activates the axis but ALSO applies a spurious 20 degrees of synthesized
   slant on top." This test targets exactly that failure mode, which
@@ -34,7 +34,7 @@
   further — the real axis match satisfies the request." />
 <!--
   Font: resources/IdentTestItal.ttf, same purpose-built font as
-  independence.html (see tests/ital-axis/README.md). Any spurious
+  independence.html (see README.md). Any spurious
   synthetic slant stacked on top of the font's own ital=1 shear would
   visibly over-shear the glyph relative to the reference, which is
   deterministic and pixel-distinguishable per this font's design.

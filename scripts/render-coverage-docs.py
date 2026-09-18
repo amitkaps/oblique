@@ -76,7 +76,7 @@ def render_coverage_md(coverage: dict) -> str:
         f"Result: {gap['result']}",
         "",
         "This is the confirmed, current scope of this repo's own novel "
-        "tests (`tests/ital-axis/`) — not duplicating upstream coverage, "
+        "tests (`tests/oblique-style-matching/`) — not duplicating upstream coverage, "
         "filling a real gap in it.",
         "",
     ]

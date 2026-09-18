@@ -17,10 +17,11 @@ This repo does two things:
    per-engine pass/fail, synced from [wpt.fyi](https://wpt.fyi) on a
    schedule (see "Live coverage dashboard" below). Turns out WPT already
    covers `slnt` fairly well; it covers `ital` **not at all**.
-2. **Supplies the tests upstream WPT is missing** for that confirmed
-   `ital`-axis gap — a small set of novel tests under `tests/ital-axis/`,
-   staged for upstreaming, following the same worked-example methodology as
-   the rest of this repo.
+2. **Supplies the tests upstream WPT is missing** — a consolidated set of
+   novel tests under `tests/oblique-style-matching/`, staged as a single
+   future WPT PR (not yet opened), following the same worked-example
+   methodology as the rest of this repo. See that folder's own README for
+   the boundary-value table and design rationale.
 
 Full build spec: [`docs/spec.md`](docs/spec.md). Execution plan:
 [`docs/plan.md`](docs/plan.md). Current state, short version:
@@ -71,12 +72,9 @@ infrastructure, gitignored, never committed — see
 
 ```
 ./scripts/setup-wpt.sh
-mkdir -p .wpt/css/css-fonts/variable-oblique-interop/font-style-oblique
-cp -r tests/font-style-oblique/*.html tests/font-style-oblique/resources \
-  .wpt/css/css-fonts/variable-oblique-interop/font-style-oblique/
-mkdir -p .wpt/css/css-fonts/variable-oblique-interop/ital-axis
-cp -r tests/ital-axis/*.html tests/ital-axis/resources \
-  .wpt/css/css-fonts/variable-oblique-interop/ital-axis/
+mkdir -p .wpt/css/css-fonts/variable-oblique-interop/oblique-style-matching
+cp -r tests/oblique-style-matching/*.html tests/oblique-style-matching/*.css tests/oblique-style-matching/resources \
+  .wpt/css/css-fonts/variable-oblique-interop/oblique-style-matching/
 cd .wpt
 ./wpt install chrome webdriver --channel stable
 ./wpt install firefox webdriver
@@ -266,11 +264,8 @@ oblique/
 │   ├── render-coverage-docs.py  # renders coverage.md/upstream-matrix.md
 │   └── generate-site-data.py    # renders site/index.html + cards.json
 ├── tests/
-│   ├── font-style-oblique/   # this repo's own novel tests (slnt side)
-│   ├── oblique-range/
-│   ├── synthesis/
-│   ├── variation-settings/
-│   └── ital-axis/            # the confirmed WPT gap this repo fills
+│   └── oblique-style-matching/  # this repo's own tests, consolidated —
+│                                # the single candidate for a future WPT PR
 ├── site/                      # static Vite project — source of the public page
 │   ├── template.html          # tracked source; generate-site-data.py fills it in
 │   ├── src/style.css

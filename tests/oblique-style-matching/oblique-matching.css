@@ -1,0 +1,13 @@
+/* Shared layout for this folder's reftests — a fixed-size test rectangle
+   with no margin/padding, so pixel-diffing isn't sensitive to font-metric
+   or line-height differences across engines. Each test's own <style>
+   still declares its @font-face(s) and per-paragraph font-style. */
+html, body {
+  margin: 0;
+  padding: 0;
+}
+.test {
+  font-size: 3em;
+  margin: 0;
+  padding: 0;
+}
