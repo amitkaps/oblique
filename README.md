@@ -23,9 +23,10 @@ This repo does two things:
    the rest of this repo.
 
 Full build spec: [`docs/spec.md`](docs/spec.md). Execution plan:
-[`docs/plan.md`](docs/plan.md). Prior-art status and results:
-[`docs/findings.md`](docs/findings.md). Coverage catalog:
-[`docs/coverage.md`](docs/coverage.md).
+[`docs/plan.md`](docs/plan.md). Current state, short version:
+[`docs/summary.md`](docs/summary.md). Full investigation trail (every claim
+sourced, every wrong turn documented): [`docs/investigation-log.md`](docs/investigation-log.md).
+Coverage catalog: [`docs/coverage.md`](docs/coverage.md).
 
 ## Non-goals
 
@@ -48,8 +49,8 @@ Full build spec: [`docs/spec.md`](docs/spec.md). Execution plan:
   behavior, not upstreamable itself)
 
 Current verified status of each of the above is in
-[`docs/findings.md`](docs/findings.md) — do not treat this list's parenthetical
-notes as current; re-check findings.md, which is dated.
+[`docs/investigation-log.md`](docs/investigation-log.md) — do not treat this
+list's parenthetical notes as current; re-check the log, which is dated.
 
 ## Methodology
 
@@ -60,7 +61,7 @@ notes as current; re-check findings.md, which is dated.
 4. Record result in `results/browser-matrix.md` using the fixed schema.
 5. Once stable and reviewed, upstream the test file(s) to WPT via PR.
 6. Aggregate upstreamed + accepted tests into an Interop proposal draft in
-   `docs/findings.md`.
+   `docs/investigation-log.md`.
 
 ## Running the tests
 
@@ -156,7 +157,7 @@ safari):
   --log-wptreport=../results/latest-safari.json
 ```
 
-**Before trusting a Safari result, read `docs/findings.md`'s "Safari —
+**Before trusting a Safari result, read `docs/investigation-log.md`'s "Safari —
 attempted, no reliable result" section.** In this environment, `wpt run`
 reported all three tests FAIL identically across four runs. This is *not*
 a font-validity problem (an early theory blaming `fontTools`-generated
@@ -202,29 +203,45 @@ It fails loudly (non-zero exit) on any API error rather than publish
 partial or stale data as current.
 
 `scripts/render-coverage-docs.py` renders `docs/coverage.md` and
-`results/upstream-matrix.md` from that JSON, and copies both JSON files into
-`docs/data/` for the static dashboard page (`docs/index.html`) to fetch
-client-side. The dashboard groups tests by axis, shows current pass/fail per
-engine, and — importantly — states the `ital`-axis gap explicitly rather
-than leaving it as something a reader has to infer from an empty section. It
-reads only committed JSON snapshots (never calls wpt.fyi live from the
+`results/upstream-matrix.md` from that JSON (and copies both JSON files into
+`docs/data/` for anyone browsing the raw data directly).
+
+`scripts/generate-site-data.py` then renders the small, curated dataset the
+public site actually needs (`site/src/data/cards.json` — a handful of cards,
+plain-language descriptions, capped "why it matters" lines, not a
+pass-through of the verbose sources above) and bakes it directly into
+`site/index.html` from `site/template.html`. The site
+([`site/`](site/), a static Vite project) has no client-side interactivity,
+so there's no JS rendering step — the page ships as plain static HTML plus
+one bundled stylesheet, built with `pnpm run build`. It's organized into two
+visually distinct sections: tests already covered by upstream WPT, and new
+tests this project wrote to fill confirmed gaps — never merged into one
+table, so a visitor can tell at a glance which is which. It reads only
+committed JSON snapshots at build time (never calls wpt.fyi live from the
 browser), so staleness is visible via a prominent last-synced timestamp
 rather than silently assumed current.
 
-The dashboard is published via GitHub Pages, serving the `docs/` folder,
-at **https://oblique.amitkaps.com** (`docs/CNAME`; requires a DNS `CNAME`
+The site is published via GitHub Pages, serving the `docs/` folder (the
+built `site/dist/` output is copied there), at
+**https://oblique.amitkaps.com** (`docs/CNAME`; requires a DNS `CNAME`
 record for that hostname pointing at `amitkaps.github.io`, set up outside
 this repo).
 
 A scheduled GitHub Actions workflow
 ([`.github/workflows/sync-wpt-results.yml`](.github/workflows/sync-wpt-results.yml))
-re-runs both scripts daily and commits the refreshed data. To run the sync
-manually:
+re-runs the full pipeline daily and commits the refreshed data + rebuilt
+site. To run it manually:
 
 ```
 uv run scripts/sync-wpt-results.py
 uv run scripts/render-coverage-docs.py
+uv run scripts/generate-site-data.py
+cd site && pnpm install && pnpm run build && cd ..
+rm -rf docs/assets && cp -r site/dist/* docs/
 ```
+
+`site/`'s toolchain (`node`, `pnpm`) is pinned in `.mise.toml`, the same way
+the Python toolchain (`python`, `uv`) already is.
 
 `results/upstream-matrix.md` (wpt.fyi-sourced, continuous, for pre-existing
 upstream tests) is intentionally kept separate from
@@ -239,26 +256,35 @@ provenance.
 oblique/
 ├── LICENSE                  # BSD-3-Clause (required for WPT upstreaming)
 ├── README.md
+├── .mise.toml                # pins python/uv AND node/pnpm versions
 ├── .github/workflows/
-│   └── sync-wpt-results.yml # daily wpt.fyi sync, commits refreshed data
+│   └── sync-wpt-results.yml # daily wpt.fyi sync, rebuilds + commits the site
 ├── scripts/
 │   ├── setup-wpt.sh          # vendors a scoped, gitignored .wpt/ checkout
 │   ├── record-results.py     # parses wptreport JSON into browser-matrix.md
 │   ├── sync-wpt-results.py   # pulls live upstream results from wpt.fyi
-│   └── render-coverage-docs.py  # renders coverage.md/upstream-matrix.md/dashboard data
+│   ├── render-coverage-docs.py  # renders coverage.md/upstream-matrix.md
+│   └── generate-site-data.py    # renders site/index.html + cards.json
 ├── tests/
-│   ├── font-style-oblique/
+│   ├── font-style-oblique/   # this repo's own novel tests (slnt side)
 │   ├── oblique-range/
 │   ├── synthesis/
 │   ├── variation-settings/
 │   └── ital-axis/            # the confirmed WPT gap this repo fills
+├── site/                      # static Vite project — source of the public page
+│   ├── template.html          # tracked source; generate-site-data.py fills it in
+│   ├── src/style.css
+│   ├── index.html             # generated — gitignored, see template.html
+│   └── dist/                  # `pnpm run build` output — copied into docs/
 ├── docs/                      # published as GitHub Pages (oblique.amitkaps.com)
-│   ├── index.html             # static live-coverage dashboard
+│   ├── index.html             # generated — copy of site/dist/index.html
+│   ├── assets/                # generated — copy of site/dist/assets/
 │   ├── CNAME                  # custom domain for GitHub Pages
 │   ├── data/                  # generated copies of coverage.json/upstream.json
 │   ├── spec.md
 │   ├── plan.md
-│   ├── findings.md
+│   ├── summary.md            # short, current-state doc — start here
+│   ├── investigation-log.md  # full narrative archive (was findings.md)
 │   ├── coverage.md           # generated — see coverage.json
 │   └── coverage.json         # source of truth for the coverage catalog
 └── results/

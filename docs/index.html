@@ -3,310 +3,76 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Oblique — WPT coverage dashboard</title>
-<style>
-  :root {
-    color-scheme: light dark;
-    --pass: #1a7f37;
-    --fail: #cf222e;
-    --other: #9a6700;
-    --border: #d0d7de;
-  }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-    max-width: 960px;
-    margin: 2rem auto;
-    padding: 0 1rem;
-    line-height: 1.5;
-  }
-  h1 { margin-bottom: 0.25rem; }
-  .subtitle { color: #666; margin-top: 0; }
-  .staleness {
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 0.75rem 1rem;
-    margin: 1rem 0;
-    font-size: 0.95rem;
-  }
-  .staleness.stale { border-color: var(--fail); background: color-mix(in srgb, var(--fail) 8%, transparent); }
-  .gap-callout {
-    border: 1px solid var(--other);
-    background: color-mix(in srgb, var(--other) 8%, transparent);
-    border-radius: 6px;
-    padding: 1rem;
-    margin: 1.5rem 0;
-  }
-  table { border-collapse: collapse; width: 100%; margin: 1rem 0; font-size: 0.9rem; }
-  th, td { border: 1px solid var(--border); padding: 0.4rem 0.6rem; text-align: left; }
-  th { background: color-mix(in srgb, currentColor 5%, transparent); }
-  code { font-size: 0.85em; }
-  .status-PASS, .status-OK { color: var(--pass); font-weight: 600; }
-  .status-FAIL, .status-ERROR, .status-CRASH, .status-TIMEOUT { color: var(--fail); font-weight: 600; }
-  .status-none { color: var(--other); }
-  .axis-group h2 { margin-top: 2.5rem; border-bottom: 2px solid var(--border); padding-bottom: 0.25rem; }
-  #checklist h2 { margin-top: 2.5rem; border-bottom: 2px solid var(--border); padding-bottom: 0.25rem; }
-  .checklist-note { color: #666; font-size: 0.85rem; }
-  .pill { display: inline-block; padding: 0.1rem 0.5rem; border-radius: 999px; font-size: 0.8rem; font-weight: 600; }
-  .pill-covered { background: color-mix(in srgb, var(--pass) 15%, transparent); color: var(--pass); }
-  .pill-partial { background: color-mix(in srgb, var(--other) 15%, transparent); color: var(--other); }
-  .pill-gap { background: color-mix(in srgb, var(--fail) 15%, transparent); color: var(--fail); }
-  footer { margin-top: 3rem; color: #666; font-size: 0.85rem; }
-</style>
+<title>Oblique — slnt/ital interop tracker</title>
+<meta name="description" content="Live-tracked pass/fail for CSS Fonts 4 oblique/slnt/ital matching across Chrome, Firefox, and Safari.">
+  <link rel="stylesheet" crossorigin href="/assets/index-D0nAOTR6.css">
 </head>
 <body>
-  <h1>Oblique: WPT coverage dashboard</h1>
-  <p class="subtitle">
-    Live-tracked pass/fail for every existing WPT test touching
-    <code>font-style: oblique</code> / <code>slnt</code> / <code>ital</code>
-    axis matching, scoped specifically to that — not a general WPT browser
-    (that's <a href="https://wpt.fyi">wpt.fyi</a> itself). Source:
-    <a href="https://github.com/vizchitra/oblique">github.com/vizchitra/oblique</a>.
-  </p>
+  <header class="page-header">
+    <h1>Oblique</h1>
+    <p class="tagline">
+      Live-tracked pass/fail for CSS Fonts 4 <code>slnt</code>/<code>ital</code>
+      variable-axis <code>font-style</code> matching across Chrome, Firefox,
+      and Safari — what's already tested by WPT, and what this project built
+      to fill the gaps.
+    </p>
+    <p class="synced-banner">Upstream results last synced 2026-09-18 08:16 UTC</p>
+  </header>
 
-  <div id="staleness" class="staleness">Loading…</div>
+  <section class="algorithm-diagram" aria-label="Simplified font-style matching algorithm">
+    <h2>How a browser picks the angle (CSS Fonts 4 §5.2, simplified)</h2>
+    <div class="diagram">
+      <div class="d-box d-start">Requested <code>font-style: oblique</code>/<code>italic</code></div>
+      <div class="d-arrow">↓</div>
+      <div class="d-box d-decision">Does <code>@font-face</code> declare an explicit <code>font-style</code> range?</div>
+      <div class="d-branches">
+        <div class="d-branch">
+          <div class="d-branch-label">yes</div>
+          <div class="d-arrow">↓</div>
+          <div class="d-box">Use the declared range</div>
+        </div>
+        <div class="d-branch">
+          <div class="d-branch-label">no (auto)</div>
+          <div class="d-arrow">↓</div>
+          <div class="d-box">Use the font's own <code>fvar</code>/<code>STAT</code>-derived range</div>
+        </div>
+      </div>
+      <div class="d-arrow">↓</div>
+      <div class="d-box d-decision">Is the requested/default angle inside that range?</div>
+      <div class="d-branches">
+        <div class="d-branch">
+          <div class="d-branch-label">yes</div>
+          <div class="d-arrow">↓</div>
+          <div class="d-box d-end">Use it directly</div>
+        </div>
+        <div class="d-branch">
+          <div class="d-branch-label">no</div>
+          <div class="d-arrow">↓</div>
+          <div class="d-box d-end">Clamp to the nearest boundary</div>
+        </div>
+      </div>
+    </div>
+    <p class="diagram-note">
+      The "auto range, angle outside it" path (right-then-right above) is
+      exactly Cairo's real-world bug shape — see the
+      <a href="#card-auto-range-default-angle">auto-range-default-angle</a> card.
+    </p>
+  </section>
 
-  <div id="gap" class="gap-callout" hidden></div>
+  <section class="card-section card-section-upstream">
+    <h2>Already tested by WPT</h2>
+    <div class="card-grid"><article class="card" id="card-explicit-angle-range"><h3>Explicit angle &amp; range matching</h3><p class="one-liner">font-style: oblique &lt;angle&gt; and declared @font-face ranges resolve correctly.</p><div class="engines"><span class="engine engine-pass">chrome: PASS</span><span class="engine engine-pass">firefox: PASS</span><span class="engine engine-pass">safari: PASS</span></div><p class="why-it-matters">The most common, well-tested case — authors explicitly setting angles or descriptor ranges.</p><p class="card-links"><a href="https://drafts.csswg.org/css-fonts-4/#font-style-prop">spec</a></p></article><article class="card" id="card-auto-range-default-angle-upstream"><h3>Auto-derived range + bare oblique/italic</h3><p class="one-liner">No explicit descriptor — matching against the font&#x27;s own fvar-derived range.</p><div class="engines"><span class="engine engine-pass">chrome: PASS</span><span class="engine engine-pass">firefox: PASS</span><span class="engine engine-pass">safari: PASS</span></div><span class="badge badge-closed-by-this-project">closed by this project</span><p class="why-it-matters">Was a real gap (Cairo&#x27;s shape) until this project closed it — see the matching card below.</p><p class="card-links"><a href="https://drafts.csswg.org/css-fonts-4/#font-style-prop">spec</a> &middot; <a href="#card-auto-range-default-angle">see how it was closed &rarr;</a></p></article><article class="card" id="card-stretch-weight-style-precedence"><h3>Stretch/weight/style matching precedence</h3><p class="one-liner">Search direction and distance among multiple oblique candidate faces.</p><div class="engines"><span class="engine engine-pass">chrome: PASS</span><span class="engine engine-pass">firefox: PASS</span><span class="engine engine-fail">safari: FAIL</span></div><span class="badge badge-safari-only-failure">Safari-only failure</span><p class="why-it-matters">Safari fails all three of these upstream tests today — a live, dated, cross-engine divergence.</p><p class="card-links"><a href="https://drafts.csswg.org/css-fonts-4/#font-style-matching">spec</a></p></article><article class="card" id="card-synthesis-parsing-inheritance"><h3>Synthesis, parsing &amp; inheritance</h3><p class="one-liner">font-synthesis fallback, oblique-angle parsing, and font-variation-settings inheritance.</p><div class="engines"><span class="engine engine-pass">chrome: PASS</span><span class="engine engine-pass">firefox: PASS</span><span class="engine engine-pass">safari: PASS</span></div><p class="why-it-matters">Generic machinery oblique/ital matching depends on — not axis-specific, but a prerequisite.</p><p class="card-links"><a href="https://drafts.csswg.org/css-fonts-4/#font-synthesis-style">spec</a></p></article><article class="card" id="card-ital-axis-upstream"><h3>ital axis coverage</h3><p class="one-liner">No upstream WPT test exercises the OpenType ital variation axis at all.</p><p class="empty-state">0 upstream tests — confirmed by full-tree search</p><p class="why-it-matters">Confirmed by a full-tree search, not sampling — the reason this project&#x27;s own tests exist.</p><p class="card-links"><a href="https://drafts.csswg.org/css-fonts-4/#font-style-prop">spec</a></p></article></div>
+  </section>
 
-  <div id="groups"></div>
+  <section class="card-section card-section-this-repo">
+    <h2>New tests from this project</h2>
+    <div class="card-grid"><article class="card" id="card-slnt-axis-activation"><h3>slnt axis activates on oblique request</h3><p class="one-liner">font-style: oblique on a variable font sets the slnt axis.</p><div class="engines"><span class="engine engine-pass">chrome: PASS</span><span class="engine engine-pass">firefox: PASS</span><span class="engine engine-not-run">safari: not run</span></div><p class="why-it-matters">Baseline sanity check the rest of this project&#x27;s tests build on.</p><p class="card-links"><a href="https://drafts.csswg.org/css-fonts-4/#font-style-prop">spec</a> &middot; <a href="https://github.com/amitkaps/oblique/blob/main/tests/font-style-oblique/slnt-axis-activation.html">test file</a></p></article><article class="card" id="card-auto-range-default-angle"><h3>Auto-derived range + bare oblique/italic</h3><p class="one-liner">Bare font-style: oblique against a font with no explicit descriptor, range excludes the UA default angle.</p><div class="engines"><span class="engine engine-pass">chrome: PASS</span><span class="engine engine-pass">firefox: PASS</span><span class="engine engine-not-run">safari: not run</span></div><p class="why-it-matters">Closes the real gap this project exists to close — Cairo&#x27;s motivating bug shape, generalized.</p><p class="card-links"><a href="https://drafts.csswg.org/css-fonts-4/#font-style-prop">spec</a> &middot; <a href="https://github.com/amitkaps/oblique/blob/main/tests/font-style-oblique/auto-range-default-angle.html">test file</a></p></article><article class="card" id="card-italic-no-extra-synthesis"><h3>italic on an ital-only font doesn&#x27;t over-synthesize</h3><p class="one-liner">italic on a font with only an ital axis (no slnt) sets ital, doesn&#x27;t also fake-slant.</p><div class="engines"><span class="engine engine-fail">chrome: FAIL</span><span class="engine engine-pass">firefox: PASS</span><span class="engine engine-not-run">safari: not run</span></div><span class="badge badge-proposed-for-upstreaming">proposed for upstreaming</span><p class="why-it-matters">Chrome fails this today — a live, reproducing instance of WebKit #209565&#x27;s documented failure mode.</p><p class="card-links"><a href="https://github.com/w3c/csswg-drafts/issues/12836">spec</a> &middot; <a href="https://github.com/amitkaps/oblique/blob/main/tests/ital-axis/italic-no-extra-synthesis.html">test file</a></p></article><article class="card" id="card-ital-slnt-independence"><h3>ital and slnt are independent axes</h3><p class="one-liner">oblique on an ital-only font must not touch ital, per #12836&#x27;s resolution.</p><div class="engines"><span class="engine engine-pass">chrome: PASS</span><span class="engine engine-pass">firefox: PASS</span><span class="engine engine-not-run">safari: not run</span></div><span class="badge badge-proposed-for-upstreaming">proposed for upstreaming</span><p class="why-it-matters">Directly tests the spec ambiguity (#12836) this project&#x27;s ital-axis work is built on.</p><p class="card-links"><a href="https://github.com/w3c/csswg-drafts/issues/12836">spec</a> &middot; <a href="https://github.com/amitkaps/oblique/blob/main/tests/ital-axis/independence.html">test file</a></p></article><article class="card" id="card-normal-plus-bare-oblique-same-family"><h3>normal + bare oblique face, same family</h3><p class="one-liner">An angled request must pick the oblique face, not fall back to the upright normal face.</p><p class="empty-state">Not yet written</p><span class="badge badge-planned">planned, not yet written</span><p class="why-it-matters">vizchitra-fonts ships two separate @font-face blocks specifically to dodge this untested hazard.</p><p class="card-links"><a href="https://drafts.csswg.org/css-fonts-4/#font-style-matching">spec</a></p></article><article class="card" id="card-font-style-plus-explicit-axis-pairing"><h3>font-style paired with an explicit axis override</h3><p class="one-liner">The spec&#x27;s own recommended author pattern for fallback compatibility, currently unverified.</p><p class="empty-state">Not yet written</p><span class="badge badge-planned">planned, not yet written</span><p class="why-it-matters">Anyone following the spec&#x27;s own compatibility advice is on unverified ground.</p><p class="card-links"><a href="https://drafts.csswg.org/css-fonts-4/#font-variation-settings-def">spec</a></p></article><article class="card" id="card-combined-slnt-ital-font"><h3>A font exposing both slnt and ital</h3><p class="one-liner">The strongest direct test of #12836&#x27;s independence claim needs one font with both axes.</p><p class="empty-state">Not yet written</p><span class="badge badge-planned">planned, not yet written</span><p class="why-it-matters">No known real-world font combines both — spec-completeness, not real-world impact evidence.</p><p class="card-links"><a href="https://github.com/w3c/csswg-drafts/issues/12836">spec</a></p></article></div>
+  </section>
 
-  <div id="evidence-tiers"></div>
-
-  <div id="checklist"></div>
-
-  <div id="confirmed-gaps"></div>
-
-  <footer>
-    Data: <code>docs/coverage.json</code> (this repo's manual audit) +
-    <code>results/upstream.json</code> (synced from
-    <a href="https://wpt.fyi">wpt.fyi</a>'s public API by
-    <code>scripts/sync-wpt-results.py</code>, refreshed on a schedule — see
-    <code>.github/workflows/sync-wpt-results.yml</code>). This page reads
-    committed JSON snapshots, not a live client-side call to wpt.fyi.
+  <footer class="page-footer">
+    <a href="https://github.com/amitkaps/oblique">github.com/amitkaps/oblique</a>
+    · <a href="https://github.com/web-platform-tests/interop/issues/64">WPT PR (not yet open)</a>
+    · <a href="https://drafts.csswg.org/css-fonts-4/#font-style-prop">CSS Fonts 4 §5.2</a>
   </footer>
-
-<script>
-async function loadJSON(path) {
-  const res = await fetch(path);
-  if (!res.ok) throw new Error(`${path}: HTTP ${res.status}`);
-  return res.json();
-}
-
-function statusClass(status) {
-  if (!status) return "status-none";
-  return "status-" + status;
-}
-
-function renderStaleness(upstream) {
-  const el = document.getElementById("staleness");
-  if (!upstream) {
-    el.textContent = "No synced results yet — results/upstream.json has not been generated.";
-    el.classList.add("stale");
-    return;
-  }
-  const syncedAt = new Date(upstream.synced_at);
-  const ageHours = (Date.now() - syncedAt.getTime()) / 36e5;
-  const versions = Object.entries(upstream.run_metadata)
-    .map(([p, m]) => `${p} ${m.browser_version}`)
-    .join(", ");
-  el.textContent = `Last synced: ${syncedAt.toISOString()} (${ageHours.toFixed(1)}h ago) — ${versions}`;
-  if (ageHours > 24 * 8) {
-    el.classList.add("stale");
-    el.textContent += " — this looks stale; treat results below as unverified, not current.";
-  }
-}
-
-function renderGap(coverage) {
-  const el = document.getElementById("gap");
-  const gap = coverage.ital_axis_gap;
-  el.hidden = false;
-  el.innerHTML = `<strong>Confirmed gap:</strong> ${gap.claim} ` +
-    `(verified ${gap.verified_at}). No existing WPT test exercises the ` +
-    `<code>ital</code> axis at all — this repo's own tests under ` +
-    `<code>tests/ital-axis/</code> are the only coverage anywhere.`;
-}
-
-function resultsByPath(upstream) {
-  const map = new Map();
-  if (!upstream) return map;
-  for (const t of upstream.tests) map.set(t.path, t.results);
-  return map;
-}
-
-function renderGroups(coverage, upstream) {
-  const byPath = resultsByPath(upstream);
-  const groups = { slnt: [], ital: [], both: [], neither: [] };
-  for (const t of coverage.tests) groups[t.axis].push(t);
-
-  const container = document.getElementById("groups");
-  const order = ["slnt", "ital", "both", "neither"];
-  const labels = {
-    slnt: "slnt axis",
-    ital: "ital axis",
-    both: "both axes",
-    neither: "neither axis (parsing / general matching)",
-  };
-
-  for (const axis of order) {
-    const tests = groups[axis];
-    if (tests.length === 0) continue;
-    const section = document.createElement("div");
-    section.className = "axis-group";
-    const rows = tests.map(t => {
-      const r = byPath.get(t.path);
-      const chrome = r ? r.chrome.status : null;
-      const firefox = r ? r.firefox.status : null;
-      const safari = r ? r.safari.status : null;
-      return `<tr>
-        <td><code>${t.path}</code></td>
-        <td>${t.title}</td>
-        <td>${t.probes_209565 ? "yes" : "no"}</td>
-        <td class="${statusClass(chrome)}">${chrome || "—"}</td>
-        <td class="${statusClass(firefox)}">${firefox || "—"}</td>
-        <td class="${statusClass(safari)}">${safari || "—"}</td>
-      </tr>`;
-    }).join("");
-    section.innerHTML = `
-      <h2>${labels[axis]} (${tests.length})</h2>
-      <table>
-        <thead><tr>
-          <th>Test</th><th>Assertion</th><th>Probes #209565?</th>
-          <th>Chrome</th><th>Firefox</th><th>Safari</th>
-        </tr></thead>
-        <tbody>${rows}</tbody>
-      </table>`;
-    container.appendChild(section);
-  }
-}
-
-function pillClass(status) {
-  if (status === "gap") return "pill pill-gap";
-  if (status === "covered-upstream" || status === "covered-by-this-repo-only") return "pill pill-covered";
-  return "pill pill-partial";
-}
-
-function pillLabel(status) {
-  return {
-    "covered-upstream": "covered — upstream WPT",
-    "covered-by-this-repo-only": "covered — this repo only",
-    "partially-covered-upstream": "partial — upstream WPT",
-    "gap": "gap",
-  }[status] || status;
-}
-
-function renderEvidenceTiers(coverage) {
-  const tiers = coverage.evidence_tiers;
-  const container = document.getElementById("evidence-tiers");
-  if (!tiers) { container.hidden = true; return; }
-  const rows = ["1", "2", "3"]
-    .filter(n => tiers[n])
-    .map(n => `<li><strong>Tier ${n}:</strong> ${tiers[n]}</li>`)
-    .join("");
-  container.innerHTML = `
-    <h2>Evidence tiers</h2>
-    <p class="checklist-note">Not every finding in this catalog carries
-      equal weight as motivating evidence. Tier numbers on items below
-      refer back to this list.</p>
-    <ul>${rows}</ul>`;
-}
-
-function renderChecklist(coverage) {
-  const mapping = coverage.checklist_mapping;
-  const container = document.getElementById("checklist");
-  if (!mapping) { container.hidden = true; return; }
-
-  const rows = mapping.items.map(entry => {
-    const tests = entry.tests.length
-      ? entry.tests.map(t => `<code>${t}</code>`).join("<br>")
-      : "—";
-    const note = entry.notes ? `<div class="checklist-note">${entry.notes}</div>` : "";
-    const tierBadge = entry.priority_tier
-      ? ` <span class="checklist-note">(tier ${entry.priority_tier})</span>`
-      : "";
-    return `<tr>
-      <td>${entry.item}</td>
-      <td><span class="${pillClass(entry.status)}">${pillLabel(entry.status)}</span>${tierBadge}</td>
-      <td>${tests}${note}</td>
-    </tr>`;
-  }).join("");
-
-  container.innerHTML = `
-    <h2>Coverage checklist status (${mapping.audited_at})</h2>
-    <p class="checklist-note">Every item from docs/spec.md's 14-item coverage
-      checklist, cross-referenced against actual test coverage — broader
-      than "probes #209565": an item can be fully covered without any
-      single test targeting that specific bug's failure modes.</p>
-    <table>
-      <thead><tr><th>Checklist item</th><th>Status</th><th>Test(s)</th></tr></thead>
-      <tbody>${rows}</tbody>
-    </table>`;
-}
-
-function renderConfirmedGaps(coverage) {
-  const data = coverage.confirmed_gaps;
-  const container = document.getElementById("confirmed-gaps");
-  if (!data) { container.hidden = true; return; }
-
-  const sorted = [...data.gaps].sort((a, b) => (a.priority || 999) - (b.priority || 999));
-  const cards = sorted.map(g => {
-    const fonts = g.corroborating_fonts
-      ? `<p><em>Corroborating fonts:</em></p><ul>${
-          g.corroborating_fonts.map(f =>
-            `<li><strong>${f.name}</strong> — slnt range ${f.range} (${f.role}; source: ${f.source})</li>`
-          ).join("")
-        }</ul>`
-      : "";
-    const evidence = g.corroborating_evidence
-      ? `<p><em>Corroborating evidence (${g.corroborating_evidence.kind}):</em> ${g.corroborating_evidence.detail} (source: ${g.corroborating_evidence.source})</p>`
-      : "";
-    const lacksFont = g.lacks_corroborating_font
-      ? `<p><em>No corroborating broken font</em> — a spec-recommended pattern that's simply untested, not tied to a known-broken font.</p>`
-      : "";
-    const noRealFont = g.real_world_font_exists === false
-      ? `<p><em>No known real-world font exists</em> for this scenario — spec-completeness, not impact evidence.</p>`
-      : "";
-    return `
-    <div class="gap-callout" style="margin-top:1rem;">
-      <strong>${g.priority ? g.priority + ". " : ""}${g.id}</strong>
-      ${g.status ? `<div class="checklist-note"><em>Status:</em> ${g.status}</div>` : ""}
-      ${g.priority_tier ? `<div class="checklist-note">Priority tier ${g.priority_tier}</div>` : ""}
-      ${g.evidence_tier ? `<div class="checklist-note"><em>Evidence tier:</em> ${g.evidence_tier}</div>` : ""}
-      <p>${g.summary}</p>
-      <p><em>Why it matters:</em> ${g.why_it_matters}</p>
-      ${fonts}${evidence}${lacksFont}${noRealFont}
-      <p><em>Candidate test:</em> ${g.candidate_test}</p>
-    </div>`;
-  }).join("");
-
-  container.innerHTML = `
-    <h2>Confirmed gaps (precise, verified by reading test content)</h2>
-    <p class="checklist-note">Narrower than a raw checklist-item miss —
-      each states exactly which combination of factors is untested,
-      confirmed by reading the closest candidate tests' actual content, not
-      title or filename alone. Audited ${data.audited_at}.</p>
-    ${cards}`;
-}
-
-(async () => {
-  try {
-    const coverage = await loadJSON("data/coverage.json");
-    let upstream = null;
-    try {
-      upstream = await loadJSON("data/upstream.json");
-    } catch (e) {
-      console.warn("upstream.json not available yet:", e);
-    }
-    renderStaleness(upstream);
-    renderGap(coverage);
-    renderGroups(coverage, upstream);
-    renderEvidenceTiers(coverage);
-    renderChecklist(coverage);
-    renderConfirmedGaps(coverage);
-  } catch (e) {
-    document.getElementById("staleness").textContent =
-      "Failed to load dashboard data: " + e.message;
-    document.getElementById("staleness").classList.add("stale");
-  }
-})();
-</script>
 </body>
 </html>

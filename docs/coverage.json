@@ -320,7 +320,7 @@
         "status": "covered-by-this-repo-only",
         "priority_tier": 1,
         "tests": ["tests/ital-axis/independence.html"],
-        "notes": "Zero upstream WPT coverage — part of the confirmed ital_axis_gap. Tier 1: dated, recorded result (PASS on Chrome and Firefox), though per docs/findings.md its font-synthesis:none setup makes the PASS less discriminating than italic-no-extra-synthesis.html's."
+        "notes": "Zero upstream WPT coverage — part of the confirmed ital_axis_gap. Tier 1: dated, recorded result (PASS on Chrome and Firefox), though per docs/investigation-log.md its font-synthesis:none setup makes the PASS less discriminating than italic-no-extra-synthesis.html's."
       },
       {
         "item": "Font exposing both slnt and ital — confirms independence per #12836",
@@ -378,7 +378,7 @@
         "test_result": {
           "chrome": {"version": "153.0.8010.48", "result": "pass"},
           "firefox": {"version": "156.0", "result": "pass"},
-          "safari": "not attempted (local safaridriver session unavailable at test time; see docs/findings.md's Safari nondeterminism section before ever trusting a single local Safari run for this class of test)"
+          "safari": "not attempted (local safaridriver session unavailable at test time; see docs/investigation-log.md's Safari nondeterminism section before ever trusting a single local Safari run for this class of test)"
         },
         "corroborating_fonts": [
           {"name": "Cairo", "range": "-11 to 11", "source": "vizchitra-fonts/docs/compat.md", "role": "motivating case — the real-world bug this repo exists to document"},

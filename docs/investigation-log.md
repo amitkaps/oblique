@@ -1,5 +1,9 @@
 # Findings
 
+> This is the full investigation trail. For the current state, see
+> [oblique.amitkaps.com](https://oblique.amitkaps.com) or
+> [`docs/summary.md`](summary.md).
+
 ## 1. Prior Art Status
 
 _Verified 2026-09-18, directly against live sources (browser/tool fetches

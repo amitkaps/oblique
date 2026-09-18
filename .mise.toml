@@ -1,3 +1,5 @@
 [tools]
 python = "3.12"
 uv = "latest"
+node = "24.21.0"
+pnpm = "12.4.2"
