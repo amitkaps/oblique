@@ -142,10 +142,59 @@ body {
   border-radius: 4px;
   border: 1px solid currentColor;
 }
-.badge-safari-only-failure { color: var(--fail); }
+.badge-safari-only-failure,
+.badge-chrome-only-failure,
+.badge-firefox-only-failure,
+.badge-cross-engine-failure { color: var(--fail); }
 .badge-closed-by-this-project,
-.badge-proposed-for-upstreaming { color: var(--accent-this-repo); }
+.badge-candidate-for-upstreaming { color: var(--accent-this-repo); }
 .badge-planned { color: var(--muted); }
+
+.test-detail {
+  margin-top: 0.25rem;
+  font-size: 0.82rem;
+}
+.test-detail summary {
+  cursor: pointer;
+  color: var(--accent-upstream);
+  font-weight: 600;
+}
+.card-section-this-repo .test-detail summary { color: var(--accent-this-repo); }
+.test-detail summary:hover { text-decoration: underline; }
+
+.test-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-top: 0.6rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid var(--border);
+}
+
+.test-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.4rem 0;
+  border-bottom: 1px dashed var(--border);
+}
+.test-row:last-child { border-bottom: none; }
+.test-path { font-size: 0.75rem; color: inherit; word-break: break-all; }
+.test-path code { font-size: 0.72rem; }
+.test-assertion { margin: 0; font-size: 0.78rem; color: var(--muted); }
+.test-row .engines { margin: 0.1rem 0; }
+.test-row .engine { font-size: 0.68rem; padding: 0.1rem 0.4rem; }
+
+.checklist-tags { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+.tag {
+  font-size: 0.65rem;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 0.05rem 0.35rem;
+}
+
+.wpt-fyi-link { font-size: 0.72rem; color: inherit; align-self: flex-start; }
 
 .page-footer {
   margin-top: 3rem;
