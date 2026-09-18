@@ -76,8 +76,8 @@ Audited 2026-09-18.
 | Explicit oblique <angle> matching | ✅ covered (upstream WPT) | `css/css-fonts/variations/font-slant-2a.html`<br>`css/css-fonts/variations/font-slant-2b.html`<br>`css/css-fonts/variations/font-slant-2c.html`<br>`css/css-fonts/variations/slnt-backslant-variable.html`<br>`css/css-fonts/variations/font-parse-numeric-stretch-style-weight.html` |
 | font-style ranges declared in @font-face | ✅ covered (upstream WPT) | `css/css-fonts/variations/font-descriptor-range-reversed.html`<br>`css/css-fonts/variations/font-descriptor-range-reversed-002.html`<br>`css/css-fonts/font-face-range-order.html`<br>`css/css-fonts/matching/range-descriptor-reversed.html` |
 | | | _All are combined weight/stretch/style range tests, not style-only, but style is exercised in each._ |
-| Bare oblique / default-angle (14deg) matching | 🟡 partial (upstream WPT) | `css/css-fonts/variations/font-slant-1.html`<br>`css/css-fonts/variations/font-slant-2b.html` |
-| | | _Covered, and passing on all three engines per results/upstream.json (synced 2026-09-17T23:17 UTC: PASS on Chrome 153.0.8010.47, Firefox 156.0, Safari 27.0 — the Safari result from wpt.fyi's own GitHub Actions CI run, a distinct and more controlled environment than this repo's local safaridriver investigation, see docs/findings.md), ONLY for the case where @font-face declares an EXPLICIT font-style descriptor range that excludes the default angle. The realistic deployment shape — no explicit descriptor at all (font-style:auto, the actual default), so the UA must derive the oblique range from the font's own fvar/STAT extremes, with a bare italic/oblique request whose default angle falls outside THAT auto-derived range — has zero upstream coverage. This is the precise shape of Cairo's real-world bug (per vizchitra-fonts/docs/compat.md): Cairo doesn't hand-author a font-style descriptor, so its usable range comes entirely from its own slnt axis (-11 to 11), and the UA default (14deg) falls outside it. See the standalone 'auto-range default-angle resolution' gap item below — reinstates Cairo as motivating evidence for a real, narrow, currently-unverified gap, not the general slnt story._ |
+| Bare oblique / default-angle (14deg) matching | ✅ covered (upstream WPT) (tier 1) | `css/css-fonts/variations/font-slant-1.html`<br>`css/css-fonts/variations/font-slant-2b.html`<br>`tests/font-style-oblique/auto-range-default-angle.html` |
+| | | _Covered for both sub-cases now. Upstream (font-slant-1.html, font-slant-2b.html) covers an EXPLICITLY authored @font-face font-style descriptor range that excludes the default angle — PASS on Chrome/Firefox/Safari per results/upstream.json. This repo's own tests/font-style-oblique/auto-range-default-angle.html (added 2026-09-18, closing docs/coverage.json's confirmed_gaps 'auto-range-default-angle') covers the previously-missing AUTO-DERIVED-range case (no explicit descriptor, font-style:auto — the realistic deployment shape, matching how Cairo and most variable webfonts actually ship) — PASS on Chrome 153.0.8010.48 and Firefox 156.0, run 2026-09-18 (Safari not attempted, see confirmed_gaps entry for why). Caveat: the test font (Inter, slnt -10..0) has a one-sided range, not Cairo's symmetric -11..11 — this closes the general upstream-coverage gap but doesn't independently re-confirm or refute Cairo's own original real-device finding (vizchitra-fonts/docs/compat.md)._ |
 | italic vs oblique resolution differences | ✅ covered (upstream WPT) | `css/css-fonts/italic-oblique-fallback.html`<br>`css/css-fonts/oblique-request-italic-only-family-no-crash.html` |
 | | | _Covered for static (non-variable) faces only; the variable-axis version of this question is items below (ital-axis specific), which are NOT covered upstream._ |
 | italic on a font with only an ital axis (no slnt) — sets ital=1 | 🟡 covered (this repo only) (tier 1) | `tests/ital-axis/italic-no-extra-synthesis.html` |
@@ -102,24 +102,7 @@ Narrower than a raw checklist-item miss — each of these states exactly which c
 
 Audited 2026-09-18.
 
-### 1. auto-range-default-angle
-
-**Priority tier:** 2
-
-**Evidence tier:** proven gap, root cause traced to a real font's real bug, test not yet written
-
-No test combines an auto-derived (no explicit @font-face font-style descriptor) oblique range with a bare font-style:oblique or font-style:italic request (UA default angle, no explicit value) on a font whose actual fvar/STAT range excludes that default angle.
-
-**Why it matters:** This is the precise shape of Cairo's real-world bug (vizchitra-fonts/docs/compat.md): Cairo ships with no font-style descriptor, so the browser must derive its usable oblique range from Cairo's own slnt axis (-11 to 11), and the UA default angle (14deg) falls outside it. The closest upstream test, css/css-fonts/variations/font-slant-1.html, tests exactly this default-angle-outside-range scenario INCLUDING the bare italic keyword — but only for a font-style descriptor that was EXPLICITLY authored in the @font-face rule. Its current PASS/FAIL status is not asserted from memory: per results/upstream.json (synced 2026-09-17T23:17 UTC via scripts/sync-wpt-results.py), it PASSES on Chrome 153.0.8010.47, Firefox 156.0, AND Safari 27.0 (22625.1.29.11.27). The Safari result there is sourced from wpt.fyi's own GitHub Actions Safari CI run, not from this repo's local safaridriver investigation (see docs/findings.md's 'Safari — attempted, no reliable result' section) — a distinct, more controlled environment, so this PASS should be read as good evidence, not as fully ruling out the same class of automation flakiness documented locally; it has not been independently re-run or cross-checked beyond the single synced wpt.fyi snapshot. The auto-derived-range version of the same question — the version that actually matches how most variable webfonts (including Cairo) ship — is untested anywhere. Verified by reading css/css-fonts/font-face-style-auto-variable.html and font-face-style-default-variable.html directly: both use only explicit oblique <angle> values (10deg/5deg/0deg), never a bare keyword. This is now a two-font-corroborated gap (see corroborating_fonts), not a single-vendor anecdote — Inter's own slnt range independently exhibits the same excludes-the-default-angle shape as Cairo's, in a font already sitting in WPT's own corpus. Highest-priority next worked example: unlike the other two gaps, this one traces directly to a live, documented production bug rather than spec-completeness — but note it is tier 2, not tier 1: the failure mode is root-caused and corroborated, not yet demonstrated by a written, run test the way tier-1 findings are.
-
-**Corroborating fonts:**
-
-- **Cairo** — slnt range -11 to 11 (motivating case — the real-world bug this repo exists to document; source: vizchitra-fonts/docs/compat.md)
-- **Inter-VF.subset.ttf / Inter.var.subset.ttf (WPT's own corpus)** — slnt range -10 to 0 (independent corroboration — a second, unrelated real font with the same auto-derived-range-excludes-default-angle shape, already present in WPT's own test corpus; source: verified via fontTools fvar read, 2026-09-18)
-
-**Candidate test:** A reftest pairing a variable font with a real slnt axis whose range excludes 14deg (e.g. -11 to 11, matching Cairo, or the simpler -10 to 0 already present in WPT's Inter-VF.subset.ttf and Inter.var.subset.ttf — both verified via fontTools to have fvar slnt min=-10 max=0, confirmed 2026-09-18), NO explicit font-style descriptor in @font-face, and font-style: italic / font-style: oblique (bare) as the test declarations — checked against whatever angle the UA actually resolves the default to.
-
-### 2. font-style-plus-explicit-axis-pairing
+### 1. font-style-plus-explicit-axis-pairing
 
 **Priority tier:** 2
 
@@ -133,7 +116,7 @@ No test pairs font-style with an explicit font-variation-settings axis override 
 
 **Candidate test:** A reftest declaring font-style: oblique 10deg together with an explicit font-variation-settings: 'slnt' <different value> on the same rule, checking which wins (or whether they're required to agree).
 
-### 3. combined-slnt-ital-font
+### 2. combined-slnt-ital-font
 
 **Priority tier:** 3
 
@@ -146,3 +129,22 @@ No font anywhere (WPT's corpus or this repo's own resources) exposes both a real
 **No known real-world font exists** for this scenario — spec-completeness, not impact evidence.
 
 **Candidate test:** Extend tests/ital-axis/resources/build-font.py's approach (fontTools FontBuilder) to add a second gvar-driven axis, or find/build a WPT-compatible font exposing both.
+
+### 3. auto-range-default-angle
+
+**Status:** test written and run — tests/font-style-oblique/auto-range-default-angle.html + -ref.html
+
+**Priority tier:** 1
+
+**Evidence tier:** written test, dated cross-engine result — but the result is a PASS, not a reproduction of Cairo's bug
+
+This gap is now closed as far as upstream WPT coverage goes: tests/font-style-oblique/auto-range-default-angle.html tests a bare font-style:oblique/italic request against a font with NO explicit @font-face font-style descriptor (auto-derived range from fvar), on a font (Inter) whose range excludes the UA default angle. Both Chrome and Firefox correctly clamp to the font's own range boundary — PASS on both, run 2026-09-18.
+
+**Why it matters:** This was the precise shape of Cairo's real-world bug (vizchitra-fonts/docs/compat.md): Cairo ships with no font-style descriptor, so the browser must derive its usable oblique range from Cairo's own slnt axis (-11 to 11), and the UA default angle (14deg) falls outside it. IMPORTANT CAVEAT: the test built here uses Inter's -10 to 0 range (one-sided, both bounds well short of 14deg either direction), not Cairo's exact -11 to 11 (symmetric, also short of 14deg either direction but spanning both signs). Both ranges exclude the default angle, and both Chrome and Firefox PASS this test — meaning the general auto-range-clamping mechanism works correctly on both engines for at least this shape. This does NOT by itself prove Cairo's original real-device finding (vizchitra-fonts/docs/compat.md) no longer reproduces: the exact symmetric range, Cairo's specific STAT table, or some other Cairo-specific factor could still differ. Read this as: the general gap in upstream WPT coverage is now closed, and the specific auto-range-clamping mechanism this gap worried about works correctly for Inter's shape on Chrome/Firefox — but Cairo's own bug (per compat.md) is not independently re-confirmed or refuted by this result. Was priority 1 / tier 2 before this test existed; now tier 1 (a written, dated, cross-engine result) — even though the outcome is a clean PASS rather than the hoped-for reproduction.
+
+**Corroborating fonts:**
+
+- **Cairo** — slnt range -11 to 11 (motivating case — the real-world bug this repo exists to document; source: vizchitra-fonts/docs/compat.md)
+- **Inter-VF.subset.ttf / Inter.var.subset.ttf (WPT's own corpus)** — slnt range -10 to 0 (used as the test font for tests/font-style-oblique/auto-range-default-angle.html — same auto-derived-range-excludes-default-angle shape as Cairo, but a one-sided (-10 to 0) rather than symmetric (-11 to 11) range; source: verified via fontTools fvar read, 2026-09-18)
+
+**Candidate test:** Done — see tests/font-style-oblique/auto-range-default-angle.html. If Cairo's own bug is worth re-verifying independently, the next step would be a variant using a font with Cairo's exact symmetric -11..11 range (or Cairo itself, subsetted) rather than Inter's one-sided range, to rule out that specific difference.

@@ -264,6 +264,7 @@ function renderConfirmedGaps(coverage) {
     return `
     <div class="gap-callout" style="margin-top:1rem;">
       <strong>${g.priority ? g.priority + ". " : ""}${g.id}</strong>
+      ${g.status ? `<div class="checklist-note"><em>Status:</em> ${g.status}</div>` : ""}
       ${g.priority_tier ? `<div class="checklist-note">Priority tier ${g.priority_tier}</div>` : ""}
       ${g.evidence_tier ? `<div class="checklist-note"><em>Evidence tier:</em> ${g.evidence_tier}</div>` : ""}
       <p>${g.summary}</p>

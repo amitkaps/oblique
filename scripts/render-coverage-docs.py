@@ -144,6 +144,8 @@ def render_coverage_md(coverage: dict) -> str:
             tier = g.get("evidence_tier")
             heading = f"### {priority}. {g['id']}" if priority else f"### {g['id']}"
             lines += [heading, ""]
+            if g.get("status"):
+                lines += [f"**Status:** {g['status']}", ""]
             if tier_num:
                 lines += [f"**Priority tier:** {tier_num}", ""]
             if tier:
