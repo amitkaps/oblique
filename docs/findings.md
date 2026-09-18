@@ -321,8 +321,15 @@ it yet:
   (-11 to 11), and the default angle (14deg) falls outside it). The closest
   upstream test, `font-slant-1.html`, was checked directly and confirmed
   **not** to cover this — it tests the identical default-angle-outside-range
-  question, but only for an explicitly authored descriptor range, and
-  passes on all three engines. **Now two-font-corroborated**: WPT's own
+  question, but only for an explicitly authored descriptor range. Its
+  PASS/FAIL status is sourced, not assumed: per `results/upstream.json`
+  (synced 2026-09-17T23:17 UTC), it passes on Chrome 153.0.8010.47,
+  Firefox 156.0, and Safari 27.0 — that Safari result comes from wpt.fyi's
+  own GitHub Actions CI run, a distinct and more controlled environment
+  than this repo's own local `safaridriver` investigation (see "Safari —
+  attempted, no reliable result" above), so treat it as good evidence
+  rather than as fully ruling out that same class of automation flakiness.
+  **Now two-font-corroborated**: WPT's own
   `Inter-VF.subset.ttf` / `Inter.var.subset.ttf` independently have the same
   shape (`slnt` range -10 to 0, verified via `fontTools` 2026-09-18),
   confirming this isn't a single-vendor anecdote.
