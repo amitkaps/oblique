@@ -28,8 +28,11 @@ writes a partial or stale results/upstream.json over a good one.
 
 Usage (from repo root):
   uv run scripts/sync-wpt-results.py
+  uv run scripts/sync-wpt-results.py --paths "css/css-fonts/a.html,css/css-fonts/b.html"
+    (scoped preview: prints a pass/fail table, does not write results/upstream.json)
 """
 
+import argparse
 import json
 import sys
 import urllib.error
@@ -98,8 +101,28 @@ def query_results(run_ids: list, test_filename: str) -> list:
 
 
 def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--paths", default=None,
+        help="comma-separated subset of docs/coverage.json paths to query "
+             "(e.g. for a quick scoped re-check). When given, this is a "
+             "read-only preview: prints a pass/fail summary to stdout and "
+             "does NOT write results/upstream.json, since a partial write "
+             "would silently drop every other cataloged test from the "
+             "committed snapshot. Omit to do the normal full-catalog sync."
+    )
+    args = parser.parse_args()
+
     coverage = json.loads(COVERAGE_PATH.read_text())
     tests = coverage["tests"]
+    scoped = args.paths is not None
+    if scoped:
+        wanted = set(p.strip() for p in args.paths.split(","))
+        tests = [t for t in tests if t["path"] in wanted]
+        missing = wanted - {t["path"] for t in tests}
+        if missing:
+            print(f"sync-wpt-results: WARNING — not in docs/coverage.json, skipped: "
+                  f"{sorted(missing)}", file=sys.stderr)
 
     print(f"sync-wpt-results: resolving latest stable runs for {PRODUCTS}...")
     runs = latest_stable_runs()
@@ -141,6 +164,25 @@ def main():
             file=sys.stderr,
         )
         sys.exit(1)
+
+    if scoped:
+        print(f"\nsync-wpt-results: scoped preview ({len(synced)} test(s)), "
+              f"NOT written to {OUTPUT_PATH}:\n")
+        header = f"{'path':<70} {'chrome':<8} {'firefox':<8} {'safari':<8}"
+        print(header)
+        print("-" * len(header))
+        pass_count = 0
+        for t in synced:
+            r = t["results"]
+            row = f"{t['path']:<70} {r['chrome']['status']:<8} {r['firefox']['status']:<8} {r['safari']['status']:<8}"
+            print(row)
+            if all(r[p]["status"] == "PASS" for p in PRODUCTS):
+                pass_count += 1
+        print(f"\n{pass_count}/{len(synced)} pass cleanly on all three engines.")
+        print(f"Query: GET {WPT_FYI_API}/runs?label=stable&max-count=1&product=<chrome|firefox|safari>, "
+              f"then GET {WPT_FYI_API}/search?run_ids=<ids>&q=<filename> per test — "
+              f"reproducible with the run ids/versions printed above.")
+        return
 
     output = {
         "synced_at": datetime.now(timezone.utc).isoformat(),

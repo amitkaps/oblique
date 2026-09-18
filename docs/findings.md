@@ -218,45 +218,85 @@ synthesis/parsing.
 `docs/coverage.json`'s `checklist_mapping` cross-references every one of
 spec.md's original 14-item coverage checklist against this catalog (broader
 than the `probes_209565` flag — an item can be fully covered without any
-single test targeting that specific bug). Result: **12 of 14 items are
-covered** (10 upstream, 2 by this repo's own `ital`-axis tests only).
+single test targeting that specific bug). Result: **11 of 14 items are
+covered** (9 upstream, 2 by this repo's own `ital`-axis tests only) — down
+from an earlier "12 of 14" after "Separate normal/oblique faces
+(ambiguous-match hazard)" was found to be wrongly marked covered (see gap 2
+below).
 
-**Three confirmed, currently-open gaps** were found — logged in
+**Four confirmed, currently-open gaps** were found — logged in
 `docs/coverage.json`'s `confirmed_gaps` field, more precise than a raw
 checklist-item miss because each was verified by reading the actual content
 of the closest candidate test, not its title:
 
-1. **`auto-range-default-angle`** — no test combines an *auto-derived*
-   oblique range (no explicit `@font-face font-style` descriptor — the
-   realistic deployment shape) with a *bare* `font-style: oblique` or
-   `font-style: italic` request on a font whose real range excludes the UA
-   default angle. This is the precise shape of Cairo's real-world bug
-   (vizchitra-fonts/docs/compat.md): Cairo ships with no `font-style`
-   descriptor, so its usable range comes entirely from its own `slnt` axis
-   (-11 to 11), and the default angle (14deg) falls outside it. Initial
-   review of this catalog credited `font-slant-1.html` and
-   `synthetic-oblique-out-of-capabilities-range.html` with covering this —
-   **that was wrong**, corrected after checking the actual test content:
-   `font-slant-1.html` tests the identical default-angle-outside-range
-   scenario (including the bare `italic` keyword) but only for an
-   *explicitly declared* `font-style` descriptor range, and it **passes on
-   Chrome/Firefox/Safari today**; `synthetic-oblique-out-of-capabilities-range.html`
-   only tests an explicit, author-supplied out-of-range angle, never a bare
-   keyword or the UA default. Neither is the auto-derived-range case. This
-   reinstates Cairo as legitimate motivating evidence for a real, narrow,
-   currently-unverified gap — not the general `slnt` story spec.md v2
-   originally framed it as.
-2. **`combined-slnt-ital-font`** — no font anywhere (WPT's corpus or this
-   repo's own resources) exposes both a real `slnt` axis and a real `ital`
-   axis together, needed to test #12836's independence claim in its
-   strongest form.
+1. **`auto-range-default-angle`** (now closed — see §2's test-result table
+   above) — no test combined an *auto-derived* oblique range (no explicit
+   `@font-face font-style` descriptor — the realistic deployment shape)
+   with a *bare* `font-style: oblique` or `font-style: italic` request on a
+   font whose real range excludes the UA default angle. This is the
+   precise shape of Cairo's real-world bug (vizchitra-fonts/docs/compat.md):
+   Cairo ships with no `font-style` descriptor, so its usable range comes
+   entirely from its own `slnt` axis (-11 to 11), and the default angle
+   (14deg) falls outside it. Initial review of this catalog credited
+   `font-slant-1.html` and `synthetic-oblique-out-of-capabilities-range.html`
+   with covering this — **that was wrong**, corrected after checking the
+   actual test content. A test now exists
+   (`tests/font-style-oblique/auto-range-default-angle.html`) and passes on
+   Chrome/Firefox — see §2 and "Evidence tiers" below for the full,
+   caveated result.
+2. **`normal-plus-bare-oblique-same-family`** — no test constructs a
+   same-family pairing of a `font-style: normal` face and a bare/unranged
+   `font-style: oblique` face and checks that an angled request correctly
+   selects the oblique face. This checklist item was previously marked
+   covered, citing three `matching/` tests
+   (`style-ranges-over-weight-direction.html`, `fixed-stretch-style-over-weight.html`,
+   `stretch-distance-over-weight-distance.html`) — **wrong**, corrected
+   after reading all three in full: every `@font-face` block in all three
+   uses `font-style: oblique <angle-or-range>`, none uses `normal`. They
+   test precedence *among multiple oblique candidates*, never a
+   normal-vs-oblique scenario. Corroborated by vizchitra-fonts' own
+   `fonts.css`, which ships two separate `@font-face` blocks (one `normal`,
+   one ranged `oblique`) specifically to avoid this hazard.
 3. **`font-style-plus-explicit-axis-pairing`** — no test pairs `font-style`
    with an explicit `font-variation-settings` axis override on the same
    declaration and checks the resulting precedence.
+4. **`combined-slnt-ital-font`** — no font anywhere (WPT's corpus or this
+   repo's own resources) exposes both a real `slnt` axis and a real `ital`
+   axis together, needed to test #12836's independence claim in its
+   strongest form.
 
-All three are candidate next worked examples — see `docs/coverage.md`'s
-"Confirmed gaps" section for the full detail, including candidate test
-designs for each.
+See `docs/coverage.md`'s "Confirmed gaps" section for the full detail on
+each, including candidate test designs, priority, and evidence tier.
+
+### A live finding, not a gap: three `matching/` tests fail on Safari today
+
+Separate from the checklist audit, scoping a `scripts/sync-wpt-results.py
+--paths` run to the 13 upstream tests most central to this repo's `slnt`
+claim (the 7 `slnt`/`font-slant-*` tests, all three `matching/` precedence
+tests, and the 3 range-descriptor-normalization tests) surfaced a real,
+dated, currently-live result that wasn't previously called out in prose
+anywhere, even though it's been visible in the raw synced data and on the
+dashboard's table all along:
+
+**10 of the 13 pass cleanly across Chrome, Firefox, and Safari. The other
+3 — all three `matching/` precedence tests
+(`style-ranges-over-weight-direction.html`, `fixed-stretch-style-over-weight.html`,
+`stretch-distance-over-weight-distance.html`) — PASS on Chrome and Firefox
+but FAIL on Safari**, per wpt.fyi's own stable CI (Chrome 153.0.8010.47,
+Firefox 156.0, Safari 27.0, run ids 5204236987269120 / 5096862033117184 /
+6240852912635904, queried via `GET /api/runs?label=stable&max-count=1&product=<x>`
+then `GET /api/search?run_ids=<ids>&q=<filename>`, 2026-09-18).
+
+This is not a coverage gap — these tests exist and run — it's evidence
+that Safari currently doesn't correctly implement the stretch-over-style-
+over-weight search-direction precedence rule these three tests check. It's
+tier-1-grade evidence (a written test, a dated cross-engine result, a real
+currently-live failure) by the same standard as
+`tests/ital-axis/italic-no-extra-synthesis.html`, just discovered via
+wpt.fyi sync rather than a test this repo authored. Same Safari-provenance
+caveat as elsewhere in this document applies: this is wpt.fyi's own CI
+run, not this repo's flaky local `safaridriver` investigation, so it's
+good evidence, not a single unverified local result.
 
 The same audit confirmed the inverse for `ital`: **zero** existing WPT tests
 anywhere under `css/css-fonts/` reference the `ital` variation axis in any
