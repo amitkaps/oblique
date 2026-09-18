@@ -165,6 +165,13 @@ def render_coverage_md(coverage: dict) -> str:
                         f"({f['role']}; source: {f['source']})"
                     )
                 lines.append("")
+            evidence = g.get("corroborating_evidence")
+            if evidence:
+                lines += [
+                    f"**Corroborating evidence ({evidence['kind']}):** "
+                    f"{evidence['detail']} (source: {evidence['source']})",
+                    "",
+                ]
             if g.get("lacks_corroborating_font"):
                 lines += [
                     "**No corroborating broken font** — unlike "

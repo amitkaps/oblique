@@ -335,8 +335,10 @@
       },
       {
         "item": "Separate normal/oblique faces (ambiguous-match hazard)",
-        "status": "covered-upstream",
-        "tests": ["css/css-fonts/matching/style-ranges-over-weight-direction.html", "css/css-fonts/matching/fixed-stretch-style-over-weight.html", "css/css-fonts/matching/stretch-distance-over-weight-distance.html"]
+        "status": "gap",
+        "priority_tier": 2,
+        "tests": [],
+        "notes": "Previously marked covered-upstream citing the three matching/ tests below — wrong, corrected after reading all three in full (not inferring from title/filename): css/css-fonts/matching/style-ranges-over-weight-direction.html, css/css-fonts/matching/fixed-stretch-style-over-weight.html, and css/css-fonts/matching/stretch-distance-over-weight-distance.html every @font-face block in all three uses font-style: oblique <angle-or-range> — not one declares font-style: normal. They test precedence AMONG MULTIPLE OBLIQUE candidates (stretch/weight/style search direction and distance), never a same-family normal-vs-bare-oblique scenario. A fourth candidate, css/css-fonts/variations/at-font-face-font-matching.html, was also read in full as a near-miss check: its descriptorPriorityTest family uses font-style: italic (not oblique) and has no normal face either — also does not cover this. See confirmed_gaps' normal-plus-bare-oblique-same-family entry."
       },
       {
         "item": "Font synthesis fallback behavior (font-synthesis)",
@@ -369,7 +371,7 @@
     "gaps": [
       {
         "id": "auto-range-default-angle",
-        "priority": 3,
+        "priority": 4,
         "priority_tier": 1,
         "status": "test written and run — tests/font-style-oblique/auto-range-default-angle.html + -ref.html",
         "evidence_tier": "written test, dated cross-engine result — but the result is a PASS, not a reproduction of Cairo's bug",
@@ -387,18 +389,32 @@
         "candidate_test": "Done — see tests/font-style-oblique/auto-range-default-angle.html. If Cairo's own bug is worth re-verifying independently, the next step would be a variant using a font with Cairo's exact symmetric -11..11 range (or Cairo itself, subsetted) rather than Inter's one-sided range, to rule out that specific difference."
       },
       {
-        "id": "font-style-plus-explicit-axis-pairing",
+        "id": "normal-plus-bare-oblique-same-family",
         "priority": 1,
+        "priority_tier": 2,
+        "evidence_tier": "proven gap, root cause traced to a real, documented production hazard, test not yet written",
+        "corroborating_evidence": {
+          "kind": "first-party production practice, not a third-party font — a different kind of corroboration than auto-range-default-angle's Cairo/Inter citations",
+          "source": "vizchitra-fonts' own fonts.css",
+          "detail": "vizchitra-fonts ships Cairo as TWO separate @font-face blocks under the same font-family name — one font-style:normal, one ranged font-style:oblique — rather than one combined face. Per vizchitra-fonts/docs/compat.md's historical-hazard note, this split exists specifically because Chromium/WebKit have been observed picking the wrong (upright, normal) face for an angled request when both faces share a family and the oblique face isn't disambiguated strongly enough. This is the repo's own operational workaround for the exact hazard this gap describes, not a third font exhibiting the same shape — cited and described as such, not conflated with auto-range-default-angle's kind of corroboration."
+        },
+        "summary": "No test constructs a same-family pairing of a font-style:normal face and a bare/unranged font-style:oblique face and checks that an angled request correctly selects the oblique face rather than falling back to normal.",
+        "why_it_matters": "Re-verified by reading (not title-inferring) all three matching/ tests previously credited with covering this checklist item (css/css-fonts/matching/style-ranges-over-weight-direction.html, fixed-stretch-style-over-weight.html, stretch-distance-over-weight-distance.html): every @font-face block in all three declares font-style: oblique <angle-or-range> — none declares font-style: normal. They test precedence AMONG MULTIPLE OBLIQUE CANDIDATES (stretch/weight/style search direction and distance), never a normal-vs-oblique same-family scenario. A fourth candidate, css/css-fonts/variations/at-font-face-font-matching.html, was also read in full as a near-miss: its descriptorPriorityTest family uses font-style: italic (not oblique) and has no normal face either. This checklist item (docs/spec.md's 'Separate normal/oblique faces (ambiguous-match hazard)') was previously marked covered-upstream citing those three tests — that was wrong and has been corrected (see checklist_mapping). The hazard itself is real and documented: it's the specific reason vizchitra-fonts' own production CSS avoids a single combined face.",
+        "candidate_test": "A reftest with one font-family containing two @font-face blocks sharing the same font-family name — one font-style: normal, one font-style: oblique (bare, unranged) — requesting an angled style (font-style: oblique or an explicit angle) and checking whether the correct (angled) face is chosen over the upright normal face."
+      },
+      {
+        "id": "font-style-plus-explicit-axis-pairing",
+        "priority": 2,
         "priority_tier": 2,
         "lacks_corroborating_font": true,
         "evidence_tier": "confirmed gap, plausible real impact (untested spec-recommended author pattern), no specific corroborating broken font",
         "summary": "No test pairs font-style with an explicit font-variation-settings axis override on the same declaration and checks the resulting precedence.",
-        "why_it_matters": "The spec's recommended pattern for authors is to pair the two (e.g. font-style: italic; font-variation-settings: 'ital' 1;) for compatibility with non-variable fallback faces, but no test verifies engines resolve any conflict between them consistently. Anyone following the spec's own compatibility advice is currently on unverified ground. Sits within tier 2 conceptually (a real, spec-recommended pattern, currently untested), but unlike auto-range-default-angle it has no specific corroborating broken font behind it (lacks_corroborating_font: true) — this is a genuinely different kind of gap (recommended-pattern-untested vs. bug-with-known-cause), and should not be read as carrying the same evidentiary weight.",
+        "why_it_matters": "The spec's recommended pattern for authors is to pair the two (e.g. font-style: italic; font-variation-settings: 'ital' 1;) for compatibility with non-variable fallback faces, but no test verifies engines resolve any conflict between them consistently. Anyone following the spec's own compatibility advice is currently on unverified ground. Sits within tier 2 conceptually (a real, spec-recommended pattern, currently untested), but unlike auto-range-default-angle and normal-plus-bare-oblique-same-family it has no specific corroborating broken font or production practice behind it (lacks_corroborating_font: true) — this is a genuinely different kind of gap (recommended-pattern-untested vs. bug-with-known-cause), and should not be read as carrying the same evidentiary weight.",
         "candidate_test": "A reftest declaring font-style: oblique 10deg together with an explicit font-variation-settings: 'slnt' <different value> on the same rule, checking which wins (or whether they're required to agree)."
       },
       {
         "id": "combined-slnt-ital-font",
-        "priority": 2,
+        "priority": 3,
         "priority_tier": 3,
         "real_world_font_exists": false,
         "evidence_tier": "confirmed absent, spec-completeness, no known real-world instance",

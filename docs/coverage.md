@@ -87,7 +87,8 @@ Audited 2026-09-18.
 | Font exposing both slnt and ital — confirms independence per #12836 | ❌ gap | — |
 | | | _No font anywhere in WPT's corpus or this repo's own resources exposes both a real slnt axis and a real ital axis together (confirmed by filename/content search of both .wpt/css/css-fonts font resources and tests/*/resources) — this is a genuine, currently-open gap, and the strongest direct test of #12836's independence claim would require building one. Candidate next worked example._ |
 | Single variable face covering normal + oblique | ✅ covered (upstream WPT) | `css/css-fonts/font-face-style-auto-variable.html`<br>`css/css-fonts/font-face-style-default-variable.html` |
-| Separate normal/oblique faces (ambiguous-match hazard) | ✅ covered (upstream WPT) | `css/css-fonts/matching/style-ranges-over-weight-direction.html`<br>`css/css-fonts/matching/fixed-stretch-style-over-weight.html`<br>`css/css-fonts/matching/stretch-distance-over-weight-distance.html` |
+| Separate normal/oblique faces (ambiguous-match hazard) | ❌ gap (tier 2) | — |
+| | | _Previously marked covered-upstream citing the three matching/ tests below — wrong, corrected after reading all three in full (not inferring from title/filename): css/css-fonts/matching/style-ranges-over-weight-direction.html, css/css-fonts/matching/fixed-stretch-style-over-weight.html, and css/css-fonts/matching/stretch-distance-over-weight-distance.html every @font-face block in all three uses font-style: oblique <angle-or-range> — not one declares font-style: normal. They test precedence AMONG MULTIPLE OBLIQUE candidates (stretch/weight/style search direction and distance), never a same-family normal-vs-bare-oblique scenario. A fourth candidate, css/css-fonts/variations/at-font-face-font-matching.html, was also read in full as a near-miss check: its descriptorPriorityTest family uses font-style: italic (not oblique) and has no normal face either — also does not cover this. See confirmed_gaps' normal-plus-bare-oblique-same-family entry._ |
 | Font synthesis fallback behavior (font-synthesis) | ✅ covered (upstream WPT) | `css/css-fonts/font-synthesis-style.html`<br>`css/css-fonts/font-synthesis-style-oblique-only.html`<br>`css/css-fonts/font-synthesis-style-binary.html`<br>`css/css-fonts/test-synthetic-italic.html`<br>`css/css-fonts/oblique-last-resort-weight-selection.html` |
 | | | _Covers font-synthesis fallback generally; the specific ital-axis spurious-synthesis failure mode (#209565) is only covered by this repo's tests/ital-axis/italic-no-extra-synthesis.html — see the probes_209565 flag on individual tests above._ |
 | Explicit font-variation-settings: 'slnt' <val> / 'ital' <val> | 🟡 partial (upstream WPT) | `css/css-fonts/font-variation-settings-descriptor-01.html` |
@@ -102,7 +103,21 @@ Narrower than a raw checklist-item miss — each of these states exactly which c
 
 Audited 2026-09-18.
 
-### 1. font-style-plus-explicit-axis-pairing
+### 1. normal-plus-bare-oblique-same-family
+
+**Priority tier:** 2
+
+**Evidence tier:** proven gap, root cause traced to a real, documented production hazard, test not yet written
+
+No test constructs a same-family pairing of a font-style:normal face and a bare/unranged font-style:oblique face and checks that an angled request correctly selects the oblique face rather than falling back to normal.
+
+**Why it matters:** Re-verified by reading (not title-inferring) all three matching/ tests previously credited with covering this checklist item (css/css-fonts/matching/style-ranges-over-weight-direction.html, fixed-stretch-style-over-weight.html, stretch-distance-over-weight-distance.html): every @font-face block in all three declares font-style: oblique <angle-or-range> — none declares font-style: normal. They test precedence AMONG MULTIPLE OBLIQUE CANDIDATES (stretch/weight/style search direction and distance), never a normal-vs-oblique same-family scenario. A fourth candidate, css/css-fonts/variations/at-font-face-font-matching.html, was also read in full as a near-miss: its descriptorPriorityTest family uses font-style: italic (not oblique) and has no normal face either. This checklist item (docs/spec.md's 'Separate normal/oblique faces (ambiguous-match hazard)') was previously marked covered-upstream citing those three tests — that was wrong and has been corrected (see checklist_mapping). The hazard itself is real and documented: it's the specific reason vizchitra-fonts' own production CSS avoids a single combined face.
+
+**Corroborating evidence (first-party production practice, not a third-party font — a different kind of corroboration than auto-range-default-angle's Cairo/Inter citations):** vizchitra-fonts ships Cairo as TWO separate @font-face blocks under the same font-family name — one font-style:normal, one ranged font-style:oblique — rather than one combined face. Per vizchitra-fonts/docs/compat.md's historical-hazard note, this split exists specifically because Chromium/WebKit have been observed picking the wrong (upright, normal) face for an angled request when both faces share a family and the oblique face isn't disambiguated strongly enough. This is the repo's own operational workaround for the exact hazard this gap describes, not a third font exhibiting the same shape — cited and described as such, not conflated with auto-range-default-angle's kind of corroboration. (source: vizchitra-fonts' own fonts.css)
+
+**Candidate test:** A reftest with one font-family containing two @font-face blocks sharing the same font-family name — one font-style: normal, one font-style: oblique (bare, unranged) — requesting an angled style (font-style: oblique or an explicit angle) and checking whether the correct (angled) face is chosen over the upright normal face.
+
+### 2. font-style-plus-explicit-axis-pairing
 
 **Priority tier:** 2
 
@@ -110,13 +125,13 @@ Audited 2026-09-18.
 
 No test pairs font-style with an explicit font-variation-settings axis override on the same declaration and checks the resulting precedence.
 
-**Why it matters:** The spec's recommended pattern for authors is to pair the two (e.g. font-style: italic; font-variation-settings: 'ital' 1;) for compatibility with non-variable fallback faces, but no test verifies engines resolve any conflict between them consistently. Anyone following the spec's own compatibility advice is currently on unverified ground. Sits within tier 2 conceptually (a real, spec-recommended pattern, currently untested), but unlike auto-range-default-angle it has no specific corroborating broken font behind it (lacks_corroborating_font: true) — this is a genuinely different kind of gap (recommended-pattern-untested vs. bug-with-known-cause), and should not be read as carrying the same evidentiary weight.
+**Why it matters:** The spec's recommended pattern for authors is to pair the two (e.g. font-style: italic; font-variation-settings: 'ital' 1;) for compatibility with non-variable fallback faces, but no test verifies engines resolve any conflict between them consistently. Anyone following the spec's own compatibility advice is currently on unverified ground. Sits within tier 2 conceptually (a real, spec-recommended pattern, currently untested), but unlike auto-range-default-angle and normal-plus-bare-oblique-same-family it has no specific corroborating broken font or production practice behind it (lacks_corroborating_font: true) — this is a genuinely different kind of gap (recommended-pattern-untested vs. bug-with-known-cause), and should not be read as carrying the same evidentiary weight.
 
 **No corroborating broken font** — unlike auto-range-default-angle, this gap is not tied to a specific known-broken font; it's a spec-recommended pattern that's simply untested.
 
 **Candidate test:** A reftest declaring font-style: oblique 10deg together with an explicit font-variation-settings: 'slnt' <different value> on the same rule, checking which wins (or whether they're required to agree).
 
-### 2. combined-slnt-ital-font
+### 3. combined-slnt-ital-font
 
 **Priority tier:** 3
 
@@ -130,7 +145,7 @@ No font anywhere (WPT's corpus or this repo's own resources) exposes both a real
 
 **Candidate test:** Extend tests/ital-axis/resources/build-font.py's approach (fontTools FontBuilder) to add a second gvar-driven axis, or find/build a WPT-compatible font exposing both.
 
-### 3. auto-range-default-angle
+### 4. auto-range-default-angle
 
 **Status:** test written and run — tests/font-style-oblique/auto-range-default-angle.html + -ref.html
 

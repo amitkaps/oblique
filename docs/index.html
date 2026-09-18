@@ -255,6 +255,9 @@ function renderConfirmedGaps(coverage) {
           ).join("")
         }</ul>`
       : "";
+    const evidence = g.corroborating_evidence
+      ? `<p><em>Corroborating evidence (${g.corroborating_evidence.kind}):</em> ${g.corroborating_evidence.detail} (source: ${g.corroborating_evidence.source})</p>`
+      : "";
     const lacksFont = g.lacks_corroborating_font
       ? `<p><em>No corroborating broken font</em> — a spec-recommended pattern that's simply untested, not tied to a known-broken font.</p>`
       : "";
@@ -269,7 +272,7 @@ function renderConfirmedGaps(coverage) {
       ${g.evidence_tier ? `<div class="checklist-note"><em>Evidence tier:</em> ${g.evidence_tier}</div>` : ""}
       <p>${g.summary}</p>
       <p><em>Why it matters:</em> ${g.why_it_matters}</p>
-      ${fonts}${lacksFont}${noRealFont}
+      ${fonts}${evidence}${lacksFont}${noRealFont}
       <p><em>Candidate test:</em> ${g.candidate_test}</p>
     </div>`;
   }).join("");

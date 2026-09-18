@@ -289,10 +289,14 @@ was closed without acceptance for lack of WPT test coverage; this repo's
 purpose is to supply that coverage, generically (not tied to any one font or
 vendor), so the proposal can be re-raised on firmer ground.
 
-The proposal leads with the tier-1 and tier-2 evidence below (already
-proven live, or root-caused and corroborated pending a written test) and
-explicitly excludes tier-3 findings from its scope — those are logged for
-completeness, not cited as impact evidence.
+Four confirmed gaps back this scope now (up from three — see "Evidence
+tiers" below): `auto-range-default-angle` (now closed with a written,
+run test), `normal-plus-bare-oblique-same-family` (newly confirmed — see
+below), `font-style-plus-explicit-axis-pairing`, and
+`combined-slnt-ital-font`. The proposal leads with the tier-1 and tier-2
+evidence below (already proven live, or root-caused and corroborated
+pending a written test) and explicitly excludes tier-3 findings from its
+scope — those are logged for completeness, not cited as impact evidence.
 
 ## 4. Evidence tiers for the Interop proposal
 
@@ -320,23 +324,49 @@ recorded cross-engine result showing the failure actually happening:
   reproduction — see its entry below for why that doesn't fully close the
   question this gap was motivated by.
 
-**Tier 2 — proven gap, root cause traced to a real bug, test not yet
-written.** The failure mode is confirmed to exist, but no test demonstrates
-it yet:
+**Tier 2 — proven gap, root cause traced to a real bug or documented
+production hazard, test not yet written.** The failure mode is confirmed
+to exist, but no test demonstrates it yet:
 
+- **`normal-plus-bare-oblique-same-family`** (`docs/coverage.json`'s
+  `confirmed_gaps`, priority 1 — now the recommended next worked example).
+  No test constructs a same-family pairing of a `font-style: normal` face
+  and a bare/unranged `font-style: oblique` face and checks that an angled
+  request correctly selects the oblique face rather than falling back to
+  upright. **This checklist item was previously marked
+  `covered-upstream`, citing three `matching/` tests — that was wrong**,
+  corrected after reading all three in full (not inferring from
+  title/filename): `css/css-fonts/matching/style-ranges-over-weight-direction.html`,
+  `fixed-stretch-style-over-weight.html`, and
+  `stretch-distance-over-weight-distance.html` all declare every
+  `@font-face` block with `font-style: oblique <angle-or-range>` — none
+  declares `font-style: normal`. They test precedence *among multiple
+  oblique candidates* (stretch/weight/style search direction and
+  distance), never a normal-vs-oblique same-family scenario. A fourth
+  candidate, `at-font-face-font-matching.html`, was also read in full as a
+  near-miss: its `descriptorPriorityTest` family uses `font-style: italic`
+  (not `oblique`) and has no `normal` face either. **Corroborating
+  evidence is first-party, not a third-party font** (a different kind of
+  corroboration than `auto-range-default-angle`'s Cairo/Inter citations):
+  vizchitra-fonts' own `fonts.css` ships Cairo as two separate
+  `@font-face` blocks under the same family — one `normal`, one ranged
+  `oblique` — rather than one combined face, specifically because
+  Chromium/WebKit have been observed picking the wrong (upright) face for
+  an angled request in that scenario (vizchitra-fonts/docs/compat.md's
+  historical-hazard note). This is the repo's own operational workaround
+  for the exact hazard this gap describes.
 - **`font-style-plus-explicit-axis-pairing`** (`docs/coverage.json`'s
-  `confirmed_gaps`, priority 1 — now the recommended next worked example,
-  since `auto-range-default-angle` below is done). A real,
-  spec-recommended author pattern (pairing `font-style` with an explicit
-  `font-variation-settings` override for fallback compatibility) that's
-  untested anywhere. Has **no specific corroborating broken font** behind
-  it (`docs/coverage.json` marks this `lacks_corroborating_font: true`) —
-  a different kind of gap (recommended-pattern-untested vs.
-  bug-with-known-cause) than the one below, and shouldn't be read as
-  carrying the same evidentiary weight it used to sit alongside.
+  `confirmed_gaps`, priority 2). A real, spec-recommended author pattern
+  (pairing `font-style` with an explicit `font-variation-settings`
+  override for fallback compatibility) that's untested anywhere. Has **no
+  specific corroborating broken font or production practice** behind it
+  (`docs/coverage.json` marks this `lacks_corroborating_font: true`) — a
+  different kind of gap (recommended-pattern-untested vs.
+  bug-with-known-cause) than the one above, and shouldn't be read as
+  carrying the same evidentiary weight.
 
 **Tier 1, with a caveat — `auto-range-default-angle`, now closed but not
-confirmatory.** `docs/coverage.json`'s `confirmed_gaps` (priority 3, now
+confirmatory.** `docs/coverage.json`'s `confirmed_gaps` (priority 4, now
 that it's done) — this **was** the recommended next worked example and now
 has one: `tests/font-style-oblique/auto-range-default-angle.html`. This is
 directly Cairo's own documented real-world failure mode
@@ -364,7 +394,7 @@ actual symmetric range (or Cairo itself, subsetted) — not yet done.
 **Tier 3 — confirmed absent, spec-completeness, no known real-world
 instance.**
 
-- **`combined-slnt-ital-font`** (priority 2). No font anywhere — WPT's
+- **`combined-slnt-ital-font`** (priority 3). No font anywhere — WPT's
   corpus or this repo's own resources — exposes both a real `slnt` axis
   and a real `ital` axis together (`docs/coverage.json` marks this
   `real_world_font_exists: false`). Worth closing for completeness (it's
@@ -372,9 +402,17 @@ instance.**
   it is **not evidence of real-world impact** and the proposal should not
   cite it as such.
 
-**Priority order for the remaining worked examples:**
-`font-style-plus-explicit-axis-pairing` first (tier 2, the highest-priority
-item still open), then `combined-slnt-ital-font` (tier 3, spec-completeness
-only). `auto-range-default-angle` is done — if it's revisited, the reason
-would be to specifically re-test Cairo's exact symmetric range rather than
-to close a coverage gap.
+### Next worked examples, in priority order
+
+1. ~~`auto-range-default-angle`~~ — **done**, see above (Chrome/Firefox
+   PASS; Cairo's exact symmetric range still unverified if worth
+   revisiting).
+2. **`normal-plus-bare-oblique-same-family`** — next up. Equally strong
+   corroboration to `auto-range-default-angle` (a real, documented
+   production hazard, just first-party rather than third-party), and a
+   simpler test shape: two `@font-face` blocks, one family, no variable
+   font or axis machinery required.
+3. `font-style-plus-explicit-axis-pairing` — real but uncorroborated
+   spec-recommended pattern.
+4. `combined-slnt-ital-font` — deprioritized, spec-completeness only, no
+   known real-world instance.

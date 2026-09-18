@@ -4,7 +4,7 @@ Generated from `results/upstream.json` by `scripts/render-coverage-docs.py` — 
 
 **This table is wpt.fyi's own continuous-integration data for pre-existing upstream WPT tests catalogued in [`docs/coverage.md`](../docs/coverage.md), fetched via `scripts/sync-wpt-results.py`.** It is a separate data source from [`results/browser-matrix.md`](browser-matrix.md), which records only tests *this repo* ran locally via the official WPT runner. Never merge the two — one is "we ran this ourselves," the other is "wpt.fyi ran this continuously upstream," and conflating them misrepresents provenance.
 
-**Last synced: 2026-09-18T06:06:41.111177+00:00** (chrome: 153.0.8010.47, firefox: 156.0, safari: 27.0 (22625.1.29.11.27)). If this timestamp looks old, the scheduled sync (see `.github/workflows/sync-wpt-results.yml`) may have stopped — treat stale data as unverified, not as current status.
+**Last synced: 2026-09-18T08:16:34.759289+00:00** (chrome: 153.0.8010.47, firefox: 156.0, safari: 27.0 (22625.1.29.11.27)). If this timestamp looks old, the scheduled sync (see `.github/workflows/sync-wpt-results.yml`) may have stopped — treat stale data as unverified, not as current status.
 
 | Path | Chrome | Firefox | Safari |
 |---|---|---|---|
