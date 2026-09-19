@@ -48,6 +48,11 @@ are load-bearing only because of the demotion below, which drives the applied va
 was quietly putting `slnt -11` back into the allowed set. Alone, its removal turns A12, B12 and C12 into hard
 `slnt 0` tests that all three engines fail. **Applied** together with the next item.
 
+The same unconditional 14deg was also pushed for an italic request on an `auto` face. It was inert on Cairo, where 11 and
+14 clamp to the same `slnt -11`, but a font with a wider `slnt` range would have shown a spurious `slnt -14`. It is removed
+there too (found in a second review); the 14deg in `requestedAxis` stays, because it only widens the set of outcomes a
+"must not be" reference forbids, which makes tests stricter without claiming the spec allows it.
+
 ## Overstated latitude 2: what that masks, the `oblique-only` demotion
 
 `reference/src/match.mjs` demotes the real positive-oblique stage to a last resort when `font-synthesis-style` is
@@ -84,9 +89,9 @@ so the applied value. That is the reason to default it off rather than an argume
 upstream `oblique-only` checks in `reference/test/upstream.test.mjs`. With it off, the only unit test that fails is
 the upstream oblique-only intent test (plus the generated-files check until the files are regenerated).
 
-`docs/findings.md` currently says A12 "is only measured, because the reference is not sure what `oblique-only` does to
+Before the change `docs/findings.md` said A12 "is only measured, because the reference is not sure what `oblique-only` does to
 a real oblique face", while the reference does assert outcomes for C12 (constrained) and D12 (specified) from that
-same uncertain reading. Four structurally identical cells carry three different statuses; that is an artefact of the
+same uncertain reading. Four structurally identical cells carried three different statuses (A12 and B12 unspecified, C12 constrained, D12 specified); that was an artefact of the
 14deg candidate interacting with clamping, not a distinction the spec draws.
 
 ## Overstated latitude 3: the G column is under-constrained across cells, not within them
@@ -129,7 +134,7 @@ check, so it is deferred.
 
 ## Status accounting
 
-59 specified, 10 constrained, 15 unspecified, applied consistently; `generate --check` agrees. One structural note:
+At the time of the audit: 59 specified, 10 constrained, 15 unspecified, applied consistently; `generate --check` agrees. One structural note:
 the `universe` of constructible outcomes in `reference/src/expected.mjs` is built from upright, the font's *negative*
 `slnt` extreme, and the axis value the request itself would set. It never includes the font's positive extreme except
 by way of a negative-angle request, so an engine that saturated backwards on a forward request would not be caught.
