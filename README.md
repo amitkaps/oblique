@@ -72,9 +72,7 @@ infrastructure, gitignored, never committed — see
 
 ```
 ./scripts/setup-wpt.sh
-mkdir -p .wpt/css/css-fonts/variable-oblique-interop/oblique-style-matching
-cp -r tests/oblique-style-matching/*.html tests/oblique-style-matching/*.css tests/oblique-style-matching/resources \
-  .wpt/css/css-fonts/variable-oblique-interop/oblique-style-matching/
+./scripts/sync-tests-to-wpt.sh   # re-run after any change under tests/
 cd .wpt
 ./wpt install chrome webdriver --channel stable
 ./wpt install firefox webdriver
@@ -259,6 +257,7 @@ oblique/
 │   └── sync-wpt-results.yml # daily wpt.fyi sync, rebuilds + commits the site
 ├── scripts/
 │   ├── setup-wpt.sh          # vendors a scoped, gitignored .wpt/ checkout
+│   ├── sync-tests-to-wpt.sh  # mirrors tests/ into .wpt/ (rsync --delete, no stale copies)
 │   ├── record-results.py     # parses wptreport JSON into browser-matrix.md
 │   ├── sync-wpt-results.py   # pulls live upstream results from wpt.fyi
 │   ├── render-coverage-docs.py  # renders coverage.md/upstream-matrix.md
