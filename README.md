@@ -25,7 +25,8 @@ This repo does two things:
 
 Full build spec: [`docs/spec.md`](docs/spec.md). Execution plan:
 [`docs/plan.md`](docs/plan.md). Current state, short version:
-[`docs/summary.md`](docs/summary.md). Full investigation trail (every claim
+[`docs/summary.md`](docs/summary.md); to resume work (pipeline, commands, findings, open items):
+[`docs/handoff.md`](docs/handoff.md). Full investigation trail (every claim
 sourced, every wrong turn documented): [`docs/investigation-log.md`](docs/investigation-log.md).
 Coverage catalog: [`docs/coverage.md`](docs/coverage.md).
 
