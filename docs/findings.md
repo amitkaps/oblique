@@ -111,31 +111,35 @@ Kept here so they are not repeated.
 resolution csswg-drafts#9389, which the Editor's Draft text has not caught up with (`RESOLUTIONS` in
 `reference/src/match.mjs`, off by default).
 
-## The hand-written tests
+## Additional tests
 
-The tests in `tests/oblique-style-matching/standalone/` are hand-written. Fourteen predate the matrix and use several
-fonts; the fifteenth, `auto-keyword-equals-omitted`, checks that `font-style: auto` and an omitted descriptor render
-identically (passes on all three engines).
+Eight hand-written tests in `tests/oblique-style-matching/standalone/` sit under the results table.
+`auto-keyword-equals-omitted` checks that `font-style: auto` and an omitted descriptor render identically (passes on all
+three engines). Three (`explicit-descriptor-range-clamp`, `boundary-0deg-normal-fallback`, `multi-branch-fallback-chain`)
+will be replaced by matrix columns. Four test the `ital` axis and wait for a real font that has one; their expectations were
+not re-derived with the reference, so treat their verdicts (Chrome fails `italic-no-extra-synthesis` and
+`ital-slnt-independence-dual-axis`, every engine fails `italic-oblique-equivalence`) as unchecked: two earlier claims of the
+same kind were withdrawn above.
 
-For the fourteen older ones, pass/fail is recorded but the expectations were not re-derived with the reference, so treat their
-"Chrome fails" verdicts (`italic-no-extra-synthesis`, `ital-slnt-independence-dual-axis`,
-`italic-oblique-equivalence`) as unchecked: two earlier claims of the same kind were withdrawn above.
+Seven earlier hand-written tests were deleted because the matrix covers them. Two of them (`auto-derived-range-clamp` and its
+Cairo twin) failed in Safari only through their bare `italic` half, where the spec is open, so those failures were never findings.
 
 ## Open
 
-1. **Grow the grid.** Rows 7 to 12 are in (`oblique 5deg`, `45deg`, `-5deg`, and the three synthesis rows).
-   Held back: `oblique 10deg` and `-11deg` (same outcome as rows 7 and 9 on one face; useful once a family has
-   several faces) and `oblique 5deg` plus `font-variation-settings` (the reference must model 7.2 for a non-normal
-   request first). Columns come next, each reviewed as a table: `oblique 0deg 10deg`, `oblique 5deg`,
-   `oblique -20deg -5deg`, `oblique -10deg 0deg`, then families of several faces. Addresses are permanent:
-   append, never renumber.
+1. **Grow the grid, sparingly.** Rows 7 to 12 are in (`oblique 5deg`, `45deg`, `-5deg`, and the three synthesis rows).
+   Not adding: `oblique 10deg` and `-11deg` (same outcome as rows 7 and 9 on one face) and a `font-variation-settings`
+   row with a non-normal request (font-variation-settings always wins by the cascade, and row 6 covers it). Columns are
+   the open question: each new one must exercise a behaviour no column has yet. Candidates: a range narrower than the
+   font (`oblique 0deg 5deg`, so a descriptor clamp differs clearly from a font clamp) and a backslant-only range (the
+   last-resort stages), each reviewed as a table before it is added. Addresses are permanent: append, never renumber.
 2. **Multi-face families** (the real 11deg ordering among several faces) are implemented and unit-tested
    in `reference/`. They do not need another font: several `@font-face` rules can point at the same Cairo file
    with different descriptors, and which face was chosen shows in the lean because each descriptor clamps
    differently (for example faces `oblique 5deg` and `oblique 20deg`: `oblique 10deg` gives slnt -5,
    `oblique 11deg` gives slnt -11). Not yet in the grid.
-3. **Re-base the hand-written tests** on the Cairo subset, judging each with the reference; the last unbuilt
-   gap is a `normal` face plus a bare-`oblique` face in one family (the way vizchitra-fonts ships Cairo).
+3. **A real `ital` font.** Find an OFL font with a real `ital` axis to subset, then move the four `ital` tests onto it
+   and model `ital` on an `auto` face in the reference. The other unbuilt gap is a `normal` face plus a bare-`oblique`
+   face in one family (the way vizchitra-fonts ships Cairo).
 4. **Why `wpt run safari` is wrong** here was not isolated (a loading race was tested and ruled out).
 5. **Real-device Safari** (iPhone, older versions) has never been run; vizchitra-fonts saw
    version-dependent behaviour (18.7 vs 27.0).

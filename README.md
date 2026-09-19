@@ -52,7 +52,7 @@ Setup, the Safari method, and gotchas: [docs/running.md](docs/running.md). All t
 |---|---|
 | `reference/` | the reference implementation, its tests, the saved spec text ([README](reference/README.md)) |
 | `tests/oblique-style-matching/matrix/` | generated reftests and manifest; never edited by hand |
-| `tests/oblique-style-matching/standalone/` | 15 hand-written tests (14 older ones on several fonts, kept while they are re-based on Cairo, plus the `auto` equivalence test) |
+| `tests/oblique-style-matching/standalone/` | 8 additional hand-written tests: four `ital`-axis ones waiting for a real font, three awaiting matrix columns, and the `auto` equivalence test |
 | `tests/oblique-style-matching/resources/` | fonts and the scripts that build them |
 | `results/` | `browser-matrix.md` (recorded runs), `survey.json` (measured lean per cell) |
 | `site/` | the page: `index.html`, `style.css`, `render.mjs` (a Vite plugin that renders the grid) |

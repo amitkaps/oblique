@@ -6,64 +6,31 @@ run via the official WPT runner — see `docs/running.md`. Rows are appended by 
 
 | test_id | engine | version | real_device | result | notes |
 |---|---|---|---|---|---|
-| slnt-axis-activation | chrome | 153.0.8010.37 | no | pass | wpt run, official runner, system Chrome via --binary |
 | independence | chrome | 153.0.8010.37 | no | pass | wpt run, official runner, system Chrome via --binary |
 | italic-no-extra-synthesis | chrome | 153.0.8010.37 | no | fail | wpt run, official runner, system Chrome via --binary — reproduces WebKit #209565's documented ital-axis spurious-synthesis failure |
-| slnt-axis-activation | firefox | 156.0 | no | pass | wpt run, official runner, system Firefox via --binary |
 | independence | firefox | 156.0 | no | pass | wpt run, official runner, system Firefox via --binary |
 | italic-no-extra-synthesis | firefox | 156.0 | no | pass | wpt run, official runner, system Firefox via --binary |
-| auto-derived-range-clamp | chrome | 153.0.8010.48 | no | pass | wpt status: PASS |
 | boundary-0deg-normal-fallback | chrome | 153.0.8010.48 | no | pass | wpt status: PASS |
-| boundary-11deg-ascending | chrome | 153.0.8010.48 | no | pass | wpt status: PASS |
-| boundary-11deg-descending | chrome | 153.0.8010.48 | no | pass | wpt status: PASS |
 | explicit-descriptor-range-clamp | chrome | 153.0.8010.48 | no | pass | wpt status: PASS |
 | independence | chrome | 153.0.8010.48 | no | pass | wpt status: PASS |
 | ital-slnt-independence-dual-axis | chrome | 153.0.8010.48 | no | fail | wpt status: FAIL |
 | italic-no-extra-synthesis | chrome | 153.0.8010.48 | no | fail | wpt status: FAIL |
 | italic-oblique-equivalence | chrome | 153.0.8010.48 | no | fail | wpt status: FAIL |
 | multi-branch-fallback-chain | chrome | 153.0.8010.48 | no | pass | wpt status: PASS |
-| slnt-axis-activation | chrome | 153.0.8010.48 | no | pass | wpt status: PASS |
-| style-plus-explicit-variation-settings | chrome | 153.0.8010.48 | no | pass | wpt status: PASS |
-| auto-derived-range-clamp | firefox | 156.0 | no | pass | wpt status: PASS |
 | boundary-0deg-normal-fallback | firefox | 156.0 | no | pass | wpt status: PASS |
-| boundary-11deg-ascending | firefox | 156.0 | no | pass | wpt status: PASS |
-| boundary-11deg-descending | firefox | 156.0 | no | pass | wpt status: PASS |
 | explicit-descriptor-range-clamp | firefox | 156.0 | no | pass | wpt status: PASS |
 | independence | firefox | 156.0 | no | pass | wpt status: PASS |
 | ital-slnt-independence-dual-axis | firefox | 156.0 | no | pass | wpt status: PASS |
 | italic-no-extra-synthesis | firefox | 156.0 | no | pass | wpt status: PASS |
 | italic-oblique-equivalence | firefox | 156.0 | no | fail | wpt status: FAIL |
 | multi-branch-fallback-chain | firefox | 156.0 | no | pass | wpt status: PASS |
-| slnt-axis-activation | firefox | 156.0 | no | pass | wpt status: PASS |
-| style-plus-explicit-variation-settings | firefox | 156.0 | no | pass | wpt status: PASS |
-| auto-derived-range-clamp-cairo-symmetric | chrome | 153.0.8010.48 | no | pass | wpt status: PASS |
-| auto-derived-range-clamp-cairo-symmetric | firefox | 156.0 | no | pass | wpt status: PASS |
-| explicit-range-bare-keyword-synthesis-stacking | chrome | 153.0.8010.48 | no | fail | wpt status: FAIL |
-| explicit-range-bare-keyword-synthesis-stacking | firefox | 156.0 | no | pass | wpt status: PASS |
-| auto-derived-range-clamp-cairo-symmetric | chrome | 153.0.8010.48 | no | pass | wpt run, official runner, system browser via --binary; default font-synthesis, real Cairo subset |
-| boundary-11deg-ascending | chrome | 153.0.8010.48 | no | pass | wpt run, official runner, system browser via --binary; default font-synthesis, real Cairo subset |
-| boundary-11deg-descending | chrome | 153.0.8010.48 | no | pass | wpt run, official runner, system browser via --binary; default font-synthesis, real Cairo subset |
-| explicit-range-bare-keyword-synthesis-stacking | chrome | 153.0.8010.48 | no | fail | wpt run, official runner, system browser via --binary; default font-synthesis, real Cairo subset |
-| style-plus-explicit-variation-settings | chrome | 153.0.8010.48 | no | pass | wpt run, official runner, system browser via --binary; default font-synthesis, real Cairo subset |
-| auto-derived-range-clamp-cairo-symmetric | firefox | 156.0 | no | pass | wpt run, official runner, system browser via --binary; default font-synthesis, real Cairo subset |
-| boundary-11deg-ascending | firefox | 156.0 | no | pass | wpt run, official runner, system browser via --binary; default font-synthesis, real Cairo subset |
-| boundary-11deg-descending | firefox | 156.0 | no | pass | wpt run, official runner, system browser via --binary; default font-synthesis, real Cairo subset |
-| explicit-range-bare-keyword-synthesis-stacking | firefox | 156.0 | no | pass | wpt run, official runner, system browser via --binary; default font-synthesis, real Cairo subset |
-| style-plus-explicit-variation-settings | firefox | 156.0 | no | pass | wpt run, official runner, system browser via --binary; default font-synthesis, real Cairo subset |
-| auto-derived-range-clamp-cairo-symmetric | safari | 27.0 | no (safaridriver automation) | fail | direct safaridriver replay of the reftest, exact pixel compare, 3 agreeing repetitions; `wpt run safari` disagreed, see docs/running.md |
-| auto-derived-range-clamp | safari | 27.0 | no (safaridriver automation) | fail | direct safaridriver replay of the reftest, exact pixel compare, 3 agreeing repetitions; `wpt run safari` disagreed, see docs/running.md |
 | boundary-0deg-normal-fallback | safari | 27.0 | no (safaridriver automation) | pass | direct safaridriver replay of the reftest, exact pixel compare, 3 agreeing repetitions; `wpt run safari` disagreed, see docs/running.md |
-| boundary-11deg-ascending | safari | 27.0 | no (safaridriver automation) | pass | direct safaridriver replay of the reftest, exact pixel compare, 3 agreeing repetitions; `wpt run safari` disagreed, see docs/running.md |
-| boundary-11deg-descending | safari | 27.0 | no (safaridriver automation) | pass | direct safaridriver replay of the reftest, exact pixel compare, 3 agreeing repetitions; `wpt run safari` disagreed, see docs/running.md |
 | explicit-descriptor-range-clamp | safari | 27.0 | no (safaridriver automation) | pass | direct safaridriver replay of the reftest, exact pixel compare, 3 agreeing repetitions; `wpt run safari` disagreed, see docs/running.md |
-| explicit-range-bare-keyword-synthesis-stacking | safari | 27.0 | no (safaridriver automation) | fail | direct safaridriver replay of the reftest, exact pixel compare, 3 agreeing repetitions; `wpt run safari` disagreed, see docs/running.md |
 | independence | safari | 27.0 | no (safaridriver automation) | pass | direct safaridriver replay of the reftest, exact pixel compare, 3 agreeing repetitions; `wpt run safari` disagreed, see docs/running.md |
 | ital-slnt-independence-dual-axis | safari | 27.0 | no (safaridriver automation) | pass | direct safaridriver replay of the reftest, exact pixel compare, 3 agreeing repetitions; `wpt run safari` disagreed, see docs/running.md |
 | italic-no-extra-synthesis | safari | 27.0 | no (safaridriver automation) | pass | direct safaridriver replay of the reftest, exact pixel compare, 3 agreeing repetitions; `wpt run safari` disagreed, see docs/running.md |
 | italic-oblique-equivalence | safari | 27.0 | no (safaridriver automation) | fail | direct safaridriver replay of the reftest, exact pixel compare, 3 agreeing repetitions; `wpt run safari` disagreed, see docs/running.md |
 | multi-branch-fallback-chain | safari | 27.0 | no (safaridriver automation) | pass | direct safaridriver replay of the reftest, exact pixel compare, 3 agreeing repetitions; `wpt run safari` disagreed, see docs/running.md |
-| slnt-axis-activation | safari | 27.0 | no (safaridriver automation) | pass | direct safaridriver replay of the reftest, exact pixel compare, 3 agreeing repetitions; `wpt run safari` disagreed, see docs/running.md |
-| style-plus-explicit-variation-settings | safari | 27.0 | no (safaridriver automation) | pass | direct safaridriver replay of the reftest, exact pixel compare, 3 agreeing repetitions; `wpt run safari` disagreed, see docs/running.md |
 | matrix-em-normal | chrome | 153.0.8010.48 | no | pass | wpt run, official runner, system browser via --binary; generated from reference/, default font-synthesis |
 | matrix-em-oblique | chrome | 153.0.8010.48 | no | pass | wpt run, official runner, system browser via --binary; generated from reference/, default font-synthesis |
 | matrix-em-oblrange | chrome | 153.0.8010.48 | no | fail | wpt run, official runner, system browser via --binary; generated from reference/, default font-synthesis |

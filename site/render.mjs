@@ -196,21 +196,81 @@ function renderMatrix(manifest, results, survey, versions) {
   return out.join("");
 }
 
-/** The hand-written tests: every recorded id that is not a generated matrix cell and still exists on disk. */
-function renderStandalone(results) {
-  const ids = readdirSync(STANDALONE_DIR)
-    .filter(isTestFile)
-    .map((n) => n.slice(0, -5))
-    .sort();
-  const rows = ids.map((id) => {
-    const lis = ENGINES.map((e) => {
-      const s = reftestStatus(results, id, e.key);
-      const cls = s === "pass" || s === "fail" ? s : "unknown";
-      return `<li class="b-badge ${cls}" title="${esc(`${e.label}: ${s}`)}"><img class="logo" src="/browsers/${e.id}.svg" alt="${esc(e.label)}"></li>`;
+const cellClass = (pass, total) => (total === 0 ? "none" : pass === total ? "all" : pass === 0 ? "zero" : "some");
+const pct = (pass, total) => (total ? `${Math.round((100 * pass) / total)}%` : "");
+
+/** one row of the results grid: a description and one cell per engine */
+const gridRow = (first, engineCells, cls = "") =>
+  `<div class="rrow ${cls}"><div class="rdesc">${first}</div>${engineCells.map((c) => `<div class="rcell ${c.cls}">${c.html}</div>`).join("")}</div>`;
+
+/**
+ * The results, in the shape wpt.fyi uses: a row per @font-face descriptor with passes over tests for each
+ * engine, opening to the tests behind it, a total with a percentage, then the hand-written tests.
+ * Only cells with a WPT test count; the ones the spec leaves open are listed, never scored.
+ */
+function renderResults(manifest, results, survey) {
+  const verdict = Object.fromEntries(compare(manifest, results, survey).map((r) => [r.address, r.per]));
+  const passed = (id, key) => reftestStatus(results, id, key) === "pass";
+  const total = Object.fromEntries(ENGINES.map((e) => [e.key, { pass: 0, n: 0 }]));
+  const out = [];
+  out.push(
+    `<div class="rgrid"><div class="rrow rhead"><div class="rdesc">Description</div>${ENGINES.map((e) => `<div class="rcell">${esc(e.label)}</div>`).join("")}</div>`,
+  );
+
+  for (const col of manifest.columns) {
+    const tested = manifest.cells.filter((c) => c.column === col.slug && c.wpt);
+    const open = manifest.cells.filter((c) => c.column === col.slug && !c.wpt);
+    const frac = ENGINES.map((e) => {
+      const pass = tested.filter((c) => passed(c.id, e.key)).length;
+      total[e.key].pass += pass;
+      total[e.key].n += tested.length;
+      return { cls: cellClass(pass, tested.length), html: `${pass} / ${tested.length}`, pass };
     });
-    return `<tr><td><a href="${esc(STANDALONE_URL + id + ".html")}">${esc(id)}</a></td><td><ul class="verdicts">${lis.join("")}</ul></td></tr>`;
-  });
-  return `<table class="standalone"><thead><tr><th>Test</th><th>Result</th></tr></thead><tbody>${rows.join("")}</tbody></table>`;
+    const anyFail = frac.some((f) => f.cls !== "all");
+    const lines = tested
+      .map((c) => {
+        const row = manifest.rows.find((r) => r.slug === c.row);
+        const cells = ENGINES.map((e) => {
+          const ok = passed(c.id, e.key);
+          const did = !ok ? `<span class="did">${esc(verdict[c.address][e.key].label ?? "")}</span>` : "";
+          return { cls: ok ? "all" : "zero", html: `${ok ? "pass" : "fail"}${did}` };
+        });
+        const desc = `<a class="addr" href="${esc(MATRIX_URL + c.files[0])}">${esc(c.address)}</a> <code>${esc(row.lines.join(" "))}</code> <span class="spec ${c.spec.decided ? "spec-decided" : "spec-open"}">${c.spec.decided ? "spec:" : "spec*:"} ${esc(c.spec.text)}</span>`;
+        return gridRow(desc, cells, "rtest");
+      })
+      .join("");
+    const note = open.length ? `<div class="rnote">Not scored, the spec leaves them open: ${open.map((c) => esc(c.address)).join(", ")}</div>` : "";
+    out.push(
+      `<details class="rgroup"${anyFail ? " open" : ""}><summary>${gridRow(`<span class="addr">${esc(col.address)}</span> <code>${esc(col.code)}</code>`, frac, "rsum")}</summary>${lines}${note}</details>`,
+    );
+  }
+  out.push(
+    gridRow("<strong>Total</strong>", ENGINES.map((e) => {
+      const t = total[e.key];
+      return { cls: cellClass(t.pass, t.n), html: `<strong>${t.pass} / ${t.n}</strong> &middot; ${pct(t.pass, t.n)}` };
+    }), "rtotal"),
+  );
+
+  // hand-written tests, one row each, then their own total
+  const ids = readdirSync(STANDALONE_DIR).filter(isTestFile).map((n) => n.slice(0, -5)).sort();
+  const extra = Object.fromEntries(ENGINES.map((e) => [e.key, 0]));
+  out.push(`<div class="rrow rhead rsection"><div class="rdesc">Additional tests</div>${ENGINES.map(() => "<div class=\"rcell\"></div>").join("")}</div>`);
+  for (const id of ids) {
+    const cells = ENGINES.map((e) => {
+      const ok = passed(id, e.key);
+      if (ok) extra[e.key]++;
+      return { cls: ok ? "all" : "zero", html: ok ? "pass" : "fail" };
+    });
+    out.push(gridRow(`<a href="${esc(STANDALONE_URL + id + ".html")}">${esc(id)}</a>`, cells, "rtest"));
+  }
+  out.push(
+    gridRow("<strong>Additional total</strong>", ENGINES.map((e) => ({
+      cls: cellClass(extra[e.key], ids.length),
+      html: `<strong>${extra[e.key]} / ${ids.length}</strong> &middot; ${pct(extra[e.key], ids.length)}`,
+    })), "rtotal"),
+  );
+  out.push("</div>");
+  return out.join("");
 }
 
 export function matrixPage() {
@@ -230,7 +290,7 @@ export function matrixPage() {
         return html
           .replace("<!--MATRIX_FONT_FACE-->", () => fontFaceCss(manifest))
           .replace("<!--MATRIX-->", () => renderMatrix(manifest, results, survey, versions))
-          .replace("<!--STANDALONE-->", () => renderStandalone(results));
+          .replace("<!--RESULTS-->", () => renderResults(manifest, results, survey));
       },
     },
     // the live specimens use the exact font file the tests do: served in dev, emitted in build

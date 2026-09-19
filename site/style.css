@@ -44,12 +44,7 @@ body {
   padding: 0.2rem 0.75rem;
 }
 
-.coverage-matrix {
-  margin: 2rem 0;
-  padding: 1.5rem;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-}
+.coverage-matrix { margin: 2rem 0; }
 .coverage-matrix h2 { margin-top: 0; font-size: 1.05rem; }
 .matrix-intro { color: var(--muted); font-size: 0.85rem; max-width: 760px; }
 .matrix-count { font-size: 0.85rem; margin: 0.75rem 0 0.5rem; }
@@ -154,12 +149,8 @@ body {
 .legend .legend-note { display: block; flex: 1 1 100%; color: var(--muted); font-style: italic; line-height: 1.6; }
 .legend-versions { color: var(--muted); }
 
-.card-section, .findings { margin: 2.5rem 0; }
-.card-section h2, .findings h2 { font-size: 1.05rem; padding-bottom: 0.3rem; border-bottom: 2px solid var(--accent-this-repo); }
 .findings p { max-width: 760px; font-size: 0.9rem; }
-.standalone { border-collapse: collapse; font-size: 0.85rem; }
-.standalone th, .standalone td { text-align: left; padding: 0.3rem 0.9rem 0.3rem 0; border-bottom: 1px solid var(--border); }
-.standalone a { color: inherit; }
+
 
 .spec, .cell-fail {
   display: block;
@@ -214,3 +205,32 @@ body {
 .row-num { display: inline-block; padding: 0 0.35rem; border: 1px solid var(--border); border-radius: 3px; }
 .matrix td.status-observed { border-left-color: var(--accent-upstream); }
 .b-badge.observed { border-color: var(--accent-upstream); border-style: dotted; }
+
+/* results, in the shape wpt.fyi uses */
+.results { margin: 2.5rem 0; }
+.results h2 { font-size: 1.05rem; margin-top: 0; }
+.rgrid { font-size: 0.82rem; border-top: 1px solid var(--border); }
+.rrow { display: grid; grid-template-columns: minmax(0, 1fr) repeat(3, 8.5rem); border-bottom: 1px solid var(--border); }
+.rrow > div { padding: 0.45rem 0.6rem; min-width: 0; }
+.rhead { font-weight: 600; color: var(--muted); }
+.rhead .rcell, .rcell { text-align: right; }
+.rsection { margin-top: 1.5rem; border-top: 1px solid var(--border); }
+.rgroup > summary { list-style: none; cursor: pointer; }
+.rgroup > summary::-webkit-details-marker { display: none; }
+.rgroup > summary .rdesc::before { content: "\25B8"; display: inline-block; width: 1.1em; color: var(--muted); }
+.rgroup[open] > summary .rdesc::before { content: "\25BE"; }
+.rgroup > summary:hover { background: color-mix(in srgb, var(--fg) 4%, transparent); }
+.rcell.all { background: color-mix(in srgb, var(--pass) 16%, transparent); }
+.rcell.some { background: color-mix(in srgb, var(--fail) 14%, transparent); }
+.rcell.zero { background: color-mix(in srgb, var(--fail) 22%, transparent); }
+.rtest .rdesc { padding-left: 1.7rem; }
+.rtest .rcell { font-size: 0.76rem; }
+.rtest code { font-size: 0.74rem; }
+.rgrid .addr, .rsum .addr { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.7rem; font-weight: 600; margin-right: 0.3rem; }
+.rgrid .spec { display: inline; margin-left: 0.6rem; }
+.did { display: block; color: var(--fail); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.66rem; }
+.rnote { padding: 0.35rem 0.6rem 0.5rem 1.7rem; color: var(--muted); font-size: 0.74rem; border-bottom: 1px solid var(--border); }
+.rtotal { font-weight: 400; border-bottom: 2px solid var(--border); }
+.rgrid a { color: inherit; }
+.findings { margin: 1.5rem 0 0; }
+@media (max-width: 720px) { .rrow { grid-template-columns: minmax(0, 1fr) repeat(3, 4.6rem); } }
