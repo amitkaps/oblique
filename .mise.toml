@@ -14,7 +14,7 @@ description = "Unit tests for the reference implementation (and that generated t
 run = "pnpm test"
 
 [tasks.generate]
-description = "Regenerate tests/oblique-style-matching/matrix/ from reference/cases/matrix.json"
+description = "Regenerate the matrix-* tests in tests/oblique-style-matching/ from reference/cases/matrix.json"
 run = "pnpm generate"
 
 [tasks.compare]

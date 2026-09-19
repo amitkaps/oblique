@@ -3,7 +3,7 @@
 // @font-face `font-style` descriptor (columns A, B, C...) x use-site request (rows 1, 2, 3...),
 // one cell per pair, all against one font (Cairo subset, capital I).
 //
-// Everything about the grid comes from tests/oblique-style-matching/matrix/matrix.manifest.json,
+// Everything about the grid comes from tests/oblique-style-matching/matrix.manifest.json,
 // which reference/ generates from reference/cases/matrix.json: addresses, labels, what the
 // reference algorithm expects in each cell, which cells have a WPT test. This file only reads
 // that manifest and the recorded browser results; it never decides an expectation.
@@ -18,7 +18,7 @@
 // verifyMatrix() fails the build if the manifest, the tests on disk and the results disagree.
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { TESTS_DIR, MATRIX_DIR, STANDALONE_DIR } from "../reference/src/cases.mjs";
+import { TESTS_DIR } from "../reference/src/cases.mjs";
 import { pinCss } from "../reference/src/outcome.mjs";
 import {
   compare,
@@ -30,8 +30,6 @@ import {
 
 const FONT_FILE = join(TESTS_DIR, "resources", "Cairo.var.subset.ttf");
 const TEST_URL_BASE = "https://github.com/amitkaps/oblique/blob/main/tests/oblique-style-matching/";
-const MATRIX_URL = TEST_URL_BASE + "matrix/";
-const STANDALONE_URL = TEST_URL_BASE + "standalone/";
 const SPECIMEN_WORD = "OBLIQUE";
 const ENGINES = [
   { id: "chromium", key: "chrome", label: "Chromium" },
@@ -54,13 +52,17 @@ function verifyMatrix(manifest, results) {
   if (cells.length !== columns.length * rows.length) throw new Error("site: the manifest is not exactly columns x rows");
   for (const cell of cells) {
     for (const name of cell.files) {
-      if (!existsSync(join(MATRIX_DIR, name)))
+      if (!existsSync(join(TESTS_DIR, name)))
         throw new Error(`site: ${name} (cell ${cell.address}) is missing: run \`pnpm generate\``);
     }
     if (cell.wpt && !results[cell.id])
       throw new Error(`site: ${cell.id} (cell ${cell.address}) has no row in results/browser-matrix.md: run and record it first`);
   }
-  const onDisk = new Set(readdirSync(MATRIX_DIR).filter((n) => n.startsWith("matrix-") && isTestFile(n)).map((n) => n.slice(0, -5)));
+  for (const t of manifest.standalone ?? []) {
+    if (!existsSync(join(TESTS_DIR, `${t.id}.html`))) throw new Error(`site: standalone test ${t.id} (${t.address}) is missing`);
+    if (!results[t.id]) throw new Error(`site: ${t.id} (${t.address}) has no row in results/browser-matrix.md: run and record it first`);
+  }
+  const onDisk = new Set(readdirSync(TESTS_DIR).filter((n) => n.startsWith("matrix-") && isTestFile(n)).map((n) => n.slice(0, -5)));
   const expected = new Set(cells.filter((c) => c.wpt).map((c) => c.id));
   const extra = [...onDisk].filter((n) => !expected.has(n));
   const missing = [...expected].filter((n) => !onDisk.has(n));
@@ -165,7 +167,7 @@ function renderMatrix(manifest, results, survey, versions) {
     for (const col of columns) {
       const cell = byAddr[`${col.address}${row.address}`];
       const res = perCell[cell.address];
-      const url = MATRIX_URL + (cell.wpt ? cell.files[0] : "matrix.manifest.json");
+      const url = TEST_URL_BASE + (cell.wpt ? cell.files[0] : "matrix.manifest.json");
       // every cell says what the reference expects on one line, then what the engines did
       const line = cell.spec;
       const spec = `<span class="spec ${line.decided ? "spec-decided" : "spec-open"}" title="${esc(cell.why.join("; "))}">${line.decided ? "spec:" : "spec*:"} ${esc(line.text)}</span>`;
@@ -206,33 +208,8 @@ const gridRow = (first, engineCells, cls = "") =>
   `<div class="rrow ${cls}"><div class="rdesc">${first}</div>${engineCells.map((c) => `<div class="rcell ${c.cls}">${c.html}</div>`).join("")}</div>`;
 
 /**
- * Where the spec leaves the outcome open: do the engines still render the same thing? Where all three
- * converge, that is evidence the spec could simply say so; where they differ, it is the list to take to CSSWG.
- */
-function renderAgreement(manifest, results, survey) {
-  const verdict = Object.fromEntries(compare(manifest, results, survey).map((r) => [r.address, r.per]));
-  const open = manifest.cells.filter((c) => c.status !== "specified");
-  const labels = (c) => ENGINES.map((e) => verdict[c.address][e.key].label);
-  const agree = open.filter((c) => labels(c).every((l) => l != null && l === labels(c)[0]));
-  const differ = open.filter((c) => !agree.includes(c));
-  const row = (c) => {
-    const col = manifest.columns.find((x) => x.slug === c.column);
-    const rw = manifest.rows.find((x) => x.slug === c.row);
-    const desc = `<span class="addr">${esc(c.address)}</span> ${esc(col.name)} <code>${esc(rw.lines.join(" "))}</code> <span class="spec spec-open">spec*: ${esc(c.spec.text)}</span>`;
-    return gridRow(desc, ENGINES.map((e) => ({ cls: "", html: esc(verdict[c.address][e.key].label ?? "not run") })), "rtest");
-  };
-  const group = (title, cells) =>
-    `<div class="rrow rhead rsection"><div class="rdesc">${title} (${cells.length})</div>${ENGINES.map(() => '<div class="rcell"></div>').join("")}</div>${cells.map(row).join("")}`;
-  return (
-    `<div class="agree"><p><strong>Where the spec is open,</strong> all three engines render the same in <strong>${agree.length} of ${open.length}</strong> cells. ` +
-    `Where they converge, the spec could say so; where they differ is the list to take to the spec authors.</p>` +
-    `<details class="ragree"><summary>Show the ${open.length} cells</summary><div class="rgrid">${group("All three agree", agree)}${group("The engines differ", differ)}</div></details></div>`
-  );
-}
-
-/**
  * The results, in the shape wpt.fyi uses: a row per @font-face descriptor with passes over tests for each
- * engine, opening to the tests behind it, a total with a percentage, then the hand-written tests.
+ * engine, opening to the tests behind it, a group Z for the hand-written tests, then a total with a percentage.
  * Only cells with a WPT test count; the ones the spec leaves open are listed, never scored.
  */
 function renderResults(manifest, results, survey) {
@@ -262,7 +239,7 @@ function renderResults(manifest, results, survey) {
           const did = !ok ? `<span class="did">${esc(verdict[c.address][e.key].label ?? "")}</span>` : "";
           return { cls: ok ? "all" : "zero", html: `${ok ? "pass" : "fail"}${did}` };
         });
-        const desc = `<a class="addr" href="${esc(MATRIX_URL + c.files[0])}">${esc(c.address)}</a> <code>${esc(row.lines.join(" "))}</code> <span class="spec ${c.spec.decided ? "spec-decided" : "spec-open"}">${c.spec.decided ? "spec:" : "spec*:"} ${esc(c.spec.text)}</span>`;
+        const desc = `<a class="addr" href="${esc(TEST_URL_BASE + c.files[0])}">${esc(c.address)}</a> <code>${esc(row.lines.join(" "))}</code> <span class="spec ${c.spec.decided ? "spec-decided" : "spec-open"}">${c.spec.decided ? "spec:" : "spec*:"} ${esc(c.spec.text)}</span>`;
         return gridRow(desc, cells, "rtest");
       })
       .join("");
@@ -271,33 +248,36 @@ function renderResults(manifest, results, survey) {
       `<details class="rgroup"${anyFail ? " open" : ""}><summary>${gridRow(`<span class="addr">${esc(col.address)}</span> <span class="col-name">${esc(col.name)}</span> <code>${esc(col.code)}</code>`, frac, "rsum")}</summary>${lines}${note}</details>`,
     );
   }
+  // group Z: the hand-written tests, which are not cells of the grid
+  const z = manifest.standalone ?? [];
+  if (z.length) {
+    const frac = ENGINES.map((e) => {
+      const pass = z.filter((t) => passed(t.id, e.key)).length;
+      total[e.key].pass += pass;
+      total[e.key].n += z.length;
+      return { cls: cellClass(pass, z.length), html: `${pass} / ${z.length}`, pass };
+    });
+    const lines = z
+      .map((t) => {
+        const cells = ENGINES.map((e) => {
+          const ok = passed(t.id, e.key);
+          return { cls: ok ? "all" : "zero", html: ok ? "pass" : "fail" };
+        });
+        return gridRow(`<a class="addr" href="${esc(TEST_URL_BASE + t.id + ".html")}">${esc(t.address)}</a> ${esc(t.name)}`, cells, "rtest");
+      })
+      .join("");
+    out.push(
+      `<details class="rgroup"${frac.some((f) => f.cls !== "all") ? " open" : ""}><summary>${gridRow(`<span class="addr">Z</span> <span class="col-name">Standalone tests</span> <code>hand-written, not cells of the grid</code>`, frac, "rsum")}</summary>${lines}</details>`,
+    );
+  }
   out.push(
     gridRow("<strong>Total</strong>", ENGINES.map((e) => {
       const t = total[e.key];
       return { cls: cellClass(t.pass, t.n), html: `<strong>${t.pass} / ${t.n}</strong> &middot; ${pct(t.pass, t.n)}` };
     }), "rtotal"),
   );
-
-  // hand-written tests, one row each, then their own total
-  const ids = readdirSync(STANDALONE_DIR).filter(isTestFile).map((n) => n.slice(0, -5)).sort();
-  const extra = Object.fromEntries(ENGINES.map((e) => [e.key, 0]));
-  out.push(`<div class="rrow rhead rsection"><div class="rdesc">Additional tests</div>${ENGINES.map(() => "<div class=\"rcell\"></div>").join("")}</div>`);
-  for (const id of ids) {
-    const cells = ENGINES.map((e) => {
-      const ok = passed(id, e.key);
-      if (ok) extra[e.key]++;
-      return { cls: ok ? "all" : "zero", html: ok ? "pass" : "fail" };
-    });
-    out.push(gridRow(`<a href="${esc(STANDALONE_URL + id + ".html")}">${esc(id)}</a>`, cells, "rtest"));
-  }
-  out.push(
-    gridRow("<strong>Additional total</strong>", ENGINES.map((e) => ({
-      cls: cellClass(extra[e.key], ids.length),
-      html: `<strong>${extra[e.key]} / ${ids.length}</strong> &middot; ${pct(extra[e.key], ids.length)}`,
-    })), "rtotal"),
-  );
   out.push("</div>");
-  return out.join("") + renderAgreement(manifest, results, survey);
+  return out.join("");
 }
 
 export function matrixPage() {

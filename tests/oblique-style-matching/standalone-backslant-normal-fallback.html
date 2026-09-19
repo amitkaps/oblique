@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" class="reftest-wait">
+<meta charset="utf-8" />
+<title>CSS Test: `font-style: normal` against a face that only leans backwards falls back to its closest-to-upright angle</title>
+<!--
+  CSS Fonts 4 5.2 "Matching font styles": "If the value of font-style is normal, oblique values
+  greater than or equal to 0 are checked in ascending order. If no match is found, italic values
+  greater than or equal to 0 are checked in ascending order. If no match is found, oblique values
+  less than 0deg are checked in descending order until a match is found."
+
+  The family has one face, declared `font-style: oblique -20deg -5deg`: every angle it covers is
+  negative (a backward lean). There is no oblique value >= 0 and no italic face, so a `normal`
+  request only reaches the third step, which picks the value closest to 0deg: -5deg. The CSS angle
+  -5deg is `slnt 5` (the two have opposite signs). Cairo's slnt axis (-11..11) can express it, so no
+  purpose-built font is needed.
+
+  Pass means the paragraph renders like the reference, which sets `slnt` to 5 directly: not upright
+  (which would mean the fallback silently did not run), and not the descriptor's far end (-20deg,
+  which the font would clamp to slnt 11).
+-->
+<link rel="help" href="https://drafts.csswg.org/css-fonts-4/#font-style-matching" />
+<link rel="match" href="standalone-backslant-normal-fallback-ref.html">
+<meta name="assert" content="'font-style: normal' against a family whose only face declares 'font-style: oblique -20deg -5deg' (no oblique value >= 0, no italic face) uses the closest oblique value below 0deg, -5deg, which sets 'slnt' to 5." />
+<link rel="stylesheet" href="oblique-matching.css">
+<!-- Font: resources/Cairo.var.subset.ttf (real Cairo subset, slnt -11..11); glyph: capital I. -->
+<style>
+  @font-face {
+    font-family: "backslant fallback test";
+    src: url('resources/Cairo.var.subset.ttf');
+    font-style: oblique -20deg -5deg;
+  }
+  .test {
+    font-family: "backslant fallback test";
+    font-size: 8em;
+  }
+</style>
+<script>
+  document.fonts.ready.then(() => {
+    document.documentElement.classList.remove('reftest-wait');
+  });
+</script>
+
+<p class="test" style="font-style: normal">I</p>

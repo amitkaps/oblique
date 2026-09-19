@@ -16,7 +16,7 @@
 
 import { readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
-import { ROOT, MATRIX_DIR } from "./cases.mjs";
+import { ROOT, TESTS_DIR } from "./cases.mjs";
 import { axis, label, synth } from "./outcome.mjs";
 
 export const ENGINES = ["chrome", "firefox", "safari"];
@@ -87,7 +87,7 @@ export function readBrowserMatrix(path = join(ROOT, "results", "browser-matrix.m
   for (const line of readFileSync(path, "utf8").split("\n")) {
     if (!line.startsWith("|") || line.startsWith("|---") || line.includes("test_id")) continue;
     const c = line.split("|").slice(1, -1).map((s) => s.trim());
-    if (c.length >= 5) (out[c[0]] ??= {})[c[1]] = c[4]; // later rows win
+    if (c.length >= 5) (out[c[0]] ??= {})[c[1]] = c[4];
   }
   return out;
 }
@@ -136,7 +136,7 @@ export function loadSurvey() {
 }
 
 export function loadManifest() {
-  return JSON.parse(readFileSync(join(MATRIX_DIR, "matrix.manifest.json"), "utf8"));
+  return JSON.parse(readFileSync(join(TESTS_DIR, "matrix.manifest.json"), "utf8"));
 }
 
 export function report(rows, manifest) {

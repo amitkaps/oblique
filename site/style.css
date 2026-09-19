@@ -235,11 +235,6 @@ body {
 .eng-line .b-badge .logo { width: 14px; height: 14px; }
 .col-name { display: block; font-weight: 600; margin: 0.2rem 0 0.15rem; }
 .rsum .col-name { display: inline; margin: 0 0.4rem 0 0; }
-.agree { margin-top: 1.25rem; font-size: 0.85rem; }
-.agree p { max-width: 760px; }
-.ragree summary { cursor: pointer; color: var(--muted); font-size: 0.8rem; margin: 0.4rem 0; }
-.ragree .rgrid { margin-top: 0.4rem; }
-
 /* the grid breaks out of the reading column; everything else stays contained */
 .coverage-matrix .matrix-wrap {
   position: relative;

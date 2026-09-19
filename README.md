@@ -12,28 +12,28 @@ generalises them.
 ## How it works
 
 ```
-reference/cases/matrix.json   7 @font-face descriptors (A-G) x 12 use-site requests (1-12)
+reference/cases/matrix.json   6 @font-face descriptors (A-F) x 10 use-site requests (1-10)
         |
 reference/                    JS implementation of the CSS Fonts 4 matching rules: what may each cell render?
         |  mise run generate
-tests/oblique-style-matching/ WPT reftests, one per cell the spec can decide (matrix/)
+tests/oblique-style-matching/ WPT reftests, one per cell the spec can decide (matrix-*)
         |
 Chrome, Firefox (wpt run) + Safari (safaridriver)  ->  results/browser-matrix.md
         |
 site/                         the grid, live in your browser, with pass/fail per engine  ->  oblique.amitkaps.com
 ```
 
-The browser is the system under test; the reference never asks one. All 84 cells use one real font, the
+The browser is the system under test; the reference never asks one. All 60 cells use one real font, the
 [Cairo](https://fonts.google.com/specimen/Cairo) variable font (SIL OFL, `slnt` -11..11) subset to the letters
 of `OBLIQUE`, and test the capital `I`, which shears cleanly. A cell is written `A2`: column A, row 2.
 
 ## Current result
 
-Chrome, Firefox and Safari agree with the spec in 73 of 84 cells. Where a face is declared with a range (the font's own,
-or narrower), `italic`, bare `oblique`, `<em>` and `oblique 45deg` make Chrome stack a synthetic skew on top of the real axis,
-and Safari do the same or drop the axis; Firefox is correct. A range wider than the font's own passes in all three. In one
-more case, `italic` with `font-synthesis-style: oblique-only` against a `normal` face, Chrome and Safari synthesize when the
-spec forbids it. Details, the claims that were withdrawn, and what is open: [docs/findings.md](docs/findings.md).
+Chrome, Firefox and Safari agree with the spec in 54 of 60 cells. Where a face is declared with a range (the font's own,
+or a narrower one), `italic`, bare `oblique` and `oblique 45deg` make Chrome stack a synthetic skew on top of the real axis,
+and Safari do the same or drop the axis; Firefox is correct. A range wider than the font's own passes in all three. Where the
+spec is open, the engines mostly differ (2 of 8 cells agree). Details, the claims that were withdrawn, and what is open:
+[docs/findings.md](docs/findings.md). Scope is oblique and `slnt`: italic fonts are out of scope.
 
 ## Run it
 
@@ -51,13 +51,13 @@ Setup, the Safari method, and gotchas: [docs/running.md](docs/running.md). All t
 | Path | What |
 |---|---|
 | `reference/` | the reference implementation, its tests, the saved spec text ([README](reference/README.md)) |
-| `tests/oblique-style-matching/matrix/` | generated reftests and manifest; never edited by hand |
-| `tests/oblique-style-matching/standalone/` | 8 additional hand-written tests: four `ital`-axis ones waiting for a real font, three awaiting matrix columns, and the `auto` equivalence test |
-| `tests/oblique-style-matching/resources/` | fonts and the scripts that build them |
+| `tests/oblique-style-matching/matrix-*.html` | generated reftests and manifest; never edited by hand |
+| `tests/oblique-style-matching/standalone-*.html` | 2 hand-written tests: `auto` equals an omitted descriptor, and a backslant-only face for `normal` |
+| `tests/oblique-style-matching/resources/` | the one font (Cairo subset) and the script that builds it |
 | `results/` | `browser-matrix.md` (recorded runs), `survey.json` (measured lean per cell) |
 | `site/` | the page: `index.html`, `style.css`, `render.mjs` (a Vite plugin that renders the grid) |
 | `scripts/` | WPT setup and sync, run and record, Safari replay, lean survey |
-| `docs/` | findings, a review of the reference against the spec, and how to run |
+| `docs/` | findings and how to run |
 
 ## Prior art
 

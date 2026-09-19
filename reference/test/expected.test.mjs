@@ -136,3 +136,20 @@ test("italic on an auto face maps to 11deg at most, never the 14deg keyword defa
   assert.deepEqual(keys(e), ["slnt=-11", "slnt=0", "synth"]);
   assert.equal(e.status, "constrained");
 });
+
+test("a one-sided range `oblique 0deg 10deg`: a negative request clamps to the range's edge, upright", () => {
+  const d = "oblique 0deg 10deg";
+  assert.deepEqual(keys(run(d, "oblique -5deg")), ["slnt=0"]);
+  assert.equal(run(d, "oblique -5deg").status, "specified");
+  assert.deepEqual(keys(run(d, "oblique 5deg")), ["slnt=-5"]); // inside the range
+  assert.deepEqual(keys(run(d, "oblique 11deg")), ["slnt=-10"]); // one degree past it: the range's edge
+  assert.deepEqual(keys(run(d, "oblique")), ["slnt=-10"]); // 14deg
+});
+
+test("a backslant-only face `oblique -20deg -5deg`: every request lands on its edge nearest upright (slnt 5)", () => {
+  const d = "oblique -20deg -5deg";
+  for (const request of ["normal", "italic", "oblique", "oblique 5deg", "oblique 45deg"]) {
+    assert.deepEqual(keys(run(d, request)), ["slnt=5"], request);
+    assert.equal(run(d, request).status, "specified", request);
+  }
+});

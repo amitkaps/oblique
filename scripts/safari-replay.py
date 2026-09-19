@@ -20,7 +20,7 @@ sessions time out.
 
 Usage (from repo root):
   uv run scripts/safari-replay.py            # print a table
-  uv run scripts/safari-replay.py --record   # also append rows
+  uv run scripts/safari-replay.py --record   # also record rows
                                                              # to results/browser-matrix.md
 """
 import argparse
@@ -36,9 +36,10 @@ from pathlib import Path
 
 from PIL import Image, ImageChops
 
+import results_file
+
 REPO_ROOT = Path(__file__).resolve().parent.parent
 TESTS_DIR = REPO_ROOT / "tests" / "oblique-style-matching"
-MATRIX_PATH = REPO_ROOT / "results" / "browser-matrix.md"
 DRIVER_PORT = 4449
 HTTP_PORT = 18931
 CROP_TOP = 8  # Safari's screenshots carry a thin dark line at the very top
@@ -77,13 +78,12 @@ def differs(a, b):
 def test_pages():
     """(test id, page path relative to TESTS_DIR, [(rel, ref path relative to TESTS_DIR)])"""
     pages = []
-    for folder in ("matrix", "standalone"):
-        for path in sorted((TESTS_DIR / folder).glob("*.html")):
-            if "-ref" in path.stem or "notupright" in path.stem or "notaxis" in path.stem:
-                continue
-            links = re.findall(r'<link rel="(match|mismatch)" href="([^"]+)"', path.read_text())
-            if links:
-                pages.append((path.stem, f"{folder}/{path.name}", [(rel, f"{folder}/{href}") for rel, href in links]))
+    for path in sorted(TESTS_DIR.glob("*.html")):
+        if "-ref" in path.stem or "-notref" in path.stem:
+            continue
+        links = re.findall(r'<link rel="(match|mismatch)" href="([^"]+)"', path.read_text())
+        if links:
+            pages.append((path.stem, path.name, links))
     return pages
 
 
@@ -100,20 +100,10 @@ def replay_once(session, pages):
     return results
 
 
-def record(rows):
-    lines = MATRIX_PATH.read_text().splitlines()
-    sep = next(i for i, l in enumerate(lines) if l.startswith("|---"))
-    at = sep + 1
-    while at < len(lines) and lines[at].startswith("|"):
-        at += 1
-    lines[at:at] = rows
-    MATRIX_PATH.write_text("\n".join(lines) + "\n")
-
-
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--reps", type=int, default=3)
-    ap.add_argument("--record", action="store_true", help="append stable results to results/browser-matrix.md")
+    ap.add_argument("--record", action="store_true", help="record stable results in results/browser-matrix.md")
     ap.add_argument("--prefix", default="", help="only replay tests whose id starts with this (e.g. matrix-)")
     ap.add_argument("--tests", default="", help="only replay these test ids (comma separated)")
     args = ap.parse_args()
@@ -155,10 +145,9 @@ def main():
         note = ("direct safaridriver replay of the reftest, exact pixel compare, "
                 f"{args.reps} agreeing repetitions; `wpt run safari` disagreed, see "
                 "docs/running.md")
-        rows = [f"| {t} | safari | {version} | no (safaridriver automation) | {res} | {note} |"
-                for t, res in stable.items()]
-        record(rows)
-        print(f"recorded {len(rows)} row(s) in {MATRIX_PATH}")
+        rows = [(t, "safari", version, "no (safaridriver automation)", res, note) for t, res in stable.items()]
+        total = results_file.record(rows)
+        print(f"recorded {len(rows)} row(s); {total} rows in {results_file.MATRIX_PATH}")
 
 
 if __name__ == "__main__":

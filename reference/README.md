@@ -6,7 +6,7 @@ browser is the system under test; nothing here calls a browser API (`getComputed
 canvas, `FontFace`, ...), and `test/independence.test.mjs` enforces that.
 
 ```
-cases/matrix.json  ->  expected()  ->  generateWpt  ->  tests/oblique-style-matching/matrix/matrix-{row}-{column}.html
+cases/matrix.json  ->  expected()  ->  generateWpt  ->  tests/oblique-style-matching/matrix-{row}-{column}.html
  (rows x columns)     (this code)      (wpt.mjs)         + matrix.manifest.json
                                                               |
               wpt run (Chrome, Firefox) / scripts/safari-replay.py (Safari)

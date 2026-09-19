@@ -1,7 +1,7 @@
-"""Parse a `wpt run --log-wptreport=<path>.json` report and append rows to
-results/browser-matrix.md in the fixed schema already defined there
+"""Parse a `wpt run --log-wptreport=<path>.json` report and record rows in
+results/browser-matrix.md in the fixed schema defined there
 (test_id | engine | version | real_device | result | notes). Never
-hand-transcribe results into that file — this is the only writer.
+hand-transcribe results into that file; scripts/results_file.py is its only writer.
 
 Usage (from repo root):
   uv run scripts/record-results.py results/latest-chrome.json
@@ -20,8 +20,8 @@ import json
 import sys
 from pathlib import Path
 
-REPO_ROOT = Path(__file__).resolve().parent.parent
-MATRIX_PATH = REPO_ROOT / "results" / "browser-matrix.md"
+import results_file
+
 
 WPT_STATUS_TO_SCHEMA = {
     "OK": "pass",
@@ -61,31 +61,15 @@ def main():
     for result in report.get("results", []):
         status = result.get("status", "NOTRUN")
         schema_result = WPT_STATUS_TO_SCHEMA.get(status, "untested")
-        test_id = test_id_from_path(result["test"])
         note = args.notes or f"wpt status: {status}"
-        rows.append(f"| {test_id} | {engine} | {version} | {real_device} | {schema_result} | {note} |")
+        rows.append((test_id_from_path(result["test"]), engine, version, real_device, schema_result, note))
 
     if not rows:
-        print("record-results: no results found in report, nothing appended", file=sys.stderr)
+        print("record-results: no results found in report, nothing recorded", file=sys.stderr)
         return
 
-    # Insert directly after the table's header-separator line (the line of
-    # dashes right below the column headers), not at EOF — the schema notes
-    # and enum captions live below the table, and a blind append would land
-    # rows after them, breaking the table.
-    lines = MATRIX_PATH.read_text().splitlines()
-    sep_index = next(
-        i for i, line in enumerate(lines) if line.startswith("|---")
-    )
-    # Existing data rows (if any) are contiguous lines starting with "|"
-    # right after the separator; insert new rows after the last of those.
-    insert_at = sep_index + 1
-    while insert_at < len(lines) and lines[insert_at].startswith("|"):
-        insert_at += 1
-    lines[insert_at:insert_at] = rows
-    MATRIX_PATH.write_text("\n".join(lines) + "\n")
-
-    print(f"record-results: appended {len(rows)} row(s) to {MATRIX_PATH}")
+    total = results_file.record(rows)
+    print(f"record-results: recorded {len(rows)} row(s); {total} rows in {results_file.MATRIX_PATH}")
 
 
 if __name__ == "__main__":
