@@ -696,3 +696,44 @@ slanted (`matrix-italic-r7-italic.html`, `matrix-obliquebare-r7-oblique-bare.htm
 declared style is applied via the real axis regardless of what was
 originally requested. Full per-file results:
 [`results/browser-matrix.md`](../results/browser-matrix.md).
+
+## 9. Moved the symmetric-range tests onto real Cairo (2026-09-19)
+
+Every symmetric-range test (the 25 `matrix-*` tests plus
+`boundary-11deg-ascending`/`-descending`,
+`auto-derived-range-clamp-cairo-symmetric`,
+`explicit-range-bare-keyword-synthesis-stacking` and
+`style-plus-explicit-variation-settings`) originally ran on
+`oblique-symmetric.ttf`: a purpose-built font with one 800x700 block glyph
+mapped to `A`, sheared 350 units at the axis extreme. It served its purpose,
+but a solid block reads as a leaning rectangle, and the site's coverage
+matrix needs the same font to be both the test and the visible specimen.
+
+Replaced with `resources/Cairo.var.subset.ttf`: **real Cairo** (SIL OFL 1.1;
+the license header carries no Reserved Font Name clause, so a subset may keep
+the name), cut to the glyphs of `OBLIQUE` by `resources/build-cairo-subset.sh`.
+This follows WPT's own precedent, which I checked directly:
+`css/css-fonts/variations/resources/Inter.var.subset.ttf` is real Inter with the
+cmap shrunk to `a l n s t` ("slant") and every axis and layout/variation table
+left intact (5 KB), and `support/fonts/Inter-VF.subset.ttf` does the same for
+`e t x`. The Cairo subset is ~7 KB, keeps both axes (`wght` 200..1000, `slnt`
+-11..11) plus `avar`/`HVAR`/`MVAR`/`STAT`, so the tests now run on Cairo's real
+axis and metadata, not only its range shape. Tests render the capital `I`
+(Cairo: a plain 4-point stem, 691 units tall, 80 wide; +134 units of width at
+`slnt` -11, i.e. tan 11 deg x 691, as expected), the same letter Inter's own
+`var-test.html` uses. Font size raised from 3em to 8em: real 11 deg vs the 14 deg
+synthetic default differ by only ~4px at 100px, versus the old font's
+exaggerated shear.
+
+**Result: all 30 tests, on both Chrome 153 and Firefox 156, kept exactly the
+result they had on the old font — zero flips** (compared against
+`results/browser-matrix.md`; includes the expected real failures
+`explicit-range-bare-keyword-synthesis-stacking` and `matrix-italic-r5-italic`
+on Chrome). Because a silent fallback to a system font would also make a
+matching pair pass, a rendered check was done too: the `I` renders an 88px
+stem leaning 16px at `slnt` -11 (11 deg x 88px = 17px), and upright in the
+`normal` cell. Section 6-8's pixel measurements (18px / 36px etc.) describe
+the old font and are left as the record of what was measured then. One
+consequence: the auto-derived-range case (`auto-derived-range-clamp-cairo-symmetric`)
+still passes on real Cairo's own axes and metadata, not just on a font with
+its range shape.

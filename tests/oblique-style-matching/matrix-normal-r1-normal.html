@@ -18,15 +18,16 @@
   content="A face declared 'font-style: normal', requested with 'bare font-style: italic, default synthesis',
   must NOT render the same as the reference (this same face's default, untouched rendering — upright)." />
 <link rel="stylesheet" href="oblique-matching.css">
-<!-- Font: resources/oblique-symmetric.ttf (Cairo's shape, slnt -11..11, no ital) — see README.md's font shape table. -->
+<!-- Font: resources/Cairo.var.subset.ttf — real Cairo subset (slnt -11..11, wght 200..1000, no ital); the test glyph is the capital I, a plain stem. See README.md's font shape table. -->
 <style>
   @font-face {
     font-family: "matrix test font";
-    src: url('resources/oblique-symmetric.ttf');
+    src: url('resources/Cairo.var.subset.ttf');
     font-style: normal;
   }
   .test {
     font-family: "matrix test font";
+    font-size: 8em;
   }
 </style>
 <script>
@@ -35,4 +36,4 @@
   });
 </script>
 
-<p class="test" style="font-style: italic;">A</p>
+<p class="test" style="font-style: italic;">I</p>

@@ -1,6 +1,8 @@
-"""Build the 5 purpose-built variable test fonts this suite's new boundary/
-range tests need: oblique-symmetric.ttf, oblique-onesided-neg.ttf,
-oblique-onesided-pos.ttf, oblique-nozero.ttf, oblique-dual-axis.ttf.
+"""Build the 4 purpose-built variable test fonts this suite's new boundary/
+range tests need: oblique-onesided-neg.ttf, oblique-onesided-pos.ttf,
+oblique-nozero.ttf, oblique-dual-axis.ttf. (A fifth, oblique-symmetric.ttf,
+lived here until the -11..11 symmetric case moved to a subset of real Cairo:
+see build-cairo-subset.sh.)
 
 Same FontBuilder pipeline as build-ident-ital-font.py (single glyph, a
 rectangle sheared by a gvar delta into a deterministic, pixel-distinguishable
@@ -125,7 +127,6 @@ def build(name: str, family: str, slnt_range: tuple, with_ital: bool):
 
 FONTS = [
     # name, family, (slnt min, default, max), with_ital
-    ("oblique-symmetric.ttf", "Oblique Symmetric Test", (-11, 0, 11), False),
     ("oblique-onesided-neg.ttf", "Oblique Onesided Neg Test", (-10, 0, 0), False),
     ("oblique-onesided-pos.ttf", "Oblique Onesided Pos Test", (0, 0, 10), False),
     # default (12) is deliberately NOT the min boundary (5): the fallback

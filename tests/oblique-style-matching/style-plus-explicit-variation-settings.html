@@ -31,15 +31,16 @@
   <val>' on the same rule disagree about the slnt value, the explicit
   font-variation-settings value wins, per §7.2's precedence ordering." />
 <link rel="stylesheet" href="oblique-matching.css">
-<!-- Font: resources/oblique-symmetric.ttf (auto, no descriptor) — see README.md. -->
+<!-- Font: resources/Cairo.var.subset.ttf (auto, no descriptor) — see README.md. -->
 <style>
   @font-face {
     font-family: "precedence test";
-    src: url('resources/oblique-symmetric.ttf');
+    src: url('resources/Cairo.var.subset.ttf');
   }
   .test {
     font-synthesis: none;
     font-family: "precedence test";
+    font-size: 8em;
     font-style: oblique 5deg;
     font-variation-settings: "slnt" -11;
   }
@@ -50,4 +51,4 @@
   });
 </script>
 
-<p class="test">A</p>
+<p class="test">I</p>

@@ -58,28 +58,27 @@
   only applies 'when a font family lacks oblique faces' (CSS Fonts 4 2.8.2),
   and this family does not lack one." />
 <!--
-  Font: resources/oblique-symmetric.ttf (same font as
-  auto-derived-range-clamp-cairo-symmetric.html — fvar slnt -11..11,
-  matching Cairo's real bounds, verified via fontTools 2026-09-19).
+  Font: resources/Cairo.var.subset.ttf (same font as
+  auto-derived-range-clamp-cairo-symmetric.html — real Cairo, subset to
+  "OBLIQUE"; fvar slnt -11..11, Cairo's real bounds).
   Unlike that test, THIS test's @font-face declares an EXPLICIT font-style
   descriptor matching the font's own true bounds exactly
   (oblique -11deg 11deg) — reproducing vizchitra-fonts' current CairoObliqueRange
   shape — rather than leaving font-style undeclared (auto-derived).
-  Test glyph: 'A', per this font's setupCharacterMap
-  (resources/build-fonts.py:86) — same convention as
+  Test glyph: the capital I — same convention as
   auto-derived-range-clamp-cairo-symmetric.html, and for the same reason
-  (this font has no glyphs for any other letter).
+  (this font's cmap only holds the letters of OBLIQUE).
 -->
 <style>
   @font-face {
     font-family: "range true bounds synthesis test font";
-    src: url('resources/oblique-symmetric.ttf');
+    src: url('resources/Cairo.var.subset.ttf');
     font-style: oblique -11deg 11deg;
   }
 
   .test {
     font-family: "range true bounds synthesis test font";
-    font-size: 3em;
+    font-size: 8em;
     /* Deliberately NOT setting font-synthesis: none here — see the header
        comment. This is the one test in this folder that leaves synthesis
        at its default (auto), on purpose. */
@@ -91,5 +90,5 @@
   });
 </script>
 
-<p class="test" style="font-style: oblique">A</p>
-<p class="test" style="font-style: italic">A</p>
+<p class="test" style="font-style: oblique">I</p>
+<p class="test" style="font-style: italic">I</p>

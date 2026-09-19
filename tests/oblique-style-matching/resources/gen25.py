@@ -1,5 +1,5 @@
 """Generator for 25 test/ref pairs (matrix-*.html), one per cell of a
-5-descriptor x 7-use-site enumeration against resources/oblique-symmetric.ttf
+5-descriptor x 7-use-site enumeration against resources/Cairo.var.subset.ttf
 (Cairo's shape), designed during a coverage-matrix session (2026-09-19) and
 kept here as the record of how each reference's expected value was derived —
 not part of the ongoing test-authoring toolchain otherwise. Each cell's
@@ -8,8 +8,11 @@ Chrome + Firefox — see docs/investigation-log.md) before being encoded here
 as a reference. Re-running this script regenerates the exact same 50 files;
 it is idempotent, not a live/ongoing dependency of any other script.
 
-All 25 use resources/oblique-symmetric.ttf (Cairo's shape, -11..11 slnt, no
-ital) to keep this batch comparable across cells.
+All 25 use resources/Cairo.var.subset.ttf (Cairo itself, subset to the letters
+of "OBLIQUE"; -11..11 slnt, no ital) and test the capital I, a plain
+4-point stem, to keep this batch comparable across cells. (Originally built
+against the purpose-built oblique-symmetric.ttf and its 'A' block glyph;
+migrated to the real font once it was confirmed no result changed.)
 
 Run from repo root: uv run tests/oblique-style-matching/resources/gen25.py
 """
@@ -17,7 +20,7 @@ import os
 
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
 
-FONT = "resources/oblique-symmetric.ttf"
+FONT = "resources/Cairo.var.subset.ttf"
 
 DESCRIPTORS = {
     "auto": ("", "no font-style descriptor (auto)"),
@@ -95,10 +98,10 @@ USE_SITE_LABELS = {
 
 def use_site_html(use_site_css: str, use_site_desc: str) -> str:
     if use_site_desc == "USE_EM":
-        return '<p class="test"><em>A</em></p>'
+        return '<p class="test"><em>I</em></p>'
     if use_site_desc == "USE_EM_SYNTHNONE":
-        return '<p class="test" style="font-synthesis: none"><em>A</em></p>'
-    return f'<p class="test" style="{use_site_css}">A</p>'
+        return '<p class="test" style="font-synthesis: none"><em>I</em></p>'
+    return f'<p class="test" style="{use_site_css}">I</p>'
 
 
 def make_files(cell_id, desc_id, use_site_css, use_site_desc, ref_kind, notes):
@@ -147,7 +150,7 @@ def make_files(cell_id, desc_id, use_site_css, use_site_desc, ref_kind, notes):
   content="A face declared '{desc_label}', requested with '{use_site_label}',
   must {"NOT " if mismatch else ""}render the same as {pass_desc}." />
 <link rel="stylesheet" href="oblique-matching.css">
-<!-- Font: {FONT} (Cairo's shape, slnt -11..11, no ital) — see README.md's font shape table. -->
+<!-- Font: {FONT} — real Cairo subset (slnt -11..11, wght 200..1000, no ital); the test glyph is the capital I, a plain stem. See README.md's font shape table. -->
 <style>
   @font-face {{
     font-family: "matrix test font";
@@ -155,6 +158,7 @@ def make_files(cell_id, desc_id, use_site_css, use_site_desc, ref_kind, notes):
   }}
   .test {{
     font-family: "matrix test font";
+    font-size: 8em;
   }}
 </style>
 <script>
@@ -180,7 +184,8 @@ def make_files(cell_id, desc_id, use_site_css, use_site_desc, ref_kind, notes):
     src: url('{FONT}');{desc_css_line}
   }}
   .test {{
-    font-family: "matrix test font";{ref_style_line}
+    font-family: "matrix test font";
+    font-size: 8em;{ref_style_line}
   }}
 </style>
 <script>
@@ -189,7 +194,7 @@ def make_files(cell_id, desc_id, use_site_css, use_site_desc, ref_kind, notes):
   }});
 </script>
 
-<p class="test">A</p>
+<p class="test">I</p>
 """
 
     test_path = os.path.join(OUT, f"{name}.html")
