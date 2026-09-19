@@ -10,11 +10,9 @@
   the bare `oblique`/`italic` UA default angle (conventionally 14deg,
   outside this declared 0-10deg range) must clamp to the declared range's
   boundary. This mirrors what upstream's
-  css/css-fonts/variations/font-slant-1.html already tests (see
-  docs/coverage.json) — reproduced here, not to duplicate upstream
-  coverage, but so this suite's own README boundary-value table has both
-  the auto and explicit cases side by side in one place, sourced from the
-  same font-building pipeline.
+  css/css-fonts/variations/font-slant-1.html already tests, reproduced here so this suite has both the auto and
+  explicit cases side by side, sourced from the same font-building
+  pipeline.
   Pass means: both the "oblique" and "italic" paragraphs render
   identically to the reference, which sets 'slnt' to -10 directly via
   font-variation-settings — the declared range's boundary closest to the

@@ -6,22 +6,22 @@ browser is the system under test; nothing here calls a browser API (`getComputed
 canvas, `FontFace`, ...), and `test/independence.test.mjs` enforces that.
 
 ```
-cases/matrix.json  ->  expected()  ->  generateWpt  ->  tests/oblique-style-matching/matrix-{row}-{column}.html
+cases/matrix.json  ->  expected()  ->  generateWpt  ->  tests/oblique-style-matching/matrix/matrix-{row}-{column}.html
  (rows x columns)     (this code)      (wpt.mjs)         + matrix.manifest.json
                                                               |
               wpt run (Chrome, Firefox) / scripts/safari-replay.py (Safari)
               scripts/survey.py  (measured lean, every cell)  ->  compare.mjs
 ```
 
-Run everything from `reference/` with Node 24 (pinned in `.mise.toml`), no dependencies:
+Node 24 (pinned in `.mise.toml`), no dependencies. From the repo root (`mise run test`, `generate` and `compare` wrap the first, second and fourth):
 
 | Command | What it does |
 |---|---|
-| `node --test` | unit tests: spec rules, upstream-test intent, independence, generated files up to date |
-| `node src/cli.mjs generate` | write the tests and manifest from `cases/matrix.json` |
-| `node src/cli.mjs generate --check` | fail if the committed files differ from what the generator produces |
-| `node src/cli.mjs classes` | which algorithm branch and outcome each cell exercises |
-| `node src/cli.mjs compare` | expected vs recorded results (`results/browser-matrix.md`, `results/survey.json`) |
+| `node --test reference/test/*.test.mjs` | unit tests: spec rules, upstream-test intent, independence, generated files up to date |
+| `node reference/src/cli.mjs generate` | write the tests and manifest from `cases/matrix.json` |
+| `node reference/src/cli.mjs generate --check` | fail if the committed files differ from what the generator produces |
+| `node reference/src/cli.mjs classes` | which algorithm branch and outcome each cell exercises |
+| `node reference/src/cli.mjs compare` | expected vs recorded results (`results/browser-matrix.md`, `results/survey.json`) |
 
 ## Files
 
@@ -75,6 +75,6 @@ Append to `cases/matrix.json`; never renumber. An address (`A1`, `B2`) is a perm
 so inserting would silently rename tests and orphan recorded results. Then:
 
 ```
-node src/cli.mjs generate && node --test      # regenerate, check
-cd .. && ./scripts/sync-tests-to-wpt.sh        # then wpt run / safari-replay / survey, record, rebuild the site
+mise run generate && mise run test    # regenerate, check
+# then mise run wpt-chrome, wpt-firefox, safari, survey (docs/running.md), and rebuild the site
 ```

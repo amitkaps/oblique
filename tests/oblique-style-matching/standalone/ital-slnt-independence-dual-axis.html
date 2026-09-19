@@ -4,13 +4,12 @@
 <title>CSS Test: `italic` and `oblique` each activate only their own axis on a font exposing both `slnt` and `ital`</title>
 <!--
   Algorithm step: CSS Fonts 4 §5.2 "Matching font styles", per the
-  resolution of csswg-drafts#12836 (merged into the published spec, see
-  docs/investigation-log.md): "For variable fonts with an ital axis, a
+  resolution of csswg-drafts#12836 (merged into the published spec): "For variable fonts with an ital axis, a
   match is created by setting the ital value to 1" (the italic branch) and
   "For variable fonts with a slnt axis, a match is created by setting the
   slnt value with the specified oblique value ... The ital axis is not
   used to satisfy an oblique request" (the oblique branch).
-  Closes docs/coverage.json's confirmed_gaps entry 'combined-slnt-ital-font':
+  Closes the gap 'combined-slnt-ital-font':
   independence.html and italic-no-extra-synthesis.html (moved into this
   folder) both use fonts with only ONE of the two axes, so they can only
   show "the axis that isn't present wasn't touched" trivially. This is the

@@ -3,9 +3,7 @@
 # without depending on an external, separately-maintained WPT clone.
 #
 # .wpt/ is fetched infrastructure, not repo content — it is gitignored and
-# never committed. This does not contradict spec.md's "No WPT checkout
-# included": that decision scopes to "not committed," not "never present
-# locally." Idempotent: if .wpt/ already exists, this is a no-op so
+# never committed. Idempotent: if .wpt/ already exists, this is a no-op so
 # contributors and CI can call it unconditionally.
 #
 # Sparse-checkout scope: css/css-fonts (the tests themselves), tools (the
@@ -34,4 +32,4 @@ git clone --depth 1 --filter=blob:none --sparse \
 cd .wpt
 git sparse-checkout set css/css-fonts tools resources docs
 
-echo "setup-wpt: done. See README.md's 'Running the tests' section for next steps."
+echo "setup-wpt: done. See docs/running.md for next steps."

@@ -15,12 +15,11 @@
   (vizchitra-fonts/docs/compat.md) — Cairo ships with no `font-style`
   descriptor, so its usable range comes entirely from its own `slnt` axis
   (-11 to 11), and the default angle falls outside it. Confirmed as an
-  upstream WPT gap in docs/coverage.json's `confirmed_gaps` (id
-  `auto-range-default-angle`, priority 1): the closest upstream test,
+  upstream WPT gap (`auto-range-default-angle`): the closest upstream test,
   css/css-fonts/variations/font-slant-1.html, covers the identical
   default-angle-outside-range question but only for an EXPLICITLY authored
-  descriptor range (and passes on Chrome/Firefox/Safari per
-  results/upstream.json — see docs/coverage.json for the full citation).
+  descriptor range (and passed on Chrome/Firefox/Safari on wpt.fyi
+  when checked, 2026-09-18).
   The auto-derived-range version — this test — was untested anywhere
   before this file existed.
   Pass means: bare `oblique` and bare `italic` render identically to the
@@ -42,7 +41,7 @@
   Font: resources/Inter.var.subset.ttf, copied verbatim from WPT's own
   css/css-fonts/variations/resources/ (already reused upstream by
   font-slant-1.html and font-face-style-auto-variable.html, both of which
-  PASS on all three engines per results/upstream.json — same font, same
+  passed on all three engines on wpt.fyi when checked — same font, same
   provenance, no new font-building risk). Its declared fvar slnt axis is
   -10..0, confirmed via fontTools 2026-09-18 — this excludes the
   conventional 14-degree default angle on either sign, which is exactly

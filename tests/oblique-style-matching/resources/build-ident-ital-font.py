@@ -98,11 +98,6 @@ def build():
     fb.save(ttf_path)
     print(f"wrote {ttf_path}")
 
-    fb.font.flavor = "woff2"
-    woff2_path = os.path.join(out_dir, "IdentTestItal.woff2")
-    fb.font.save(woff2_path)
-    print(f"wrote {woff2_path}")
-
 
 if __name__ == "__main__":
     build()

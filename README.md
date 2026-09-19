@@ -1,294 +1,69 @@
 # Oblique
 
-Variable font oblique interop — font- and vendor-neutral tracking of CSS
-Fonts 4 `slnt`/`ital` axis matching interoperability, feeding a future
-[web-platform-tests/interop](https://github.com/web-platform-tests/interop)
-proposal. The VizChitra/Cairo font compatibility investigation
-([fonts.vizchitra.com/compat](https://fonts.vizchitra.com/compat),
-[github.com/vizchitra/fonts](https://github.com/vizchitra/fonts)) is the
-motivating case, not the subject.
+Do Chrome, Firefox and Safari match `font-style` (`normal`, `italic`, `oblique`, `slnt`) the way CSS Fonts 4
+says? This repo answers that with tests, and the tests are staged as a possible
+[web-platform-tests](https://github.com/web-platform-tests/wpt) contribution. **No WPT PR is open.**
+Live results: <https://oblique.amitkaps.com>.
 
-This repo does two things:
+It grew out of the VizChitra/Cairo font investigation
+([fonts.vizchitra.com/compat](https://fonts.vizchitra.com/compat)), which measured real-world bugs; this repo
+generalises them.
 
-1. **Catalogs and continuously tracks existing WPT coverage** of
-   oblique/`slnt`/`ital` matching — [`docs/coverage.md`](docs/coverage.md)
-   lists every relevant upstream test, and
-   [`results/upstream-matrix.md`](results/upstream-matrix.md) has their live
-   per-engine pass/fail, synced from [wpt.fyi](https://wpt.fyi) on a
-   schedule (see "Live coverage dashboard" below). Turns out WPT already
-   covers `slnt` fairly well; it covers `ital` **not at all**.
-2. **Supplies the tests upstream WPT is missing** — a consolidated set of
-   novel tests under `tests/oblique-style-matching/`, staged as a single
-   future WPT PR (not yet opened), following the same worked-example
-   methodology as the rest of this repo. See that folder's own README for
-   the boundary-value table and design rationale.
+## How it works
 
-Full build spec: [`docs/spec.md`](docs/spec.md). Execution plan:
-[`docs/plan.md`](docs/plan.md). Current state, short version:
-[`docs/summary.md`](docs/summary.md); to resume work (pipeline, commands, findings, open items):
-[`docs/handoff.md`](docs/handoff.md). Full investigation trail (every claim
-sourced, every wrong turn documented): [`docs/investigation-log.md`](docs/investigation-log.md).
-Coverage catalog: [`docs/coverage.md`](docs/coverage.md).
+```
+reference/cases/matrix.json   5 @font-face descriptors (A-E) x 6 use-site requests (1-6)
+        |
+reference/                    JS implementation of the CSS Fonts 4 matching rules: what may each cell render?
+        |  mise run generate
+tests/oblique-style-matching/ WPT reftests, one per cell the spec can decide (matrix/)
+        |
+Chrome, Firefox (wpt run) + Safari (safaridriver)  ->  results/browser-matrix.md
+        |
+site/                         the grid, live in your browser, with pass/fail per engine  ->  oblique.amitkaps.com
+```
 
-## Non-goals
+The browser is the system under test; the reference never asks one. All 30 cells use one real font, the
+[Cairo](https://fonts.google.com/specimen/Cairo) variable font (SIL OFL, `slnt` -11..11) subset to the letters
+of `OBLIQUE`, and test the capital `I`, which shears cleanly. A cell is written `E2`: column E, row 2.
 
-- Not a general compatibility framework.
-- Not a permanent home for tests — everything here is staged to graduate
-  into WPT.
-- No opinions on whether a feature *should* exist — only whether behavior
-  is interoperable per spec.
+## Current result
+
+Chrome, Firefox and Safari agree with the spec in 27 of 30 cells. In three (`italic`, bare `oblique` and
+`<em>` against a face declared `oblique -11deg 11deg`) Firefox is correct, Chrome stacks a synthetic skew on
+top of the real axis, and Safari does the same or drops the axis. Details, the claims that were withdrawn, and
+what is open: [docs/findings.md](docs/findings.md).
+
+## Run it
+
+```
+mise run install && mise run test     # reference implementation
+mise run generate                     # regenerate the WPT tests from the reference
+mise run wpt-setup && mise run wpt-chrome && mise run wpt-firefox && mise run safari
+mise run site-dev                     # the page, locally
+```
+
+Setup, the Safari method, and gotchas: [docs/running.md](docs/running.md). All tasks: `mise tasks`.
+
+## Layout
+
+| Path | What |
+|---|---|
+| `reference/` | the reference implementation, its tests, the saved spec text ([README](reference/README.md)) |
+| `tests/oblique-style-matching/matrix/` | generated reftests and manifest; never edited by hand |
+| `tests/oblique-style-matching/standalone/` | 14 older hand-written tests, kept while they are re-based on Cairo |
+| `tests/oblique-style-matching/resources/` | fonts and the scripts that build them |
+| `results/` | `browser-matrix.md` (recorded runs), `survey.json` (measured lean per cell) |
+| `site/` | the page: `index.html`, `style.css`, `render.mjs` (a Vite plugin that renders the grid) |
+| `scripts/` | WPT setup and sync, run and record, Safari replay, lean survey |
+| `docs/` | findings and how to run |
 
 ## Prior art
 
-- Interop proposal: https://github.com/web-platform-tests/interop/issues/64
-  (2022, closed without acceptance — lacked WPT test coverage; this repo
-  supplies it)
-- WebKit bug: https://bugs.webkit.org/show_bug.cgi?id=209565
-- Chromium bug: https://issues.chromium.org/issues/40681464
-- Spec ambiguity, now resolved: https://github.com/w3c/csswg-drafts/issues/12836
-- Original spec ambiguity (superseded by #12836): https://github.com/w3c/csswg-drafts/issues/3125
-- Community test suite: https://arrowtype.github.io/vf-slnt-test/ (reference
-  behavior, not upstreamable itself)
+- Interop proposal, 2022: <https://github.com/web-platform-tests/interop/issues/64>
+- WebKit bug: <https://bugs.webkit.org/show_bug.cgi?id=209565>
+- Chromium bug: <https://issues.chromium.org/issues/40681464>
+- Spec discussions: <https://github.com/w3c/csswg-drafts/issues/12836>, <https://github.com/w3c/csswg-drafts/issues/3125>
+- Community test page: <https://arrowtype.github.io/vf-slnt-test/>
 
-Current verified status of each of the above is in
-[`docs/investigation-log.md`](docs/investigation-log.md) — do not treat this
-list's parenthetical notes as current; re-check the log, which is dated.
-
-## Methodology
-
-1. Identify one CSS Fonts 4 normative requirement (cite spec section +
-   prior-art issue).
-2. Write one focused, WPT-compatible test (reftest or testharness) for it.
-3. Run via the official WPT runner (not custom Playwright/vitest).
-4. Record result in `results/browser-matrix.md` using the fixed schema.
-5. Once stable and reviewed, upstream the test file(s) to WPT via PR.
-6. Aggregate upstreamed + accepted tests into an Interop proposal draft in
-   `docs/investigation-log.md`.
-
-## Running the tests
-
-A minimal, scoped WPT checkout can be vendored locally (fetched
-infrastructure, gitignored, never committed — see
-[`scripts/setup-wpt.sh`](scripts/setup-wpt.sh)):
-
-```
-./scripts/setup-wpt.sh
-./scripts/sync-tests-to-wpt.sh   # re-run after any change under tests/
-cd .wpt
-./wpt install chrome webdriver --channel stable
-./wpt install firefox webdriver
-./wpt run chrome css/css-fonts/variable-oblique-interop/ --log-wptreport=../results/latest-chrome.json
-./wpt run firefox css/css-fonts/variable-oblique-interop/ --log-wptreport=../results/latest-firefox.json
-```
-
-Both `resources/` subdirectories (each test's font files) must be copied
-alongside their `*.html`, not just the HTML — each test's `@font-face src`
-is a relative `url('resources/...')`, so the test breaks silently without
-its font. Don't pass `--install-fonts` unless a test specifically needs a
-system-installed font (ours don't — they use embedded `@font-face` web
-fonts): on macOS it can stall indefinitely waiting on a permission
-interaction that never resolves in a non-interactive shell.
-
-If you already have Chrome or Firefox installed system-wide, point at it
-directly instead of `./wpt install <product> browser` (which downloads a
-separate copy):
-
-```
-./wpt run chrome css/css-fonts/variable-oblique-interop/ \
-  --binary="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \
-  --webdriver-binary=_venv3/bin/chrome/chromedriver \
-  --log-wptreport=../results/latest-chrome.json
-
-./wpt run --yes firefox css/css-fonts/variable-oblique-interop/ \
-  --binary="/Applications/Firefox.app/Contents/MacOS/firefox" \
-  --webdriver-binary=_venv3/bin/geckodriver \
-  --log-wptreport=../results/latest-firefox.json
-```
-
-`--yes` is needed on Firefox's first run — without it, `wpt run` prompts
-interactively to install the OpenH264 GMP plugin (irrelevant to these
-tests) and hangs forever in a non-interactive shell.
-
-**Known issue on some machines:** `./wpt run`'s first invocation bootstraps
-its own Python venv and can fail building the `cryptography` package from
-source (`error: failed to run custom build command for openssl-sys`) on
-machines with no Rust/OpenSSL dev toolchain — reproduced on an Intel Mac in
-this environment (no Homebrew available either). Pre-installing a
-wheel-backed `cryptography` version into `.wpt/_venv3` does **not** help —
-wpt's own installer force-upgrades past it regardless. What does work,
-confirmed in this environment: cap the version with a `PIP_CONSTRAINT` file
-before running, so pip's resolver never reaches for the unwheeled release:
-
-```
-echo "cryptography<=48.0.1" > /tmp/wpt-constraints.txt
-PIP_CONSTRAINT=/tmp/wpt-constraints.txt ./wpt run chrome ...
-```
-
-(`cryptography` does publish prebuilt wheels — confirmed a `cp311-abi3`
-universal2 wheel, forward-compatible with newer CPython via the stable ABI,
-exists as of `48.0.1` — the underlying cause is that whatever *newer*
-version wpt's dependency chain resolves to at install time has no wheel yet
-for this platform, forcing a source build that then fails for lack of
-Rust/OpenSSL.) Installing an older Python via `mise` does not help either —
-abi3 wheels are forward-compatible across CPython versions, so the version
-lacking a wheel lacks it regardless of which CPython minor version runs it.
-
-Safari (macOS only, requires two one-time setup steps beyond Chrome/
-Firefox — `wpt run` exempts chrome/firefox from the second one, but not
-safari):
-
-1. Enable Develop → "Allow Remote Automation" in Safari (or
-   `sudo /usr/bin/safaridriver --enable`, which needs an interactive
-   password prompt).
-2. Add WPT's test subdomains to `/etc/hosts` (this is a real, if low-risk,
-   edit to a shared system file — dozens of `127.0.0.1 *.test` aliases,
-   nothing that touches real DNS or existing entries):
-   ```
-   cd .wpt
-   ./wpt make-hosts-file | sudo tee -a /etc/hosts
-   ```
-
-**Do not use `wpt run safari` for results.** Measured on Safari 27.0 (see
-`docs/investigation-log.md` section 11): it reports FAIL for ~20 of 44 tests
-whose test and reference screenshots are pixel-identical, passes one test that
-really fails, and 5 results flip between identical runs. Use the direct replay
-instead, which loads each test and reference through `safaridriver`, waits for
-`reftest-wait`, and compares pixels exactly:
-
-```
-uv run --with pillow scripts/safari-replay.py            # prints pass/fail, 3 repetitions
-uv run --with pillow scripts/safari-replay.py --record   # also appends stable rows to results/browser-matrix.md
-```
-
-If `safaridriver` reports "session not created ... timed out", Remote
-Automation is not actually reaching Safari: quit Safari fully (Cmd-Q), check
-System Settings > Privacy & Security > Automation for your terminal app, and
-retry. (`wpt run --channel=stable` is needed to use system Safari at all, since
-the default is Safari Technology Preview.)
-
-Then record results into `results/browser-matrix.md` — never hand-transcribe:
-
-```
-uv run scripts/record-results.py results/latest-chrome.json
-uv run scripts/record-results.py results/latest-firefox.json
-```
-
-`--real-device` is for a genuine physical-device run (e.g. `--webdriver-binary`
-pointed at a real iPhone's Safari, matching vizchitra-fonts/docs/compat.md's
-convention) — e.g. `--real-device --notes "iPhone XR, Safari 18.7"`. Desktop
-Safari via `safaridriver` is not a real device; see the caveat above before
-recording anything from it at all.
-
-## Live coverage dashboard
-
-[`docs/coverage.json`](docs/coverage.json) catalogs every existing upstream
-WPT test relevant to oblique/`slnt`/`ital` (path, spec assertion, which axis
-it touches, whether it plausibly probes WebKit #209565's documented failure
-modes), built by walking the vendored `css/css-fonts` tree directly — not
-sampled from search results. It also records the confirmed absence of any
-`ital`-axis test anywhere upstream, with the search method used.
-
-`scripts/sync-wpt-results.py` queries [wpt.fyi's public API](https://wpt.fyi/api)
-for the latest-stable Chrome/Firefox/Safari run and writes structured,
-per-test results to `results/upstream.json` — this is the **only** path
-results enter the repo for upstream tests; nothing here is hand-transcribed.
-It fails loudly (non-zero exit) on any API error rather than publish
-partial or stale data as current.
-
-`scripts/render-coverage-docs.py` renders `docs/coverage.md` and
-`results/upstream-matrix.md` from that JSON (and copies both JSON files into
-`docs/data/` for anyone browsing the raw data directly).
-
-`scripts/generate-site-data.py` then renders the small, curated dataset the
-public site actually needs (`site/src/data/cards.json` — a handful of cards,
-plain-language descriptions, capped "why it matters" lines, not a
-pass-through of the verbose sources above) and bakes it directly into
-`site/index.html` from `site/template.html`. The site
-([`site/`](site/), a static Vite project) has no client-side interactivity,
-so there's no JS rendering step — the page ships as plain static HTML plus
-one bundled stylesheet, built with `pnpm run build`. It's organized into two
-visually distinct sections: tests already covered by upstream WPT, and new
-tests this project wrote to fill confirmed gaps — never merged into one
-table, so a visitor can tell at a glance which is which. It reads only
-committed JSON snapshots at build time (never calls wpt.fyi live from the
-browser), so staleness is visible via a prominent last-synced timestamp
-rather than silently assumed current.
-
-The site is published via GitHub Pages, serving the `docs/` folder (the
-built `site/dist/` output is copied there), at
-**https://oblique.amitkaps.com** (`docs/CNAME`; requires a DNS `CNAME`
-record for that hostname pointing at `amitkaps.github.io`, set up outside
-this repo).
-
-A scheduled GitHub Actions workflow
-([`.github/workflows/sync-wpt-results.yml`](.github/workflows/sync-wpt-results.yml))
-re-runs the full pipeline daily and commits the refreshed data + rebuilt
-site. To run it manually:
-
-```
-uv run scripts/sync-wpt-results.py
-uv run scripts/render-coverage-docs.py
-uv run scripts/generate-site-data.py
-cd site && pnpm install && pnpm run build && cd ..
-rm -rf docs/assets && cp -r site/dist/* docs/
-```
-
-`site/`'s toolchain (`node`, `pnpm`) is pinned in `.mise.toml`, the same way
-the Python toolchain (`python`, `uv`) already is.
-
-`results/upstream-matrix.md` (wpt.fyi-sourced, continuous, for pre-existing
-upstream tests) is intentionally kept separate from
-`results/browser-matrix.md` (this repo's own local WPT-runner results, for
-its own novel tests) — one is "wpt.fyi ran this continuously upstream," the
-other is "we ran this ourselves"; merging them would misrepresent
-provenance.
-
-## Repo structure
-
-```
-oblique/
-├── LICENSE                  # BSD-3-Clause (required for WPT upstreaming)
-├── README.md
-├── .mise.toml                # pins python/uv AND node/pnpm versions
-├── .github/workflows/
-│   └── sync-wpt-results.yml # daily wpt.fyi sync, rebuilds + commits the site
-├── reference/                # JS reference implementation of CSS Fonts 4 font-style matching;
-│   │                         # generates tests/oblique-style-matching/matrix-*.html (see reference/README.md)
-├── scripts/
-│   ├── setup-wpt.sh          # vendors a scoped, gitignored .wpt/ checkout
-│   ├── sync-tests-to-wpt.sh  # mirrors tests/ into .wpt/ (rsync --delete, no stale copies)
-│   ├── safari-replay.py      # Safari results: direct safaridriver replay (wpt run is unreliable there)
-│   ├── survey.py             # measures the lean of every generated cell in Chrome, Firefox and Safari
-│   ├── record-results.py     # parses wptreport JSON into browser-matrix.md
-│   ├── sync-wpt-results.py   # pulls live upstream results from wpt.fyi
-│   ├── render-coverage-docs.py  # renders coverage.md/upstream-matrix.md
-│   └── generate-site-data.py    # renders site/index.html + cards.json
-├── tests/
-│   └── oblique-style-matching/  # this repo's own tests, consolidated —
-│                                # the single candidate for a future WPT PR
-├── site/                      # static Vite project — source of the public page
-│   ├── template.html          # tracked source; generate-site-data.py fills it in
-│   ├── src/style.css
-│   ├── index.html             # generated — gitignored, see template.html
-│   └── dist/                  # `pnpm run build` output — copied into docs/
-├── docs/                      # published as GitHub Pages (oblique.amitkaps.com)
-│   ├── index.html             # generated — copy of site/dist/index.html
-│   ├── assets/                # generated — copy of site/dist/assets/
-│   ├── CNAME                  # custom domain for GitHub Pages
-│   ├── data/                  # generated copies of coverage.json/upstream.json
-│   ├── spec.md
-│   ├── plan.md
-│   ├── summary.md            # short, current-state doc — start here
-│   ├── investigation-log.md  # full narrative archive (was findings.md)
-│   ├── coverage.md           # generated — see coverage.json
-│   └── coverage.json         # source of truth for the coverage catalog
-└── results/
-    ├── browser-matrix.md      # this repo's own local WPT-runner results
-    ├── upstream-matrix.md     # generated — see upstream.json
-    └── upstream.json          # wpt.fyi-synced data, source of truth for the above
-```
-
-No WPT checkout is committed to this repo — WPT is external test-runner
-infrastructure. `scripts/setup-wpt.sh` vendors a minimal, scoped copy into
-a gitignored `.wpt/` for anyone who clones this repo to run tests locally;
-see "Running the tests" above.
+LICENSE: BSD-3-Clause, as WPT requires.

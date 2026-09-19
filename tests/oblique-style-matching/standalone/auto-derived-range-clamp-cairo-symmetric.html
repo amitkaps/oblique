@@ -11,8 +11,8 @@
   Why this is a SEPARATE test from auto-derived-range-clamp.html: that test
   uses Inter.var.subset.ttf (WPT's own corpus font), whose actual slnt
   range is -10..0 — one-sided, and narrower than Cairo's. It PASSED on
-  Chrome and Firefox, but docs/coverage.json's confirmed_gaps entry
-  (`auto-range-default-angle`) is explicit that a one-sided-range PASS does
+  Chrome and Firefox, but the gap analysis for
+  `auto-range-default-angle` was explicit that a one-sided-range PASS does
   not independently re-confirm or refute Cairo's own real-world bug
   (vizchitra-fonts/docs/compat.md), because Cairo's range is a different
   shape: symmetric, -11 to 11.
