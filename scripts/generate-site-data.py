@@ -33,6 +33,9 @@ import json
 import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import coverage_matrix
+
 REPO_ROOT = Path(__file__).resolve().parent.parent
 COVERAGE_PATH = REPO_ROOT / "docs" / "coverage.json"
 UPSTREAM_PATH = REPO_ROOT / "results" / "upstream.json"
@@ -144,6 +147,19 @@ def load_matrix_results():
     return rows
 
 
+def load_matrix_versions():
+    """{engine: version} of the latest recorded row per engine in
+    results/browser-matrix.md (for the legend under the coverage matrix)."""
+    versions = {}
+    for line in MATRIX_PATH.read_text().splitlines():
+        if not line.startswith("|") or line.startswith("|---") or "test_id" in line:
+            continue
+        cells = [c.strip() for c in line.strip("|").split("|")]
+        if len(cells) >= 5 and cells[1] in ("chrome", "firefox", "safari"):
+            versions[cells[1]] = cells[2]
+    return versions
+
+
 def build_checklist_index(coverage: dict) -> dict:
     """{test_path: [short_label, ...]} reverse index of coverage.json's
     checklist_mapping, so each rendered test row can show which checklist
@@ -171,48 +187,6 @@ def verify_category_mapping(coverage: dict):
             f"generate-site-data: TEST_CATEGORY has {len(extra)} path(s) not "
             f"in docs/coverage.json (stale mapping?): {sorted(extra)}"
         )
-
-
-def verify_matrix_mapping():
-    """Same discipline as verify_category_mapping(): fail loudly rather than
-    silently render an incomplete or colliding matrix."""
-    shape_ids = {s["id"] for s in MATRIX_FONT_SHAPES}
-    column_ids = {c["id"] for c in MATRIX_USE_SITE_COLUMNS}
-    seen_cells = {}
-    for c in THIS_REPO_CARDS:
-        if c.get("planned"):
-            continue
-        missing = [f for f in ("font_shape", "loading_technique", "use_site") if f not in c]
-        if missing:
-            raise RuntimeError(
-                f"generate-site-data: card {c['id']!r} is missing matrix "
-                f"field(s) {missing} — every built THIS_REPO_CARDS entry "
-                f"needs font_shape/loading_technique/use_site"
-            )
-        if c["font_shape"] not in shape_ids:
-            raise RuntimeError(
-                f"generate-site-data: card {c['id']!r} references unknown "
-                f"font_shape {c['font_shape']!r} — add it to MATRIX_FONT_SHAPES"
-            )
-        if c["loading_technique"] not in MATRIX_LOADING_TECHNIQUES:
-            raise RuntimeError(
-                f"generate-site-data: card {c['id']!r} references unknown "
-                f"loading_technique {c['loading_technique']!r} — add it to "
-                f"MATRIX_LOADING_TECHNIQUES"
-            )
-        if c["use_site"] not in column_ids:
-            raise RuntimeError(
-                f"generate-site-data: card {c['id']!r} references unknown "
-                f"use_site {c['use_site']!r} — add it to MATRIX_USE_SITE_COLUMNS"
-            )
-        cell = (c["font_shape"], c["loading_technique"], c["use_site"])
-        if cell in seen_cells:
-            raise RuntimeError(
-                f"generate-site-data: cards {seen_cells[cell]!r} and "
-                f"{c['id']!r} collide on the same matrix cell {cell} — "
-                f"the matrix can only show one test per cell"
-            )
-        seen_cells[cell] = c["id"]
 
 
 def matrix_status(test_id, matrix_by_id, engine):
@@ -284,62 +258,6 @@ UPSTREAM_CATEGORIES = [
 
 _UPSTREAMING = "candidate-for-upstreaming"  # all validated files in tests/oblique-style-matching/
 
-# The coverage matrix's row axis: distinct slnt/ital axis SHAPES actually
-# present among tests/oblique-style-matching/resources/*, in the same order
-# as the folder's own README "Font shape table" (plus the two external
-# fonts it lists separately). Every non-planned THIS_REPO_CARDS entry below
-# must set font_shape to one of these ids — checked by verify_matrix_mapping().
-MATRIX_FONT_SHAPES = [
-    {"id": "slnt-symmetric", "label": "slnt-only, symmetric ±11° (Cairo's shape)",
-     "note": "resources/oblique-symmetric.ttf — slnt -11..11, no ital"},
-    {"id": "slnt-onesided-neg-real", "label": "slnt-only, one-sided -10..0° (real production font)",
-     "note": "resources/Inter.var.subset.ttf — the actual Inter variable font, not a synthetic stand-in"},
-    {"id": "slnt-onesided-neg-synthetic", "label": "slnt-only, one-sided -10..0° (synthetic, Inter's shape)",
-     "note": "resources/oblique-onesided-neg.ttf — purpose-built minimal stand-in for Inter's shape"},
-    {"id": "slnt-onesided-pos", "label": "slnt-only, one-sided 0..10° (mirror/backslant shape)",
-     "note": "resources/oblique-onesided-pos.ttf — no known real-world instance"},
-    {"id": "slnt-nozero", "label": "slnt-only, off-zero 5..20° (never includes 0)",
-     "note": "resources/oblique-nozero.ttf — forces deep fallback-chain traversal"},
-    {"id": "slnt-ital-dual", "label": "slnt + ital, dual-axis ±11° / 0-1",
-     "note": "resources/oblique-dual-axis.ttf — the only font in this suite with both axes present"},
-    {"id": "slnt-explicit-corpus", "label": "slnt-only, -15..0° (WPT's own corpus font)",
-     "note": "resources/FontStyleTest-slnt-VF.woff2, authored by Stephen Nixon"},
-    {"id": "ital-only", "label": "ital-only, no slnt",
-     "note": "resources/IdentTestItal.ttf"},
-]
-
-# The matrix's row sub-axis within each font shape: HOW the @font-face
-# declares (or doesn't declare) font-style. A closed vocabulary, same
-# "fail loudly on drift" discipline as TEST_CATEGORY.
-MATRIX_LOADING_TECHNIQUES = {
-    "auto-derived": "No font-style descriptor (auto-derived range)",
-    "explicit-range-true-bounds": "Explicit range matching the font's true bounds",
-    "bare-italic-descriptor": "Bare font-style: italic descriptor (binary, no range)",
-}
-
-# The matrix's column axis: what's requested at the use site, INCLUDING the
-# font-synthesis setting — deliberately, since that's exactly what
-# distinguished auto-derived-range-clamp-cairo-symmetric.html (PASS, synthesis
-# suppressed) from explicit-range-bare-keyword-synthesis-stacking.html (FAIL
-# on Chrome, synthesis left at default) despite the same font. Derived
-# bottom-up from what test files actually, jointly exercise — not from an
-# idealized orthogonal enumeration of CSS properties (several tests render
-# both a bare oblique AND a bare italic paragraph with one shared recorded
-# result, so that's one column, not two).
-MATRIX_USE_SITE_COLUMNS = [
-    {"id": "bare-oblique-italic-synth-none", "label": "bare oblique + italic (synthesis off)"},
-    {"id": "bare-oblique-italic-synth-default", "label": "bare oblique + italic (default synthesis)"},
-    {"id": "bare-oblique-only-synth-default", "label": "bare oblique only (default synthesis)"},
-    {"id": "bare-oblique-only-synth-none", "label": "bare oblique only (synthesis off)"},
-    {"id": "bare-italic-only-synth-default", "label": "bare italic only (default synthesis)"},
-    {"id": "bare-italic-only-synth-none", "label": "bare italic only (synthesis off)"},
-    {"id": "explicit-angle-positive-synth-none", "label": "explicit angle, positive (synthesis off)"},
-    {"id": "explicit-angle-negative-synth-none", "label": "explicit angle, negative (synthesis off)"},
-    {"id": "normal-synth-none", "label": "font-style: normal (synthesis off)"},
-    {"id": "explicit-angle-plus-slnt-combo-synth-none", "label": "explicit angle + explicit slnt combo (synthesis off)"},
-    {"id": "bare-italic-plus-explicit-angle-synth-none", "label": "bare italic + explicit angle, same file (synthesis off)"},
-]
-
 THIS_REPO_CARDS = [
     {
         "id": "slnt-axis-activation",
@@ -349,8 +267,6 @@ THIS_REPO_CARDS = [
         "spec_link": "https://drafts.csswg.org/css-fonts-4/#font-style-prop",
         "tier": 1, "test_id": "slnt-axis-activation",
         "test_file": "tests/oblique-style-matching/slnt-axis-activation.html", "badge": _UPSTREAMING,
-        "font_shape": "slnt-explicit-corpus", "loading_technique": "explicit-range-true-bounds",
-        "use_site": "bare-oblique-only-synth-default",
     },
     {
         "id": "auto-derived-range-clamp",
@@ -360,8 +276,6 @@ THIS_REPO_CARDS = [
         "spec_link": "https://drafts.csswg.org/css-fonts-4/#font-style-prop",
         "tier": 1, "test_id": "auto-derived-range-clamp",
         "test_file": "tests/oblique-style-matching/auto-derived-range-clamp.html", "badge": _UPSTREAMING,
-        "font_shape": "slnt-onesided-neg-real", "loading_technique": "auto-derived",
-        "use_site": "bare-oblique-italic-synth-none",
     },
     {
         "id": "auto-derived-range-clamp-cairo-symmetric",
@@ -371,8 +285,6 @@ THIS_REPO_CARDS = [
         "spec_link": "https://drafts.csswg.org/css-fonts-4/#font-style-prop",
         "tier": 1, "test_id": "auto-derived-range-clamp-cairo-symmetric",
         "test_file": "tests/oblique-style-matching/auto-derived-range-clamp-cairo-symmetric.html", "badge": _UPSTREAMING,
-        "font_shape": "slnt-symmetric", "loading_technique": "auto-derived",
-        "use_site": "bare-oblique-italic-synth-none",
     },
     {
         "id": "explicit-range-bare-keyword-synthesis-stacking",
@@ -382,8 +294,6 @@ THIS_REPO_CARDS = [
         "spec_link": "https://drafts.csswg.org/css-fonts-4/#font-synthesis-style",
         "tier": 1, "test_id": "explicit-range-bare-keyword-synthesis-stacking",
         "test_file": "tests/oblique-style-matching/explicit-range-bare-keyword-synthesis-stacking.html", "badge": _UPSTREAMING,
-        "font_shape": "slnt-symmetric", "loading_technique": "explicit-range-true-bounds",
-        "use_site": "bare-oblique-italic-synth-default",
     },
     {
         "id": "explicit-descriptor-range-clamp",
@@ -393,8 +303,6 @@ THIS_REPO_CARDS = [
         "spec_link": "https://drafts.csswg.org/css-fonts-4/#font-style-matching",
         "tier": 1, "test_id": "explicit-descriptor-range-clamp",
         "test_file": "tests/oblique-style-matching/explicit-descriptor-range-clamp.html", "badge": _UPSTREAMING,
-        "font_shape": "slnt-onesided-neg-synthetic", "loading_technique": "explicit-range-true-bounds",
-        "use_site": "bare-oblique-italic-synth-none",
     },
     {
         "id": "boundary-11deg-ascending",
@@ -404,8 +312,6 @@ THIS_REPO_CARDS = [
         "spec_link": "https://drafts.csswg.org/css-fonts-4/#font-style-matching",
         "tier": 1, "test_id": "boundary-11deg-ascending",
         "test_file": "tests/oblique-style-matching/boundary-11deg-ascending.html", "badge": _UPSTREAMING,
-        "font_shape": "slnt-symmetric", "loading_technique": "auto-derived",
-        "use_site": "explicit-angle-positive-synth-none",
     },
     {
         "id": "boundary-11deg-descending",
@@ -415,8 +321,6 @@ THIS_REPO_CARDS = [
         "spec_link": "https://drafts.csswg.org/css-fonts-4/#font-style-matching",
         "tier": 1, "test_id": "boundary-11deg-descending",
         "test_file": "tests/oblique-style-matching/boundary-11deg-descending.html", "badge": _UPSTREAMING,
-        "font_shape": "slnt-symmetric", "loading_technique": "auto-derived",
-        "use_site": "explicit-angle-negative-synth-none",
     },
     {
         "id": "boundary-0deg-normal-fallback",
@@ -426,8 +330,6 @@ THIS_REPO_CARDS = [
         "spec_link": "https://drafts.csswg.org/css-fonts-4/#font-style-matching",
         "tier": 1, "test_id": "boundary-0deg-normal-fallback",
         "test_file": "tests/oblique-style-matching/boundary-0deg-normal-fallback.html", "badge": _UPSTREAMING,
-        "font_shape": "slnt-nozero", "loading_technique": "explicit-range-true-bounds",
-        "use_site": "normal-synth-none",
     },
     {
         "id": "multi-branch-fallback-chain",
@@ -437,8 +339,6 @@ THIS_REPO_CARDS = [
         "spec_link": "https://drafts.csswg.org/css-fonts-4/#font-style-matching",
         "tier": 1, "test_id": "multi-branch-fallback-chain",
         "test_file": "tests/oblique-style-matching/multi-branch-fallback-chain.html", "badge": _UPSTREAMING,
-        "font_shape": "slnt-nozero", "loading_technique": "explicit-range-true-bounds",
-        "use_site": "bare-italic-only-synth-none",
     },
     {
         "id": "style-plus-explicit-variation-settings",
@@ -448,8 +348,6 @@ THIS_REPO_CARDS = [
         "spec_link": "https://drafts.csswg.org/css-fonts-4/#feature-variation-precedence",
         "tier": 1, "test_id": "style-plus-explicit-variation-settings",
         "test_file": "tests/oblique-style-matching/style-plus-explicit-variation-settings.html", "badge": _UPSTREAMING,
-        "font_shape": "slnt-symmetric", "loading_technique": "auto-derived",
-        "use_site": "explicit-angle-plus-slnt-combo-synth-none",
     },
     {
         "id": "italic-no-extra-synthesis",
@@ -459,8 +357,6 @@ THIS_REPO_CARDS = [
         "spec_link": "https://github.com/w3c/csswg-drafts/issues/12836",
         "tier": 1, "test_id": "italic-no-extra-synthesis",
         "test_file": "tests/oblique-style-matching/italic-no-extra-synthesis.html", "badge": _UPSTREAMING,
-        "font_shape": "ital-only", "loading_technique": "bare-italic-descriptor",
-        "use_site": "bare-italic-only-synth-default",
     },
     {
         "id": "ital-slnt-independence",
@@ -470,8 +366,6 @@ THIS_REPO_CARDS = [
         "spec_link": "https://github.com/w3c/csswg-drafts/issues/12836",
         "tier": 1, "test_id": "independence",
         "test_file": "tests/oblique-style-matching/independence.html", "badge": _UPSTREAMING,
-        "font_shape": "ital-only", "loading_technique": "auto-derived",
-        "use_site": "bare-oblique-only-synth-none",
     },
     {
         "id": "italic-oblique-equivalence",
@@ -481,8 +375,6 @@ THIS_REPO_CARDS = [
         "spec_link": "https://drafts.csswg.org/css-fonts-4/#font-style-matching",
         "tier": 1, "test_id": "italic-oblique-equivalence",
         "test_file": "tests/oblique-style-matching/italic-oblique-equivalence.html", "badge": _UPSTREAMING,
-        "font_shape": "slnt-ital-dual", "loading_technique": "bare-italic-descriptor",
-        "use_site": "explicit-angle-positive-synth-none",
     },
     {
         "id": "ital-slnt-independence-dual-axis",
@@ -492,8 +384,6 @@ THIS_REPO_CARDS = [
         "spec_link": "https://github.com/w3c/csswg-drafts/issues/12836",
         "tier": 1, "test_id": "ital-slnt-independence-dual-axis",
         "test_file": "tests/oblique-style-matching/ital-slnt-independence-dual-axis.html", "badge": _UPSTREAMING,
-        "font_shape": "slnt-ital-dual", "loading_technique": "auto-derived",
-        "use_site": "bare-italic-plus-explicit-angle-synth-none",
     },
     {
         "id": "normal-plus-bare-oblique-same-family",
@@ -621,70 +511,6 @@ def build_this_repo_cards(matrix_by_id):
     return cards
 
 
-def build_matrix(this_repo_cards: list) -> dict:
-    """{font_shape_id: {loading_technique_id: {use_site_id: card}}}, built
-    from cards already computed by build_this_repo_cards() — no
-    recomputation of pass/fail, just regrouped by the matrix's axes."""
-    matrix = {s["id"]: {} for s in MATRIX_FONT_SHAPES}
-    by_id = {c["id"]: c for c in THIS_REPO_CARDS}
-    for card in this_repo_cards:
-        src = by_id[card["id"]]
-        if src.get("planned"):
-            continue
-        shape = matrix[src["font_shape"]]
-        shape.setdefault(src["loading_technique"], {})[src["use_site"]] = card
-    return matrix
-
-
-def render_matrix_html(matrix: dict) -> str:
-    e = html.escape
-    parts = []
-    for shape in MATRIX_FONT_SHAPES:
-        techniques = matrix[shape["id"]]
-        tested = sum(len(v) for v in techniques.values())
-        parts.append('<details class="matrix-group">')
-        if techniques:
-            parts.append(
-                f'<summary>{e(shape["label"])} — {tested} test'
-                f'{"s" if tested != 1 else ""} across {len(techniques)} '
-                f'loading technique{"s" if len(techniques) != 1 else ""}</summary>'
-            )
-        else:
-            parts.append(f'<summary>{e(shape["label"])} — 0 tests written yet</summary>')
-        parts.append(f'<p class="matrix-note">{e(shape["note"])}</p>')
-
-        if not techniques:
-            parts.append('<p class="matrix-note">No tests written for this font shape yet.</p>')
-            parts.append("</details>")
-            continue
-
-        parts.append('<div class="matrix-wrap"><table class="matrix"><thead><tr><th>Loading technique</th>')
-        for col in MATRIX_USE_SITE_COLUMNS:
-            parts.append(f"<th>{e(col['label'])}</th>")
-        parts.append("</tr></thead><tbody>")
-        for tech_id, tech_label in MATRIX_LOADING_TECHNIQUES.items():
-            if tech_id not in techniques:
-                continue
-            parts.append(f"<tr><th>{e(tech_label)}</th>")
-            for col in MATRIX_USE_SITE_COLUMNS:
-                card = techniques[tech_id].get(col["id"])
-                if card is None:
-                    parts.append('<td class="matrix-empty">&mdash;</td>')
-                    continue
-                url = f'https://github.com/amitkaps/oblique/blob/main/{card["test_file"]}'
-                parts.append('<td class="matrix-cell">')
-                parts.append(f'<a class="matrix-link" href="{e(url)}">{e(card["plain_name"])}</a>')
-                parts.append('<div class="engines">')
-                for engine in ("chrome", "firefox", "safari"):
-                    status = card["results"][engine]
-                    label = STATUS_LABEL.get(status, status)
-                    parts.append(f'<span class="engine engine-{e(status)}">{e(engine)}: {e(label)}</span>')
-                parts.append("</div></td>")
-            parts.append("</tr>")
-        parts.append("</tbody></table></div></details>")
-    return "".join(parts)
-
-
 def render_card_html(card: dict) -> str:
     e = html.escape
     parts = [f'<article class="card" id="card-{e(card["id"])}">']
@@ -744,16 +570,18 @@ def main():
 
     coverage = load_coverage()
     verify_category_mapping(coverage)
-    verify_matrix_mapping()
     upstream_data, upstream_by_path = load_upstream()
     matrix_by_id = load_matrix_results()
+    coverage_matrix.verify_matrix(matrix_by_id)
+    coverage_matrix.sync_font()
     checklist_index = build_checklist_index(coverage)
 
     upstream_cards = build_upstream_cards(
         coverage, upstream_by_path, upstream_data["run_metadata"], checklist_index
     )
     this_repo_cards = build_this_repo_cards(matrix_by_id)
-    coverage_matrix = build_matrix(this_repo_cards)
+    cell_results = coverage_matrix.build_cell_results(matrix_by_id, matrix_status)
+    matrix_versions = load_matrix_versions()
 
     # cards.json is an intermediate artifact for inspection/debugging, not
     # consumed by the page itself (rendered directly to HTML below) — drop
@@ -761,11 +589,8 @@ def main():
     json_cards = [{k: v for k, v in c.items() if k != "detail_html"}
                   for c in upstream_cards + this_repo_cards]
     matrix_json = {
-        shape["id"]: {
-            tech_id: {use_site_id: card["id"] for use_site_id, card in use_sites.items()}
-            for tech_id, use_sites in coverage_matrix[shape["id"]].items()
-        }
-        for shape in MATRIX_FONT_SHAPES
+        f"{col}|{row}": {"test": cell["test"], "results": cell_results[(col, row)]}
+        for (col, row), cell in coverage_matrix.CELLS.items()
     }
     data = {
         "generated_note": "Generated by scripts/generate-site-data.py from "
@@ -788,7 +613,8 @@ def main():
     page = page.replace(
         "<!--CARDS_THIS_REPO-->", "".join(render_card_html(c) for c in this_repo_cards)
     )
-    page = page.replace("<!--MATRIX-->", render_matrix_html(coverage_matrix))
+    page = page.replace("<!--MATRIX_FONT_FACE-->", coverage_matrix.font_face_css())
+    page = page.replace("<!--MATRIX-->", coverage_matrix.render_matrix_html(cell_results, matrix_versions))
     SITE_HTML_PATH.write_text(page)
     print(f"generate-site-data: wrote {SITE_HTML_PATH}")
 

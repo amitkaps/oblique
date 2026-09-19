@@ -51,42 +51,108 @@ body {
   border-radius: 8px;
 }
 .coverage-matrix h2 { margin-top: 0; font-size: 1.05rem; }
-.matrix-intro { color: var(--muted); font-size: 0.85rem; max-width: 720px; }
+.matrix-intro { color: var(--muted); font-size: 0.85rem; max-width: 760px; }
+.matrix-count { font-size: 0.85rem; margin: 0.75rem 0 0.5rem; }
 
-.matrix-group { margin-top: 0.75rem; }
-.matrix-group summary {
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 0.9rem;
-}
-.matrix-group summary:hover { text-decoration: underline; }
-.matrix-note { font-size: 0.78rem; color: var(--muted); margin: 0.3rem 0 0.6rem; }
-
-.matrix-wrap { overflow-x: auto; margin-top: 0.5rem; }
-.matrix {
-  border-collapse: collapse;
-  width: 100%;
+.face-block {
+  margin: 0.5rem 0 1rem;
+  padding: 0.6rem 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
   font-size: 0.78rem;
+  overflow-x: auto;
 }
+.face-block em { color: var(--accent-this-repo); font-style: normal; font-weight: 600; }
+
+.matrix-wrap { overflow-x: auto; }
+.matrix { border-collapse: collapse; width: 100%; font-size: 0.78rem; }
 .matrix th, .matrix td {
   border: 1px solid var(--border);
-  padding: 0.4rem 0.5rem;
+  padding: 0.5rem;
   vertical-align: top;
   text-align: left;
 }
-.matrix thead th { white-space: nowrap; background: var(--bg); }
-.matrix tbody th { white-space: nowrap; font-weight: 600; background: var(--bg); }
-.matrix-cell { min-width: 150px; }
-.matrix-link {
-  display: block;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: inherit;
-  margin-bottom: 0.25rem;
+.matrix thead th { background: var(--bg); min-width: 170px; }
+.matrix thead th:first-child { min-width: 0; }
+.matrix thead code { display: block; font-size: 0.72rem; white-space: normal; }
+.col-note { display: block; margin-top: 0.25rem; font-size: 0.68rem; font-weight: 400; color: var(--muted); font-style: italic; }
+.matrix tbody th {
+  background: var(--bg);
+  position: sticky;
+  left: 0;
+  min-width: 150px;
+  font-weight: 400;
+  z-index: 1;
 }
-.matrix-empty { color: var(--muted); text-align: center; }
-.matrix .engines { gap: 0.2rem; }
-.matrix .engine { font-size: 0.65rem; padding: 0.08rem 0.35rem; }
+.matrix tbody th code { font-size: 0.72rem; }
+.row-num { color: var(--muted); font-weight: 600; }
+
+.matrix td { border-left-width: 3px; }
+.matrix td.status-pass { border-left-color: var(--pass); }
+.matrix td.status-fail { border-left-color: var(--fail); }
+.matrix td.status-partial, .matrix td.status-unknown { border-left-color: var(--unknown); }
+.matrix td.status-blank { color: var(--muted); text-align: center; vertical-align: middle; }
+.blank-cell { display: block; font-size: 1.2rem; }
+
+/* The live specimen: the word OBLIQUE twice, screen-blended on a dark panel.
+   Pink = the test's own reference rendering, cyan = the CSS under test. Aligned
+   they blend to a pale colour; visible pink is a failure. */
+.specimen-link { display: block; text-decoration: none; }
+.overlap {
+  position: relative;
+  isolation: isolate;
+  background: #0b0d10;
+  border-radius: 4px;
+  padding: 0.35rem 0.5rem;
+  font-size: 1.7rem;
+  line-height: 1.15;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.overlap span { display: block; font-synthesis: weight style; mix-blend-mode: screen; }
+.ov-control { position: absolute; top: 0.35rem; left: 0.5rem; color: #ff3d9a; }
+.ov-test { position: relative; color: #22d3ee; }
+.overlap-single .ov-test { color: #e6edf3; }
+
+.verdicts {
+  display: flex;
+  gap: 0.35rem;
+  list-style: none;
+  padding: 0;
+  margin: 0.5rem 0 0;
+}
+.b-badge {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.b-badge .logo { width: 15px; height: 15px; }
+.b-badge.pass { border-color: var(--pass); }
+.b-badge.fail { border-color: var(--fail); }
+.b-badge.unknown { border-color: var(--border); border-style: dashed; }
+.b-badge.unknown .logo { opacity: 0.4; }
+
+.cell-tags { display: flex; flex-wrap: wrap; gap: 0.25rem; margin-top: 0.4rem; }
+.matrix td.status-blank .cell-tags { justify-content: center; }
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1.1rem;
+  list-style: none;
+  padding: 0;
+  margin: 0.9rem 0 0;
+  font-size: 0.78rem;
+}
+.legend li { display: inline-flex; align-items: center; gap: 0.4rem; }
+.legend .logo { width: 16px; height: 16px; }
+.legend-note { color: var(--muted); font-style: italic; }
+.legend-versions { color: var(--muted); }
 
 .card-section { margin: 2.5rem 0; }
 .card-section h2 {
@@ -210,5 +276,9 @@ body {
 .page-footer a { color: inherit; }
 
 @media (max-width: 480px) {
-  .matrix-cell { min-width: 120px; }
+  .matrix thead th { min-width: 150px; }
+  .overlap { font-size: 1.4rem; }
 }
+
+.ov-pink { color: #ff3d9a; }
+.ov-cyan { color: #22d3ee; }

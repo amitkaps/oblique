@@ -6,6 +6,9 @@
 <title>Oblique — slnt/ital interop tracker</title>
 <meta name="description" content="Live-tracked pass/fail for CSS Fonts 4 oblique/slnt/ital matching across Chrome, Firefox, and Safari.">
 <link rel="stylesheet" href="/src/style.css">
+<style>
+<!--MATRIX_FONT_FACE-->
+</style>
 </head>
 <body>
   <header class="page-header">
@@ -19,15 +22,19 @@
     <p class="synced-banner"><!--SYNCED_BANNER--></p>
   </header>
 
-  <section class="coverage-matrix" aria-label="Font shape by use-site CSS test coverage">
-    <h2>Test coverage: font shape × use-site CSS</h2>
+  <section class="coverage-matrix" aria-label="Test coverage by @font-face font-style descriptor and use-site CSS">
+    <h2>Test coverage: <code>@font-face</code> descriptor &times; use-site CSS</h2>
     <p class="matrix-intro">
-      Rows group this project's own test fonts by their <code>slnt</code>/<code>ital</code>
-      shape, with a sub-row per <code>@font-face</code> loading technique tried
-      on that font. Columns are what's requested at the use site — including
-      the <code>font-synthesis</code> setting, since that turned out to matter.
-      <strong>A blank cell means untested</strong> — not passing, not failing,
-      just never tried. Click a font shape to expand it.
+      One font, one glyph under test: real Cairo (<code>slnt</code> &minus;11..11), subset to
+      the letters of OBLIQUE, tested on the capital <code>I</code>. Columns are what the
+      <code>@font-face</code> declares; rows are the CSS at the use site
+      (<code>font-synthesis</code> is at its default unless the row says otherwise). Each
+      specimen is live in <em>your</em> browser: <b class="ov-pink">pink</b> is the
+      test's own reference rendering, <b class="ov-cyan">cyan</b> is the CSS under test;
+      aligned they blend pale, and <strong>visible pink is a failure</strong>. The circles
+      are this project's recorded <code>wpt run</code> results.
+      <strong>A dash means no test yet</strong> &mdash; not passing, not failing.
+      Candidate for upstreaming; no WPT PR has been opened.
     </p>
     <!--MATRIX-->
   </section>
