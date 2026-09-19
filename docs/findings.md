@@ -8,9 +8,9 @@ Cairo `OBLIQUE` subset (`slnt` -11..11); a cell is written `A2` (column A, row 2
 
 ## Confirmed failures
 
-Ten cells have a spec-decided outcome that Chrome and Safari get wrong; Firefox passes all of them.
+Eleven cells have a spec-decided outcome that Chrome and Safari get wrong; Firefox passes all of them.
 
-### Ranges: A2, A3, A5, A8, C2, C3, C5, C8, C12... synthesis stacked on the axis
+### Ranges: A2, A3, A5, A8, A12, C2, C3, C5, C8, C12... synthesis stacked on the axis
 
 `italic`, bare `oblique`, `<em>` and `oblique 45deg` against a face declared with a range: the spec (2.3 "if no oblique
 faces exist" is not satisfied) says the axis must clamp and nothing may be synthesized on top.
@@ -28,7 +28,7 @@ The three range columns tell the trigger apart:
 
 | Column | Chrome and Safari fail | Pass |
 |---|---|---|
-| A: the font's own range, `-11deg 11deg` | rows 2, 3, 5, 8 (and 12, untested) | `normal`, `oblique 11deg`, `oblique 5deg`, `-5deg`, `font-variation-settings`, synthesis off |
+| A: the font's own range, `-11deg 11deg` | rows 2, 3, 5, 8, 12 | `normal`, `oblique 11deg`, `oblique 5deg`, `-5deg`, `font-variation-settings`, synthesis off |
 | C: narrow range, `-5deg 5deg` | the same rows: 2, 3, 5, 8, 12 | the same |
 | B: wider than the font, `-20deg 20deg` | none | all 12 rows, in all three engines |
 
@@ -45,8 +45,11 @@ The three range columns tell the trigger apart:
 `font-style: italic` with `font-synthesis-style: oblique-only` against a face declared `normal`: 2.8.2 says a
 synthesized oblique "must not be used as fallback if italic is specified", so the glyph must be upright. Firefox
 is upright; Chrome and Safari synthesize (21px). Upstream `font-synthesis-style-oblique-only` fails on the same two
-engines. Cell A12 (the same request on the font's own range) shows the stacking again but is only measured, because the
-reference is not sure what `oblique-only` does to a real oblique face.
+engines. Cell A12 (the same request on the font's own range) is the stacking again: 2.8.2 speaks of synthesized faces,
+so the real oblique face still matches and the axis at -11 is the outcome. Reading `oblique-only` more broadly, so that
+real oblique faces are also a last resort for italic (the reading behind the WPT test, csswg-drafts#9390), would make
+A12, B12 and C12 upright, and all three engines contradict that. The reference keeps that reading as an option that
+is off; see [review.md](review.md).
 
 ## How a cell is decided
 
@@ -55,13 +58,13 @@ for a cell: `upright`, `axis slnt=n`, or `synth`. A stacked axis plus synthesis 
 
 | Status | Meaning | Cells now |
 |---|---|---|
-| specified | one testable outcome; a reftest with one `match` reference | 59 |
-| constrained | several outcomes, or synthesis, are allowed but something is forbidden; several `match` references or a `mismatch` | 10 |
-| unspecified | the spec excludes nothing testable; no test, browsers are only measured | 15 |
+| specified | one testable outcome; a reftest with one `match` reference | 62 |
+| constrained | several outcomes, or synthesis, are allowed but something is forbidden; several `match` references or a `mismatch` | 9 |
+| unspecified | the spec excludes nothing testable; no test, browsers are only measured | 13 |
 
 Two signals agree in every cell: the reftests (Chrome and Firefox via `wpt run`, Safari via
 `scripts/safari-replay.py`) and a separate measurement of the glyph's lean (`scripts/survey.py`).
-`mise run compare`: 73 of 84 cells agree, 11 diverge (the ten failing cells above, and A12 which has no test), none is `reference-suspect` (a cell every
+`mise run compare`: 73 of 84 cells agree, 11 diverge (the eleven failing cells above), none is `reference-suspect` (a cell every
 engine fails, which would point at the reference or a spec gap rather than at three browsers).
 
 Spec rules that decide cells (quoted in `reference/spec/css-fonts-4-excerpts.txt`):
@@ -106,17 +109,26 @@ range ("implicit `auto` ranges" in #7999), so it takes the axis and is never she
 
 ## Where the spec is open, do the engines agree?
 
-Of the 25 cells where the spec allows several outcomes, all three engines render the same in 11. If they converge, the spec
+Of the 22 cells where the spec allows several outcomes, all three engines render the same in 10. If they converge, the spec
 could simply say so; where they differ is the list to take to the spec authors. One font, three engine versions, matched by
 the lean of the glyph, so this is evidence rather than proof.
 
-- **Agree (11):** a `normal` face given `italic`, bare `oblique` or `<em>` is synthesized at the default 14deg by all three
+- **Agree (10):** a `normal` face given `italic`, bare `oblique` or `<em>` is synthesized at the default 14deg by all three
   (E2, E3, E5); an italic-declared face on a `slnt`-only font takes the axis at -11 for a `normal` request, bare `oblique`,
-  `oblique 11deg`, `5deg`, `45deg`, `-5deg` and `oblique` with synthesis off (G1, G3, G4, G7, G8, G9, G11), and B12.
-- **Differ (14):** italic on an italic-declared face (G2, G5, G10, G12): Chrome takes the axis, Firefox and Safari stay upright.
+  `oblique 11deg`, `5deg`, `45deg`, `-5deg` and `oblique` with synthesis off (G1, G3, G4, G7, G8, G9, G11).
+- **Differ (12):** italic on an italic-declared face (G2, G5, G10, G12): Chrome takes the axis, Firefox and Safari stay upright.
   Italic on an `auto` face (F2, F5, F10, F12): Chrome and Firefox take the axis, Safari stays upright. An explicit small
   angle on a `normal` face (E4, E7, E8, E9): Firefox skews at the requested angle, Chrome and Safari stay upright (or use 14deg
-  for 45deg). Plus the two stacked-synthesis cells with no test (A12, C12).
+  for 45deg).
+
+**G1 against G2 is inconsistent.** Firefox and Safari render the italic-declared face slanted for `font-style: normal`
+(G1, 16px) and upright for `font-style: italic` (G2, 0px); Chrome slants both. 5.2 lets a user agent either distinguish
+italic from oblique (nothing to apply without an `ital` axis, so both upright) or map italic onto oblique 11deg (both
+slanted). Read that way, neither gives 16 then 0, which makes asking for italic less italic than asking for normal. The
+same split runs down the column in those two engines: italic requests (G2, G5, G10, G12) upright, oblique requests
+(G3, G4, G7, G8, G9, G11) slanted. The measurement is fact; that no policy explains it is an inference, because the
+"common scale" sentence is about matching, not the applied value. It is a question for the CSSWG, and no reftest can
+decide it.
 
 ## Claims withdrawn
 

@@ -57,7 +57,7 @@ Setup, the Safari method, and gotchas: [docs/running.md](docs/running.md). All t
 | `results/` | `browser-matrix.md` (recorded runs), `survey.json` (measured lean per cell) |
 | `site/` | the page: `index.html`, `style.css`, `render.mjs` (a Vite plugin that renders the grid) |
 | `scripts/` | WPT setup and sync, run and record, Safari replay, lean survey |
-| `docs/` | findings and how to run |
+| `docs/` | findings, a review of the reference against the spec, and how to run |
 
 ## Prior art
 

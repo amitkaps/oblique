@@ -39,7 +39,11 @@ test("italic-oblique-fallback.html: an italic-only family is used for every requ
 // css/css-fonts/font-synthesis-style-oblique-only.html
 test("font-synthesis-style-oblique-only.html: normal + oblique family", () => {
   const fam = [face("A", "normal"), face("B", "oblique")];
-  const syn = (fontSynthesisStyle) => ({ synthesisStyle: resolveSynthesisStyle({ fontSynthesisStyle }) });
+  // the WPT test asserts the broader reading of oblique-only (csswg-drafts#9390), a resolution
+  const syn = (fontSynthesisStyle) => ({
+    synthesisStyle: resolveSynthesisStyle({ fontSynthesisStyle }),
+    resolutions: { obliqueOnlyDemotesRealObliqueFaces: true },
+  });
   assert.deepEqual(pick("normal", fam, syn("auto")), ["A"]);
   assert.deepEqual(pick("oblique", fam, syn("auto")), ["B"]);
   assert.deepEqual(pick("italic", fam, syn("auto")), ["B"]); // italic falls back to oblique
@@ -54,7 +58,7 @@ test("font-synthesis-style-oblique-only.html: normal + oblique family", () => {
 // ascending: face1 yields 14, face2 (contains 11) yields 11, so only face2 survives.
 test("oblique-last-resort-weight-selection.html: KNOWN DISAGREEMENT with the spec text", () => {
   const fam = [face("face1", "oblique 14deg 30deg"), face("face2", "oblique 5deg 14deg")];
-  const got = pick("italic", fam, { synthesisStyle: "oblique-only" });
+  const got = pick("italic", fam, { synthesisStyle: "oblique-only", resolutions: { obliqueOnlyDemotesRealObliqueFaces: true } });
   assert.deepEqual(got, ["face2"], "the ED's 11deg threshold selects face2 alone");
   // the test intends both faces to survive (so weight can pick face1). Recorded, not fitted.
 });

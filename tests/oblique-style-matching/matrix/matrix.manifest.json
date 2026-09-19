@@ -537,7 +537,7 @@
       "assumptions": [],
       "why": [
         "selected face face (stage: italic: oblique >= 11deg ascending, then < 11deg descending)",
-        "italic request on an oblique face: slant angle unspecified (2.3); use the stage's closest value or the 14deg default",
+        "italic request on an oblique face: the applied value is the stage's closest value (7.2), clamped to the descriptor, then to the font",
         "no synthesis: the family has an italic or oblique face (5.2)"
       ],
       "wpt": true,
@@ -583,7 +583,7 @@
       "assumptions": [],
       "why": [
         "selected face face (stage: italic: oblique >= 11deg ascending, then < 11deg descending)",
-        "italic request on an oblique face: slant angle unspecified (2.3); use the stage's closest value or the 14deg default",
+        "italic request on an oblique face: the applied value is the stage's closest value (7.2), clamped to the descriptor, then to the font",
         "no synthesis: the family has an italic or oblique face (5.2)"
       ],
       "wpt": true,
@@ -629,7 +629,7 @@
       "assumptions": [],
       "why": [
         "selected face face (stage: italic: oblique >= 11deg ascending, then < 11deg descending)",
-        "italic request on an oblique face: slant angle unspecified (2.3); use the stage's closest value or the 14deg default",
+        "italic request on an oblique face: the applied value is the stage's closest value (7.2), clamped to the descriptor, then to the font",
         "no synthesis: the family has an italic or oblique face (5.2)"
       ],
       "wpt": true,
@@ -675,7 +675,7 @@
       "assumptions": [],
       "why": [
         "selected face face (stage: italic: oblique >= 11deg ascending, then < 11deg descending)",
-        "italic request on an oblique face: slant angle unspecified (2.3); use the stage's closest value or the 14deg default",
+        "italic request on an oblique face: the applied value is the stage's closest value (7.2), clamped to the descriptor, then to the font",
         "no synthesis: the family has an italic or oblique face (5.2)"
       ],
       "wpt": true,
@@ -1512,7 +1512,7 @@
       "assumptions": [],
       "why": [
         "selected face face (stage: italic: oblique >= 11deg ascending, then < 11deg descending)",
-        "italic request on an oblique face: slant angle unspecified (2.3); use the stage's closest value or the 14deg default",
+        "italic request on an oblique face: the applied value is the stage's closest value (7.2), clamped to the descriptor, then to the font",
         "no synthesis: the family has an italic or oblique face (5.2)"
       ],
       "wpt": true,
@@ -1558,7 +1558,7 @@
       "assumptions": [],
       "why": [
         "selected face face (stage: italic: oblique >= 11deg ascending, then < 11deg descending)",
-        "italic request on an oblique face: slant angle unspecified (2.3); use the stage's closest value or the 14deg default",
+        "italic request on an oblique face: the applied value is the stage's closest value (7.2), clamped to the descriptor, then to the font",
         "no synthesis: the family has an italic or oblique face (5.2)"
       ],
       "wpt": true,
@@ -1604,7 +1604,7 @@
       "assumptions": [],
       "why": [
         "selected face face (stage: italic: oblique >= 11deg ascending, then < 11deg descending)",
-        "italic request on an oblique face: slant angle unspecified (2.3); use the stage's closest value or the 14deg default",
+        "italic request on an oblique face: the applied value is the stage's closest value (7.2), clamped to the descriptor, then to the font",
         "no synthesis: the family has an italic or oblique face (5.2)"
       ],
       "wpt": true,
@@ -1650,7 +1650,7 @@
       "assumptions": [],
       "why": [
         "selected face face (stage: italic: oblique >= 11deg ascending, then < 11deg descending)",
-        "italic request on an oblique face: slant angle unspecified (2.3); use the stage's closest value or the 14deg default",
+        "italic request on an oblique face: the applied value is the stage's closest value (7.2), clamped to the descriptor, then to the font",
         "no synthesis: the family has an italic or oblique face (5.2)"
       ],
       "wpt": true,
@@ -3183,7 +3183,7 @@
       "assumptions": [],
       "why": [
         "selected face face (stage: italic: oblique >= 11deg ascending, then < 11deg descending)",
-        "italic request on an oblique face: slant angle unspecified (2.3); use the stage's closest value or the 14deg default",
+        "italic request on an oblique face: the applied value is the stage's closest value (7.2), clamped to the descriptor, then to the font",
         "no synthesis: font-synthesis-style: none forbids synthesis"
       ],
       "wpt": true,
@@ -3229,7 +3229,7 @@
       "assumptions": [],
       "why": [
         "selected face face (stage: italic: oblique >= 11deg ascending, then < 11deg descending)",
-        "italic request on an oblique face: slant angle unspecified (2.3); use the stage's closest value or the 14deg default",
+        "italic request on an oblique face: the applied value is the stage's closest value (7.2), clamped to the descriptor, then to the font",
         "no synthesis: font-synthesis-style: none forbids synthesis"
       ],
       "wpt": true,
@@ -3275,7 +3275,7 @@
       "assumptions": [],
       "why": [
         "selected face face (stage: italic: oblique >= 11deg ascending, then < 11deg descending)",
-        "italic request on an oblique face: slant angle unspecified (2.3); use the stage's closest value or the 14deg default",
+        "italic request on an oblique face: the applied value is the stage's closest value (7.2), clamped to the descriptor, then to the font",
         "no synthesis: font-synthesis-style: none forbids synthesis"
       ],
       "wpt": true,
@@ -3321,7 +3321,7 @@
       "assumptions": [],
       "why": [
         "selected face face (stage: italic: oblique >= 11deg ascending, then < 11deg descending)",
-        "italic request on an oblique face: slant angle unspecified (2.3); use the stage's closest value or the 14deg default",
+        "italic request on an oblique face: the applied value is the stage's closest value (7.2), clamped to the descriptor, then to the font",
         "no synthesis: font-synthesis-style: none forbids synthesis"
       ],
       "wpt": true,
@@ -3787,17 +3787,12 @@
       "request": "italic",
       "descriptor": "oblique -11deg 11deg",
       "css": "font-style: italic; font-synthesis-style: oblique-only;",
-      "status": "unspecified",
+      "status": "specified",
       "spec": {
-        "decided": false,
-        "text": "slnt 0 / -11"
+        "decided": true,
+        "text": "slnt -11"
       },
       "allowed": [
-        {
-          "kind": "axis",
-          "axis": "slnt",
-          "value": 0
-        },
         {
           "kind": "axis",
           "axis": "slnt",
@@ -3805,21 +3800,30 @@
         }
       ],
       "plan": {
-        "match": [],
+        "match": [
+          {
+            "kind": "axis",
+            "axis": "slnt",
+            "value": -11
+          }
+        ],
         "mismatch": []
       },
       "selected": [
         "face"
       ],
-      "stage": "italic: oblique <= 0 descending",
+      "stage": "italic: oblique >= 11deg ascending, then < 11deg descending",
       "assumptions": [],
       "why": [
-        "selected face face (stage: italic: oblique <= 0 descending)",
-        "italic request on an oblique face: slant angle unspecified (2.3); use the stage's closest value or the 14deg default",
+        "selected face face (stage: italic: oblique >= 11deg ascending, then < 11deg descending)",
+        "italic request on an oblique face: the applied value is the stage's closest value (7.2), clamped to the descriptor, then to the font",
         "no synthesis: oblique-only: a synthesized oblique must not stand in for italic"
       ],
-      "wpt": false,
-      "files": []
+      "wpt": true,
+      "files": [
+        "matrix-italicobo-oblrange.html",
+        "matrix-italicobo-oblrange-slnt-11-ref.html"
+      ]
     },
     {
       "address": "B12",
@@ -3829,17 +3833,12 @@
       "request": "italic",
       "descriptor": "oblique -20deg 20deg",
       "css": "font-style: italic; font-synthesis-style: oblique-only;",
-      "status": "unspecified",
+      "status": "specified",
       "spec": {
-        "decided": false,
-        "text": "slnt 0 / -11"
+        "decided": true,
+        "text": "slnt -11"
       },
       "allowed": [
-        {
-          "kind": "axis",
-          "axis": "slnt",
-          "value": 0
-        },
         {
           "kind": "axis",
           "axis": "slnt",
@@ -3847,21 +3846,30 @@
         }
       ],
       "plan": {
-        "match": [],
+        "match": [
+          {
+            "kind": "axis",
+            "axis": "slnt",
+            "value": -11
+          }
+        ],
         "mismatch": []
       },
       "selected": [
         "face"
       ],
-      "stage": "italic: oblique <= 0 descending",
+      "stage": "italic: oblique >= 11deg ascending, then < 11deg descending",
       "assumptions": [],
       "why": [
-        "selected face face (stage: italic: oblique <= 0 descending)",
-        "italic request on an oblique face: slant angle unspecified (2.3); use the stage's closest value or the 14deg default",
+        "selected face face (stage: italic: oblique >= 11deg ascending, then < 11deg descending)",
+        "italic request on an oblique face: the applied value is the stage's closest value (7.2), clamped to the descriptor, then to the font",
         "no synthesis: oblique-only: a synthesized oblique must not stand in for italic"
       ],
-      "wpt": false,
-      "files": []
+      "wpt": true,
+      "files": [
+        "matrix-italicobo-oblwide.html",
+        "matrix-italicobo-oblwide-slnt-11-ref.html"
+      ]
     },
     {
       "address": "C12",
@@ -3871,17 +3879,12 @@
       "request": "italic",
       "descriptor": "oblique -5deg 5deg",
       "css": "font-style: italic; font-synthesis-style: oblique-only;",
-      "status": "constrained",
+      "status": "specified",
       "spec": {
-        "decided": false,
-        "text": "slnt 0 / -5"
+        "decided": true,
+        "text": "slnt -5"
       },
       "allowed": [
-        {
-          "kind": "axis",
-          "axis": "slnt",
-          "value": 0
-        },
         {
           "kind": "axis",
           "axis": "slnt",
@@ -3893,11 +3896,6 @@
           {
             "kind": "axis",
             "axis": "slnt",
-            "value": 0
-          },
-          {
-            "kind": "axis",
-            "axis": "slnt",
             "value": -5
           }
         ],
@@ -3906,17 +3904,16 @@
       "selected": [
         "face"
       ],
-      "stage": "italic: oblique <= 0 descending",
+      "stage": "italic: oblique >= 11deg ascending, then < 11deg descending",
       "assumptions": [],
       "why": [
-        "selected face face (stage: italic: oblique <= 0 descending)",
-        "italic request on an oblique face: slant angle unspecified (2.3); use the stage's closest value or the 14deg default",
+        "selected face face (stage: italic: oblique >= 11deg ascending, then < 11deg descending)",
+        "italic request on an oblique face: the applied value is the stage's closest value (7.2), clamped to the descriptor, then to the font",
         "no synthesis: oblique-only: a synthesized oblique must not stand in for italic"
       ],
       "wpt": true,
       "files": [
         "matrix-italicobo-oblnarrow.html",
-        "matrix-italicobo-oblnarrow-slnt0-ref.html",
         "matrix-italicobo-oblnarrow-slnt-5-ref.html"
       ]
     },
@@ -3953,11 +3950,11 @@
       "selected": [
         "face"
       ],
-      "stage": "italic: oblique >= 11deg ascending, then < 11deg descending (last resort under oblique-only)",
+      "stage": "italic: oblique >= 11deg ascending, then < 11deg descending",
       "assumptions": [],
       "why": [
-        "selected face face (stage: italic: oblique >= 11deg ascending, then < 11deg descending (last resort under oblique-only))",
-        "italic request on an oblique face: slant angle unspecified (2.3); use the stage's closest value or the 14deg default",
+        "selected face face (stage: italic: oblique >= 11deg ascending, then < 11deg descending)",
+        "italic request on an oblique face: the applied value is the stage's closest value (7.2), clamped to the descriptor, then to the font",
         "no synthesis: oblique-only: a synthesized oblique must not stand in for italic"
       ],
       "wpt": true,

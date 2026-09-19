@@ -109,3 +109,23 @@ test("C (normal-declared) oblique requests are a recorded hedge: the axis is for
     assert.deepEqual(keys(run("normal", request)), ["slnt=0", "synth"], request);
   }
 });
+
+test("italic on a face with an oblique range applies the stage's closest value, never the 14deg keyword default (7.2)", () => {
+  // A wider range would let 14deg through if it were a second candidate; the font's own limit hides it here
+  const wide = expected({ faces: [{ id: "f", descriptor: "oblique -20deg 20deg" }], font: { slnt: [-30, 30], ital: null }, request: "italic" });
+  assert.deepEqual(keys(wide), ["slnt=-11"]);
+  assert.equal(wide.status, "specified");
+});
+
+test("italic + oblique-only against a face with a real oblique range: the range face is still the match (ED text)", () => {
+  // The demotion of real oblique faces is csswg-drafts#9390, a resolution that is off by default.
+  const oo = { synthesis: { fontSynthesisStyle: "oblique-only" } };
+  for (const [descriptor, want] of [["oblique -11deg 11deg", "slnt=-11"], ["oblique -20deg 20deg", "slnt=-11"], ["oblique -5deg 5deg", "slnt=-5"]]) {
+    const e = run(descriptor, "italic", oo);
+    assert.deepEqual(keys(e), [want], descriptor);
+    assert.equal(e.status, "specified", descriptor);
+  }
+  // with the resolution on the range face falls to the <= 0 stage and applies 0
+  const on = expected({ faces: [{ id: "f", descriptor: "oblique -11deg 11deg" }], font, request: "italic", ...oo, resolutions: { obliqueOnlyDemotesRealObliqueFaces: true } });
+  assert.deepEqual(keys(on), ["slnt=0"]);
+});

@@ -4,7 +4,7 @@ The single folder that would be proposed to WPT (`css/css-fonts/variable-oblique
 This README is not copied into `.wpt/`.
 
 ```
-matrix/       69 generated reftests + matrix.manifest.json (never edited by hand)
+matrix/       71 generated reftests + matrix.manifest.json (never edited by hand)
 standalone/   8 additional hand-written tests (see below)
 resources/    fonts (each with a .headers sidecar for WPT) and the scripts that build them
 oblique-matching.css   shared fixed-size layout, so pixel diffs do not depend on font metrics

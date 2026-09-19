@@ -97,10 +97,11 @@ export function resolveVariation(match, request, font) {
       const { lo, hi } = st;
       if (request.kind === "italic") {
         // italic: "The angle and direction of slant is unspecified."
-        notes.push("italic request on an oblique face: slant angle unspecified (2.3); use the stage's closest value or the 14deg default");
-        for (const a of [match.value ?? ITALIC_AS_OBLIQUE_ANGLE, DEFAULT_OBLIQUE_ANGLE]) {
-          allowed.push(slntOutcome(clamp(a, lo, hi), font));
-        }
+        // 7.2: "the value applied is the closest matching value as determined by the font matching
+        // algorithm", which is match.value. The 14deg default belongs to a bare `oblique` keyword
+        // (2.3), never to an italic request, so it is not a second candidate here.
+        notes.push("italic request on an oblique face: the applied value is the stage's closest value (7.2), clamped to the descriptor, then to the font");
+        allowed.push(slntOutcome(clamp(match.value ?? ITALIC_AS_OBLIQUE_ANGLE, lo, hi), font));
       } else {
         const a = match.kind === "oblique" && match.value !== null ? match.value : request.angle ?? 0;
         notes.push(`oblique face [${lo}, ${hi}]: closest matching value ${a}, clamped to the descriptor, then to the font`);
