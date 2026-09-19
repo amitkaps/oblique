@@ -20,6 +20,10 @@ export PIP_CONSTRAINT="$constraints"
 report="../results/latest-$engine.json"
 folder=css/css-fonts/variable-oblique-interop/
 cd .wpt
+rm -f "$report"
+# wpt exits nonzero when any test fails, and failures are the data here: record whatever it
+# reported. Only a run that produced no report is an error.
+set +e
 case "$engine" in
   chrome)
     ./wpt run chrome "$folder" \
@@ -32,5 +36,11 @@ case "$engine" in
       --webdriver-binary=_venv3/bin/geckodriver --log-wptreport="$report" ;;
   *) echo "unknown engine: $engine" >&2; exit 2 ;;
 esac
+wpt_status=$?
+set -e
 cd ..
+if [ ! -s "results/latest-$engine.json" ]; then
+  echo "wpt run produced no report (exit $wpt_status); nothing recorded" >&2
+  exit 1
+fi
 uv run scripts/record-results.py "results/latest-$engine.json"

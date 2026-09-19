@@ -3,9 +3,9 @@
 //
 // The result is an ALLOWED SET of outcomes, because the spec leaves latitude in
 // places. An outcome is one of:
-//   { kind: 'upright' }                          the glyph is not slanted
-//   { kind: 'axis', axis: 'slnt', value: n }     the real axis is set
+//   { kind: 'axis', axis: 'slnt', value: n }     the real axis is set (slnt 0 is upright)
 //   { kind: 'synth', angle }                     a synthesized geometric skew
+// (the vocabulary lives in outcome.mjs)
 // A real axis value AND a synthetic skew together ("stacked") is never allowed.
 //
 // A WPT reftest can only express two kinds of assertion: "matches one of these
@@ -23,7 +23,8 @@
 
 import { parseDescriptor, parseRequest, resolveSynthesisStyle } from "./style.mjs";
 import { matchFontStyle } from "./match.mjs";
-import { resolveVariation, UPRIGHT, key, clamp } from "./variation.mjs";
+import { resolveVariation, clamp } from "./variation.mjs";
+import { axis, UPRIGHT, isUpright, key, specLine } from "./outcome.mjs";
 import { resolveSynthesis } from "./synthesis.mjs";
 
 /**
@@ -43,7 +44,7 @@ export function expected(c) {
 
   const match = matchFontStyle(request, faces, { synthesisStyle, resolutions: c.resolutions });
   const variation = resolveVariation(match, request, font);
-  const synth = resolveSynthesis(request, faces, synthesisStyle);
+  const synth = resolveSynthesis(request, faces, synthesisStyle, { font });
 
   const why = [`selected face ${match.faces.map((f) => f.id).join(", ")} (stage: ${match.stage})`, ...variation.notes];
   let allowed = [...variation.allowed];
@@ -54,11 +55,11 @@ export function expected(c) {
     // only the font's own range still limits it.
     if (request.kind !== "normal") throw new Error("fvs combined with a non-normal request is not modelled");
     const v = font.slnt ? clamp(c.fvs.slnt, font.slnt[0], font.slnt[1]) : 0;
-    allowed = [v === 0 ? UPRIGHT : { kind: "axis", axis: "slnt", value: v }];
+    allowed = [axis(v)];
     why.push("font-variation-settings is applied after the font-style variations (7.2), so it decides the axis");
   } else if (synth.eligible) {
     allowed.push({ kind: "synth", angle: synth.angle });
-    if (!allowed.some((o) => o.kind === "upright")) allowed.push(UPRIGHT);
+    if (!allowed.some(isUpright)) allowed.push(UPRIGHT);
     why.push(`synthesis permitted: ${synth.reason}; not required (2.3 "will be generated" vs 5.2 "may create")`);
   } else if (request.kind !== "normal") {
     why.push(`no synthesis: ${synth.reason}`);
@@ -66,9 +67,13 @@ export function expected(c) {
 
   const hasSynth = allowed.some((o) => o.kind === "synth");
   const constructible = allowed.filter((o) => o.kind !== "synth");
-  // the outcomes a reference can be built for, in the direction a forward slant takes
+  // the outcomes a reference can be built for: upright, the font's full forward slant (an engine
+  // that saturates the axis), and the axis value THIS request would set if the descriptor were
+  // ignored (an engine that applies the request where the face forbids it)
   const universe = [UPRIGHT];
-  if (font.slnt && font.slnt[0] < 0) universe.push({ kind: "axis", axis: "slnt", value: font.slnt[0] });
+  const addAxis = (o) => o.kind === "axis" && !universe.some((u) => key(u) === key(o)) && universe.push(o);
+  if (font.slnt && font.slnt[0] < 0) addAxis(axis(font.slnt[0]));
+  for (const o of variation.requestedAxis) addAxis(o);
   const allowedKeys = new Set(allowed.map(key));
 
   let plan;
@@ -85,6 +90,7 @@ export function expected(c) {
 
   return {
     status,
+    spec: specLine(status, allowed),
     allowed,
     plan,
     selected: match.faces.map((f) => f.id),

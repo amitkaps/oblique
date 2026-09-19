@@ -39,7 +39,11 @@ test("italic-oblique-fallback.html: an italic-only family is used for every requ
 // css/css-fonts/font-synthesis-style-oblique-only.html
 test("font-synthesis-style-oblique-only.html: normal + oblique family", () => {
   const fam = [face("A", "normal"), face("B", "oblique")];
-  const syn = (fontSynthesisStyle) => ({ synthesisStyle: resolveSynthesisStyle({ fontSynthesisStyle }) });
+  // the WPT test asserts the broader reading of oblique-only (csswg-drafts#9390), a resolution
+  const syn = (fontSynthesisStyle) => ({
+    synthesisStyle: resolveSynthesisStyle({ fontSynthesisStyle }),
+    resolutions: { obliqueOnlyDemotesRealObliqueFaces: true },
+  });
   assert.deepEqual(pick("normal", fam, syn("auto")), ["A"]);
   assert.deepEqual(pick("oblique", fam, syn("auto")), ["B"]);
   assert.deepEqual(pick("italic", fam, syn("auto")), ["B"]); // italic falls back to oblique
@@ -54,7 +58,36 @@ test("font-synthesis-style-oblique-only.html: normal + oblique family", () => {
 // ascending: face1 yields 14, face2 (contains 11) yields 11, so only face2 survives.
 test("oblique-last-resort-weight-selection.html: KNOWN DISAGREEMENT with the spec text", () => {
   const fam = [face("face1", "oblique 14deg 30deg"), face("face2", "oblique 5deg 14deg")];
-  const got = pick("italic", fam, { synthesisStyle: "oblique-only" });
+  const got = pick("italic", fam, { synthesisStyle: "oblique-only", resolutions: { obliqueOnlyDemotesRealObliqueFaces: true } });
   assert.deepEqual(got, ["face2"], "the ED's 11deg threshold selects face2 alone");
   // the test intends both faces to survive (so weight can pick face1). Recorded, not fitted.
+});
+
+// css/css-fonts/font-face-style-auto-variable.html and font-face-style-default-variable.html
+// (assert: "font-style: auto applies automatic slant range for variable fonts"; the reference
+// document pins the axis with font-variation-settings 'slnt' -10 / -5 / 0). Font: Inter,
+// slnt -10..0. Both pass on Chrome, Firefox and Safari (wpt.fyi, 2026-09-18).
+import { expected } from "../src/expected.mjs";
+test("font-face-style-auto-variable.html / -default-variable.html: auto applies the requested angle within the font's range", () => {
+  const inter = { slnt: [-10, 0], ital: null };
+  for (const descriptor of ["auto", undefined]) {
+    for (const [request, slnt] of [["oblique 10deg", -10], ["oblique 5deg", -5]]) {
+      const e = expected({ faces: [{ id: "Inter", descriptor }], font: inter, request });
+      assert.deepEqual(e.allowed, [{ kind: "axis", axis: "slnt", value: slnt }], `${descriptor} ${request}`);
+      assert.equal(e.status, "specified");
+    }
+    assert.deepEqual(expected({ faces: [{ id: "Inter", descriptor }], font: inter, request: "oblique 0deg" }).allowed, [{ kind: "axis", axis: "slnt", value: 0 }]);
+  }
+});
+
+// css/css-fonts/synthetic-oblique-out-of-capabilities-range.html (csswg-drafts#7999)
+// "font-style with angle outside of the 'slnt' range supported by the font does not synthesize oblique
+// faces": oblique 60deg on an auto Inter face renders exactly like oblique 10deg (the font's limit).
+// Passes on Chrome, Firefox and Safari (wpt.fyi, 2026-09-18).
+test("synthetic-oblique-out-of-capabilities-range.html: an out-of-range angle on an auto face stops at the font's limit", () => {
+  const inter = { slnt: [-10, 0], ital: null };
+  const at = (request) => expected({ faces: [{ id: "Inter", descriptor: undefined }], font: inter, request });
+  assert.deepEqual(at("oblique 60deg").allowed, at("oblique 10deg").allowed);
+  assert.deepEqual(at("oblique 60deg").allowed, [{ kind: "axis", axis: "slnt", value: -10 }]);
+  assert.equal(at("oblique 60deg").allowed.some((o) => o.kind === "synth"), false);
 });

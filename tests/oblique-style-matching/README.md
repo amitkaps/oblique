@@ -4,17 +4,19 @@ The single folder that would be proposed to WPT (`css/css-fonts/variable-oblique
 This README is not copied into `.wpt/`.
 
 ```
-matrix/       21 generated reftests + matrix.manifest.json (never edited by hand)
-standalone/   14 hand-written tests, kept while they are re-based on the Cairo subset
+matrix/       71 generated reftests + matrix.manifest.json (never edited by hand)
+standalone/   8 additional hand-written tests (see below)
 resources/    fonts (each with a .headers sidecar for WPT) and the scripts that build them
 oblique-matching.css   shared fixed-size layout, so pixel diffs do not depend on font metrics
 ```
 
 ## matrix/
 
-Columns are the `@font-face` `font-style` descriptor (A omitted, B `normal`, C `italic`, D bare `oblique`,
-E `oblique -11deg 11deg`); rows are the use-site request (1 `normal`, 2 `italic`, 3 `oblique`,
-4 `oblique 11deg`, 5 `<em>`, 6 `font-variation-settings: 'slnt' -11`). A cell is `E2`; its file is
+Columns are the `@font-face` `font-style` descriptor (A the font's own range `oblique -11deg 11deg`, B a wider range
+`oblique -20deg 20deg`, C a narrow range `oblique -5deg 5deg`, D bare `oblique`, E `normal`, F `auto` (omitted), G `italic`); rows are the use-site request (1 `normal`, 2 `italic`, 3 `oblique`,
+4 `oblique 11deg`, 5 `<em>`, 6 `font-variation-settings: 'slnt' -11`, 7 `oblique 5deg`, 8 `oblique 45deg`,
+9 `oblique -5deg`, 10 `italic` with `font-synthesis-style: none`, 11 `oblique` with `font-synthesis: none`,
+12 `italic` with `font-synthesis-style: oblique-only`). A cell is `A2`; its file is
 `matrix-{row slug}-{column slug}.html` (`matrix-italic-oblrange.html`). Every cell uses
 `resources/Cairo.var.subset.ttf` and the capital `I`.
 
@@ -26,34 +28,36 @@ E `oblique -11deg 11deg`); rows are the use-site request (1 `normal`, 2 `italic`
 - **unspecified**: no file; the spec is silent, so the cell is only measured (`scripts/survey.py`).
 
 References are plain faces with the axis pinned through `font-variation-settings`, so they never depend on the
-descriptor under test. No test sets `font-synthesis`. Results and what they mean: [../../docs/findings.md](../../docs/findings.md).
+descriptor under test. Only rows 10 to 12 set `font-synthesis`; that is their point. Results and what they mean: [../../docs/findings.md](../../docs/findings.md).
 
 ## standalone/
 
-Each test quotes the CSS Fonts 4 clause it checks. They use several fonts, which is what the re-basing is
-meant to remove; their expectations were not re-derived with the reference.
+Additional tests, shown at the bottom of the site's results. Each quotes the CSS Fonts 4 clause it checks.
 
-| Test | Font | Claim |
-|---|---|---|
-| `slnt-axis-activation` | FontStyleTest-slnt-VF (WPT's) | `oblique` activates `slnt` (baseline) |
-| `auto-derived-range-clamp` | Inter subset (WPT's) | no descriptor: default angle clamps to the font's range |
-| `auto-derived-range-clamp-cairo-symmetric` | Cairo | same, on Cairo's -11..11 |
-| `explicit-descriptor-range-clamp` | oblique-onesided-neg | explicit descriptor range clamps |
-| `boundary-11deg-ascending`, `-descending` | Cairo | the 11deg search boundaries |
-| `boundary-0deg-normal-fallback` | oblique-nozero | `normal` 3-stage fallback |
-| `multi-branch-fallback-chain` | oblique-nozero | `italic` 4-stage fallback |
-| `italic-oblique-equivalence` | oblique-dual-axis | `oblique 11deg` against an italic-only face |
-| `style-plus-explicit-variation-settings` | Cairo | `font-variation-settings` after `font-style` (7.2) |
-| `ital-slnt-independence-dual-axis` | oblique-dual-axis | `ital` and `slnt` are independent |
-| `independence`, `italic-no-extra-synthesis` | IdentTestItal | `italic` sets `ital`, no extra synthesis |
-| `explicit-range-bare-keyword-synthesis-stacking` | Cairo | no synthesis on top of a clamped axis (same claim as cells E2/E3) |
+| Test | Font | Claim | Status |
+|---|---|---|---|
+| `auto-keyword-equals-omitted` | Cairo | `font-style: auto` renders exactly like an omitted descriptor (4.4: `auto` is the initial value), for seven requests. Holds even where the spec is open. Not a column: it would repeat column F | keep |
+| `explicit-descriptor-range-clamp` | oblique-onesided-neg | an explicit descriptor range clamps the request | replace by a matrix column |
+| `boundary-0deg-normal-fallback` | oblique-nozero | `normal` against a backslant-only face: 3-stage fallback | replace by a matrix column |
+| `multi-branch-fallback-chain` | oblique-nozero | `italic`: 4-stage fallback | replace by a matrix column |
+| `independence`, `italic-no-extra-synthesis` | IdentTestItal | `italic` sets `ital`, no extra synthesis | keep: needs an `ital` font |
+| `ital-slnt-independence-dual-axis` | oblique-dual-axis | `ital` and `slnt` are independent | keep: needs an `ital` font |
+| `italic-oblique-equivalence` | oblique-dual-axis | `oblique 11deg` against an italic-only face | keep: needs an `ital` font |
+
+The four `ital` tests wait for a real font with an `ital` axis (one to subset, OFL). Their expectations were not
+re-derived with the reference, which does not model `ital` on an `auto` face yet, so treat their verdicts as unchecked.
+
+Seven earlier tests were removed because the matrix covers them: the two `boundary-11deg` tests (F4 and the
+backslant row), both `auto-derived-range-clamp` tests (F3, F8 and upstream `font-face-style-auto-variable`),
+`slnt-axis-activation`, `explicit-range-bare-keyword-synthesis-stacking` (A2, A3) and
+`style-plus-explicit-variation-settings` (font-variation-settings always wins by the cascade; row 6 covers it).
+They remain in git history at the `pre-simplification` tag and before commit "Results table".
 
 ## resources/
 
 | Font | Built by | Notes |
 |---|---|---|
-| `Cairo.var.subset.ttf` | `build-cairo-subset.sh` | Real Cairo (SIL OFL 1.1, no Reserved Font Name) subset to the letters of `OBLIQUE`, the way WPT's `Inter.var.subset.ttf` subsets Inter. `slnt` -11..11, `wght` 200..1000, no `ital`; both axes and all layout and variation tables kept |
-| `Inter.var.subset.ttf`, `FontStyleTest-slnt-VF.woff2` | copied from WPT | used by two standalone tests |
+| `Cairo.var.subset.ttf` | `build-cairo-subset.sh` | Real Cairo (SIL OFL 1.1, no Reserved Font Name) subset to the letters of `OBLIQUE`, the way WPT subsets Inter for its own tests. `slnt` -11..11, `wght` 200..1000, no `ital`; both axes and all layout and variation tables kept |
 | `IdentTestItal.ttf` | `build-ident-ital-font.py` | one glyph, `ital` axis only |
 | `oblique-onesided-neg.ttf`, `oblique-nozero.ttf`, `oblique-dual-axis.ttf` | `build-fonts.py` | purpose-built: `slnt` -10..0; 5..20; -11..11 with `ital` |
 

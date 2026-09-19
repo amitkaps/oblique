@@ -6,6 +6,7 @@
 import { readdirSync, readFileSync, writeFileSync, rmSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { loadMatrix, MATRIX_DIR, cells } from "./cases.mjs";
+import { label } from "./outcome.mjs";
 import { generate } from "./wpt.mjs";
 import { compare, loadManifest, loadSurvey, readBrowserMatrix, report } from "./compare.mjs";
 
@@ -43,7 +44,7 @@ function runGenerate(check) {
 function runClasses() {
   const groups = new Map();
   for (const c of cells(loadMatrix())) {
-    const k = `${c.expected.status} | ${c.expected.stage} | ${c.expected.allowed.map((o) => (o.kind === "axis" ? `${o.axis}=${o.value}` : o.kind)).join(",")}`;
+    const k = `${c.expected.status} | ${c.expected.stage} | ${c.expected.allowed.map(label).join(", ")}`;
     groups.set(k, [...(groups.get(k) ?? []), c.address]);
   }
   for (const [k, v] of [...groups].sort()) console.log(`${v.join(" ").padEnd(30)} ${k}`);

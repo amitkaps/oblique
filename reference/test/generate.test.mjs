@@ -37,10 +37,12 @@ test("every generated reftest has at least one reference, and the refs it links 
   }
 });
 
-test("no generated test sets font-synthesis (a matched request must not be synthesized)", () => {
-  const { files } = generate(loadMatrix());
+test("no generated test sets font-synthesis, except the rows whose point is that setting", () => {
+  const matrix = loadMatrix();
+  const setsSynthesis = matrix.rows.filter((r) => /synthesis/.test(r.extraCss ?? "")).map((r) => `matrix-${r.slug}-`);
+  const { files } = generate(matrix);
   for (const [name, content] of files) {
-    if (!name.endsWith(".html")) continue;
+    if (!name.endsWith(".html") || setsSynthesis.some((p) => name.startsWith(p))) continue;
     const body = content.replace(/<!--[\s\S]*?-->/g, "");
     assert.doesNotMatch(body, /font-synthesis[a-z-]*\s*:/, name); // a declaration, not the spec link
   }

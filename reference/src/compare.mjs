@@ -17,31 +17,69 @@
 import { readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { ROOT, MATRIX_DIR } from "./cases.mjs";
+import { axis, label, synth } from "./outcome.mjs";
 
 export const ENGINES = ["chrome", "firefox", "safari"];
 const TOL = 1.5;
 
-/** lean (px) an allowed outcome predicts, from the font's calibration */
+/** lean (px, positive = forward slant) an allowed outcome predicts, from the font's calibration */
 export function predictedLean(o, font) {
-  if (o.kind === "upright") return 0;
-  if (o.kind === "axis") return Math.abs(o.value) * font.pxPerSlntUnit;
-  return Math.tan((o.angle * Math.PI) / 180) * font.glyphHeightPx;
+  if (o.kind === "axis") return -o.value * font.pxPerSlntUnit; // slnt and CSS angle have opposite signs
+  return Math.sign(o.angle) * Math.tan((Math.abs(o.angle) * Math.PI) / 180) * font.glyphHeightPx;
 }
 
-/** What a measured lean looks like, for reporting. */
-export function leanLabel(lean, font) {
-  const axisMax = Math.abs(font.slnt[0]) * font.pxPerSlntUnit;
-  const synth14 = predictedLean({ kind: "synth", angle: 14 }, font);
-  const near = (v, t) => Math.abs(lean - v) <= t;
-  if (near(0, TOL)) return "upright";
-  if (near(axisMax, TOL)) return `axis ${font.slnt[0]}`;
-  if (near(synth14, TOL)) return "synthetic 14deg";
-  if (near(axisMax + synth14, 3)) return "stacked (axis + synthetic)";
+const SYNTH_MIN = 3;
+const SYNTH_MAX = 90;
+
+/**
+ * What a measured lean looks like, in the same words as an expectation: `slnt 0`, `slnt -11`,
+ * `synth ~14°`, or a stack of both. A lean alone is ambiguous (an axis at -5 and a 5deg synthesized
+ * skew lean the same), so the cell narrows it down:
+ *   - axis values the cell allows are always plausible;
+ *   - axis values it forbids are plausible only if the engine FAILED the reftest: a pass means the
+ *     glyph differs, pixel for pixel, from the forbidden axis rendering, so it is a synthesized skew;
+ *   - a stacked rendering is an axis value plus about one default skew (14deg, ~22px);
+ *   - anything else that leans is a synthesized skew, labelled with its angle.
+ */
+export function describeLean(cell, lean, font, reftest = null) {
+  if (lean === null || lean === undefined) return null;
+  const px = font.pxPerSlntUnit;
+  const near = (v, t = TOL) => Math.abs(lean - v) <= t;
+  if (near(0)) return label(axis(0));
+
+  const allowedAxes = cell.allowed.filter((o) => o.kind === "axis").map((o) => o.value);
+  const forbiddenAxes = (cell.plan?.mismatch ?? []).filter((o) => o.kind === "axis").map((o) => o.value);
+  const plausible = new Set(allowedAxes);
+  if (reftest !== "pass") for (const v of forbiddenAxes) plausible.add(v);
+  for (const v of plausible) if (v !== 0 && near(-v * px)) return label(axis(v));
+
+  const synth14 = Math.abs(predictedLean(synth(14), font));
+  const stacked = [...new Set([...allowedAxes, ...forbiddenAxes, font.slnt[0]])]
+    .filter((v) => v !== 0)
+    .map((v) => ({ v, off: Math.abs(lean + v * px - synth14) })) // what is left over must be a forward default skew
+    .filter((c) => c.off <= 3)
+    .sort((x, y) => x.off - y.off)[0];
+  if (stacked) return `${label(axis(stacked.v))} + synth`;
+
+  if (Math.abs(lean) >= SYNTH_MIN) {
+    const deg = Math.abs(lean) - synth14 <= TOL && synth14 - Math.abs(lean) <= TOL ? 14 : Math.round((Math.atan(Math.abs(lean) / font.glyphHeightPx) * 180) / Math.PI);
+    return `synth ~${lean < 0 ? "-" : ""}${deg}\u00B0`;
+  }
   return `lean ${lean}px`;
 }
 
+/**
+ * Is a measured lean one the cell allows? Axis and upright outcomes predict an exact lean.
+ * A synthesized skew has an engine-chosen angle (Firefox follows the request, Chrome and Safari
+ * use their own), so any forward or backward skew of plausible size in the requested direction
+ * counts, and it cannot be told apart from an axis by size alone.
+ */
 export function withinAllowed(cell, lean, font) {
-  return cell.allowed.some((o) => Math.abs(predictedLean(o, font) - lean) <= TOL);
+  return cell.allowed.some((o) =>
+    o.kind === "synth"
+      ? Math.sign(lean) === Math.sign(o.angle) && Math.abs(lean) >= SYNTH_MIN && Math.abs(lean) <= SYNTH_MAX
+      : Math.abs(predictedLean(o, font) - lean) <= TOL,
+  );
 }
 
 export function readBrowserMatrix(path = join(ROOT, "results", "browser-matrix.md")) {
@@ -76,7 +114,7 @@ export function compare(manifest, matrixResults, survey) {
       per[e] = {
         reftest,
         lean,
-        label: lean === null ? null : leanLabel(lean, manifest.font),
+        label: describeLean(cell, lean, manifest.font, reftest),
         ok: verdicts.length ? verdicts.every(Boolean) : null,
       };
     }

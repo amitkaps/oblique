@@ -18,6 +18,10 @@
 //     not fall back to a face labelled `italic` when other faces exist. The ED
 //     text still lists "italic values" stages in the oblique branches; WPT's
 //     css-fonts/italic-oblique-fallback.html asserts the resolution instead.
+//   obliqueOnlyDemotesRealObliqueFaces - csswg-drafts#9390: under `font-synthesis-style:
+//     oblique-only` an italic request treats REAL oblique faces as a last resort too. The ED
+//     text is about synthesized faces ("they must not be used as fallback"); WPT's
+//     font-synthesis-style-oblique-only.html asserts the broader reading. See docs/review.md.
 
 import { ITALIC_VALUE } from "./style.mjs";
 
@@ -25,6 +29,10 @@ export const RESOLUTIONS = {
   noItalicFallbackForOblique: {
     issue: "https://github.com/w3c/csswg-drafts/issues/9389",
     effect: "an oblique request does not select an italic-labelled face while any other face exists",
+  },
+  obliqueOnlyDemotesRealObliqueFaces: {
+    issue: "https://github.com/w3c/csswg-drafts/issues/9390",
+    effect: "with font-synthesis-style: oblique-only, an italic request tries real positive-oblique faces only after every other stage",
   },
 };
 
@@ -106,7 +114,7 @@ const mirror = (f) => ({
  */
 export function matchFontStyle(request, faces, opts = {}) {
   const synthesisStyle = opts.synthesisStyle ?? "auto";
-  const res = { noItalicFallbackForOblique: false, ...(opts.resolutions ?? {}) };
+  const res = { noItalicFallbackForOblique: false, obliqueOnlyDemotesRealObliqueFaces: false, ...(opts.resolutions ?? {}) };
   const tried = [];
   const assumptions = [];
   const stages = []; // [label, () => hit | null, kind]
@@ -119,21 +127,23 @@ export function matchFontStyle(request, faces, opts = {}) {
     stages.push(["normal: oblique < 0 descending", () => obDescendingNegative(faces), "oblique"]);
   } else if (request.kind === "italic") {
     // "italic: contains the italic value; oblique >= 11deg ascending then below 11deg
-    // descending (positive only); italic <= 0; oblique <= 0 descending."
+    // descending (positive only); italic <= 0; oblique <= 0 descending." The "italic <= 0" stage
+    // is not modelled: every italic face has the italic value 1, so it can never match.
     stages.push(["italic: italic faces", () => itHit(faces, { includesOne: true }), "italic"]);
     const positiveOblique = [
       "italic: oblique >= 11deg ascending, then < 11deg descending",
       () => obAscendingFrom(faces, 11) ?? obDescendingPositiveBelow(faces, 11),
       "oblique",
     ];
-    // 2.8.2 oblique-only: oblique faces "must not be used as fallback if italic is
-    // specified". WPT's oblique-last-resort-weight-selection.html treats them as a
-    // last resort (still usable when nothing else exists), so the positive-oblique
-    // stage moves to the end instead of disappearing. The normal face (oblique 0)
-    // keeps its place in the <= 0 stage.
-    if (synthesisStyle !== "oblique-only") stages.push(positiveOblique);
+    // Resolution (off by default): 2.8.2 oblique-only, read as "real oblique faces must not be used
+    // as fallback if italic is specified". WPT's oblique-last-resort-weight-selection.html treats
+    // them as a last resort (still usable when nothing else exists), so the positive-oblique stage
+    // moves to the end instead of disappearing. The normal face (oblique 0) keeps its place in the
+    // <= 0 stage. Without the resolution the stage keeps its place, as the ED text has it.
+    const demote = synthesisStyle === "oblique-only" && res.obliqueOnlyDemotesRealObliqueFaces;
+    if (!demote) stages.push(positiveOblique);
     stages.push(["italic: oblique <= 0 descending", () => obDescendingAtMostZero(faces), "oblique"]);
-    if (synthesisStyle === "oblique-only") {
+    if (demote) {
       stages.push([positiveOblique[0] + " (last resort under oblique-only)", positiveOblique[1], "oblique"]);
     }
   } else {

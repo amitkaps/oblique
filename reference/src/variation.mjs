@@ -17,15 +17,13 @@ import { ITALIC_AS_OBLIQUE_ANGLE, DEFAULT_OBLIQUE_ANGLE } from "./style.mjs";
 
 export const clamp = (v, lo, hi) => Math.min(Math.max(v, lo), hi);
 
-export const UPRIGHT = { kind: "upright" };
-export const key = (o) =>
-  o.kind === "upright" ? "upright" : o.kind === "synth" ? "synth" : `${o.axis}=${o.value}`;
+import { axis, UPRIGHT, key } from "./outcome.mjs";
+export { UPRIGHT, key };
 
 /** CSS oblique angle -> outcome, through the font's own slnt range (sign flips). */
 function slntOutcome(cssAngle, font) {
   if (!font.slnt) return UPRIGHT;
-  const v = clamp(-cssAngle, font.slnt[0], font.slnt[1]);
-  return v === 0 ? UPRIGHT : { kind: "axis", axis: "slnt", value: v };
+  return axis(clamp(-cssAngle, font.slnt[0], font.slnt[1]));
 }
 
 function unique(outcomes) {
@@ -57,12 +55,22 @@ export function resolveVariation(match, request, font) {
       if (request.kind === "normal") {
         notes.push("auto face, normal request: selected as normal, applied value 0");
         allowed.push(UPRIGHT);
+      } else if (request.kind === "oblique" && font.slnt) {
+        // 4.4 scopes its two auto clauses separately: "for font selection purposes" the face is
+        // selected as if normal, and "for variation axis clamping, clamping does not occur". So
+        // the face is found as a normal face, but the value applied is the requested angle,
+        // limited only by the font's own range. 5.2: "for variable fonts with a slnt axis, a
+        // match is created by setting the slnt value with the specified oblique value";
+        // geometric shearing is only the fallback when there is no axis. Upstream WPT
+        // font-face-style-auto-variable.html and -default-variable.html assert the same
+        // (auto applies the font's slant range; they pass on all three engines).
+        notes.push("auto face, oblique request, font with slnt: the axis is set to the requested angle, limited by the font only (5.2, 4.4)");
+        allowed.push(slntOutcome(request.angle, font));
       } else {
-        // 4.4: auto is "selected as if normal" and "clamping does not occur". Read
-        // literally the face is a normal face (nothing applied); read as the
-        // variable-font intent, the requested value is applied unclamped by the
-        // descriptor and limited only by the font. The text does not choose.
-        assumptions.push("auto-value-application: 'as if normal' vs 'clamping does not occur' (4.4)");
+        // italic on an auto face is genuinely open: 5.2's italic steps never set slnt, the
+        // face is a normal one, and "not required to distinguish italic from oblique" would
+        // map italic 1 onto oblique 11deg. Upright, a synthesized skew and the axis all fit.
+        assumptions.push("auto-italic: no step applies slnt for an italic request (5.2); UAs may map italic to oblique 11deg");
         allowed.push(UPRIGHT);
         if (request.kind === "oblique") allowed.push(slntOutcome(request.angle, font));
         else {
@@ -89,10 +97,11 @@ export function resolveVariation(match, request, font) {
       const { lo, hi } = st;
       if (request.kind === "italic") {
         // italic: "The angle and direction of slant is unspecified."
-        notes.push("italic request on an oblique face: slant angle unspecified (2.3); use the stage's closest value or the 14deg default");
-        for (const a of [match.value ?? ITALIC_AS_OBLIQUE_ANGLE, DEFAULT_OBLIQUE_ANGLE]) {
-          allowed.push(slntOutcome(clamp(a, lo, hi), font));
-        }
+        // 7.2: "the value applied is the closest matching value as determined by the font matching
+        // algorithm", which is match.value. The 14deg default belongs to a bare `oblique` keyword
+        // (2.3), never to an italic request, so it is not a second candidate here.
+        notes.push("italic request on an oblique face: the applied value is the stage's closest value (7.2), clamped to the descriptor, then to the font");
+        allowed.push(slntOutcome(clamp(match.value ?? ITALIC_AS_OBLIQUE_ANGLE, lo, hi), font));
       } else {
         const a = match.kind === "oblique" && match.value !== null ? match.value : request.angle ?? 0;
         notes.push(`oblique face [${lo}, ${hi}]: closest matching value ${a}, clamped to the descriptor, then to the font`);
@@ -101,6 +110,15 @@ export function resolveVariation(match, request, font) {
     }
   }
 
+  // the axis value the request itself would set, whatever the descriptors say: what a buggy
+  // engine would apply on a face that forbids it (used to build "must not be" references)
+  const requestedAxis =
+    request.kind === "normal"
+      ? []
+      : request.kind === "oblique"
+        ? [slntOutcome(request.angle, font)]
+        : [slntOutcome(ITALIC_AS_OBLIQUE_ANGLE, font), slntOutcome(DEFAULT_OBLIQUE_ANGLE, font)];
+
   if (match.faces.length > 1) assumptions.push("tie: more than one face remained; the UA may pick any");
-  return { allowed: unique(allowed), notes, assumptions };
+  return { allowed: unique(allowed), notes, assumptions, requestedAxis };
 }

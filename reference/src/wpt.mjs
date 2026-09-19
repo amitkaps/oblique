@@ -10,14 +10,11 @@
 // plain face with the axis PINNED through font-variation-settings, which 7.2 says wins.
 
 import { cells } from "./cases.mjs";
+import { describe, pinCss, token } from "./outcome.mjs";
 
 const FONT_FAMILY = "matrix test font";
 
 const esc = (s) => s.replaceAll("&", "&amp;").replaceAll("<", "&lt;");
-const token = (o) => (o.kind === "upright" ? "upright" : `slnt${o.value}`);
-const pinned = (o) => `font-variation-settings: 'slnt' ${o.kind === "upright" ? 0 : o.value};`;
-const describe = (o) =>
-  o.kind === "upright" ? "upright" : o.kind === "synth" ? `a synthesized ${o.angle}deg skew` : `${o.axis} ${o.value}`;
 
 function faceRule(matrix, descriptor) {
   const line = descriptor ? `\n    font-style: ${descriptor};` : "";
@@ -60,7 +57,7 @@ ${faceRule(matrix, null)}
   .test {
     font-family: "${FONT_FAMILY}";
     font-size: ${matrix.font.fontSize};
-    ${pinned(outcome)}
+    ${pinCss(outcome)}
   }
 </style>
 ${SCRIPT}
@@ -91,11 +88,11 @@ function testHtml(cell, matrix, refs) {
   Cell ${cell.address}: @font-face ${desc}, request "${cell.row.request}"${cell.row.em ? " (through <em>)" : ""}${cell.row.fvs ? " (through font-variation-settings)" : ""}.
   Status: ${e.status}. The reference algorithm permits: ${allowed}.
   ${e.why.join("\n  ")}${e.assumptions.length ? "\n  Assumptions: " + e.assumptions.join("; ") : ""}
-  font-synthesis is left at its default: a matched request must not be synthesized.
+  ${cell.row.extraCss && /synthesis/.test(cell.row.extraCss) ? `The row sets ${cell.row.extraCss}` : "font-synthesis is left at its default: a matched request must not be synthesized."}
 -->
 ${links}
 <meta name="assert"
-  content="A face declared '${esc(desc)}', requested with '${esc(cell.row.lines.join(" "))}', ${esc(rule)}." />
+  content="A face ${cell.col.descriptor ? `declared '${esc(desc)}'` : "with no font-style descriptor (auto)"}, requested with '${esc(cell.row.lines.join(" "))}', ${esc(rule)}." />
 <link rel="stylesheet" href="../oblique-matching.css">
 <!-- Font: ${matrix.font.file}: ${matrix.font.note} -->
 <style>
@@ -135,6 +132,7 @@ export function generate(matrix) {
       descriptor: cell.col.descriptor,
       css: cell.css,
       status: e.status,
+      spec: e.spec,
       allowed: e.allowed,
       plan: e.plan,
       selected: e.selected,

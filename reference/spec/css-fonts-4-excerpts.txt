@@ -226,3 +226,24 @@ and font-style
 descriptors in that @font-face rule.
  Then, the values applied in this step should be clamped (possibly again) to the values
 that are supported by the font.
+
+==============================================================================
+2.8 Controlling synthetic faces: introduction (added 2026-09-20; same page, hash above)
+==============================================================================
+Synthetic font faces are a fallback strategy
+to provide an approximation to the requested font
+when a font family lacks a suitable face.
+ [...]
+Variable fonts,
+where the font designer has provided
+one or more axes of variation
+do not count as font synthesis
+and their use is not affected by the font-synthesis property.
+ (w3c/csswg-drafts 6f7c48d, "Clarified that font variations do not count as font synthesis", #9391)
+
+Also from #9391, ac67b72 ("Distinguished use of varfont slnt axis from synthetic obliquing"): in the two
+oblique branches of 5.2 above, the slnt-axis match comes first and shearing is only the "Otherwise"
+fallback. Before it, the axis match was conditional on font-synthesis-style: auto.
+Origin: csswg-drafts#7999 (avoid synthesis outside a variable font's range). In that thread the issue's
+author says "correctly declares" means a declaration "that would not restrict the range to 0", which
+leaves a normal-declared face outside the issue's stated scope; the normative text has no such exception.
