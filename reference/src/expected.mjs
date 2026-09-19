@@ -43,7 +43,7 @@ export function expected(c) {
 
   const match = matchFontStyle(request, faces, { synthesisStyle, resolutions: c.resolutions });
   const variation = resolveVariation(match, request, font);
-  const synth = resolveSynthesis(request, faces, synthesisStyle);
+  const synth = resolveSynthesis(request, faces, synthesisStyle, { font });
 
   const why = [`selected face ${match.faces.map((f) => f.id).join(", ")} (stage: ${match.stage})`, ...variation.notes];
   let allowed = [...variation.allowed];

@@ -324,7 +324,7 @@
       ],
       "stage": "italic: oblique <= 0 descending",
       "assumptions": [
-        "auto-value-application: 'as if normal' vs 'clamping does not occur' (4.4)"
+        "auto-italic: no step applies slnt for an italic request (5.2); UAs may map italic to oblique 11deg"
       ],
       "why": [
         "selected face face (stage: italic: oblique <= 0 descending)",
@@ -505,38 +505,39 @@
       "request": "oblique",
       "descriptor": null,
       "css": "font-style: oblique;",
-      "status": "unspecified",
+      "status": "specified",
       "allowed": [
-        {
-          "kind": "upright"
-        },
         {
           "kind": "axis",
           "axis": "slnt",
           "value": -11
-        },
-        {
-          "kind": "synth",
-          "angle": 14
         }
       ],
       "plan": {
-        "match": [],
+        "match": [
+          {
+            "kind": "axis",
+            "axis": "slnt",
+            "value": -11
+          }
+        ],
         "mismatch": []
       },
       "selected": [
         "face"
       ],
       "stage": "oblique 14: oblique <= 0 descending",
-      "assumptions": [
-        "auto-value-application: 'as if normal' vs 'clamping does not occur' (4.4)"
-      ],
+      "assumptions": [],
       "why": [
         "selected face face (stage: oblique 14: oblique <= 0 descending)",
-        "synthesis permitted: no oblique face exists (2.3); not required (2.3 \"will be generated\" vs 5.2 \"may create\")"
+        "auto face, oblique request, font with slnt: the axis is set to the requested angle, limited by the font only (5.2, 4.4)",
+        "no synthesis: an auto face on a font with a slnt axis is matched by the axis; shearing is only the fallback (5.2)"
       ],
-      "wpt": false,
-      "files": []
+      "wpt": true,
+      "files": [
+        "matrix-oblique-auto.html",
+        "matrix-oblique-auto-slnt-11-ref.html"
+      ]
     },
     {
       "address": "B3",
@@ -714,38 +715,39 @@
       "request": "oblique 11deg",
       "descriptor": null,
       "css": "font-style: oblique 11deg;",
-      "status": "unspecified",
+      "status": "specified",
       "allowed": [
-        {
-          "kind": "upright"
-        },
         {
           "kind": "axis",
           "axis": "slnt",
           "value": -11
-        },
-        {
-          "kind": "synth",
-          "angle": 11
         }
       ],
       "plan": {
-        "match": [],
+        "match": [
+          {
+            "kind": "axis",
+            "axis": "slnt",
+            "value": -11
+          }
+        ],
         "mismatch": []
       },
       "selected": [
         "face"
       ],
       "stage": "oblique 11: oblique <= 0 descending",
-      "assumptions": [
-        "auto-value-application: 'as if normal' vs 'clamping does not occur' (4.4)"
-      ],
+      "assumptions": [],
       "why": [
         "selected face face (stage: oblique 11: oblique <= 0 descending)",
-        "synthesis permitted: no oblique face exists (2.3); not required (2.3 \"will be generated\" vs 5.2 \"may create\")"
+        "auto face, oblique request, font with slnt: the axis is set to the requested angle, limited by the font only (5.2, 4.4)",
+        "no synthesis: an auto face on a font with a slnt axis is matched by the axis; shearing is only the fallback (5.2)"
       ],
-      "wpt": false,
-      "files": []
+      "wpt": true,
+      "files": [
+        "matrix-obl11-auto.html",
+        "matrix-obl11-auto-slnt-11-ref.html"
+      ]
     },
     {
       "address": "B4",
@@ -947,7 +949,7 @@
       ],
       "stage": "italic: oblique <= 0 descending",
       "assumptions": [
-        "auto-value-application: 'as if normal' vs 'clamping does not occur' (4.4)"
+        "auto-italic: no step applies slnt for an italic request (5.2); UAs may map italic to oblique 11deg"
       ],
       "why": [
         "selected face face (stage: italic: oblique <= 0 descending)",

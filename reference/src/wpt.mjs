@@ -95,7 +95,7 @@ function testHtml(cell, matrix, refs) {
 -->
 ${links}
 <meta name="assert"
-  content="A face declared '${esc(desc)}', requested with '${esc(cell.row.lines.join(" "))}', ${esc(rule)}." />
+  content="A face ${cell.col.descriptor ? `declared '${esc(desc)}'` : "with no font-style descriptor (auto)"}, requested with '${esc(cell.row.lines.join(" "))}', ${esc(rule)}." />
 <link rel="stylesheet" href="../oblique-matching.css">
 <!-- Font: ${matrix.font.file}: ${matrix.font.note} -->
 <style>

@@ -57,12 +57,22 @@ export function resolveVariation(match, request, font) {
       if (request.kind === "normal") {
         notes.push("auto face, normal request: selected as normal, applied value 0");
         allowed.push(UPRIGHT);
+      } else if (request.kind === "oblique" && font.slnt) {
+        // 4.4 scopes its two auto clauses separately: "for font selection purposes" the face is
+        // selected as if normal, and "for variation axis clamping, clamping does not occur". So
+        // the face is found as a normal face, but the value applied is the requested angle,
+        // limited only by the font's own range. 5.2: "for variable fonts with a slnt axis, a
+        // match is created by setting the slnt value with the specified oblique value";
+        // geometric shearing is only the fallback when there is no axis. Upstream WPT
+        // font-face-style-auto-variable.html and -default-variable.html assert the same
+        // (auto applies the font's slant range; they pass on all three engines).
+        notes.push("auto face, oblique request, font with slnt: the axis is set to the requested angle, limited by the font only (5.2, 4.4)");
+        allowed.push(slntOutcome(request.angle, font));
       } else {
-        // 4.4: auto is "selected as if normal" and "clamping does not occur". Read
-        // literally the face is a normal face (nothing applied); read as the
-        // variable-font intent, the requested value is applied unclamped by the
-        // descriptor and limited only by the font. The text does not choose.
-        assumptions.push("auto-value-application: 'as if normal' vs 'clamping does not occur' (4.4)");
+        // italic on an auto face is genuinely open: 5.2's italic steps never set slnt, the
+        // face is a normal one, and "not required to distinguish italic from oblique" would
+        // map italic 1 onto oblique 11deg. Upright, a synthesized skew and the axis all fit.
+        assumptions.push("auto-italic: no step applies slnt for an italic request (5.2); UAs may map italic to oblique 11deg");
         allowed.push(UPRIGHT);
         if (request.kind === "oblique") allowed.push(slntOutcome(request.angle, font));
         else {

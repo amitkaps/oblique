@@ -58,3 +58,20 @@ test("oblique-last-resort-weight-selection.html: KNOWN DISAGREEMENT with the spe
   assert.deepEqual(got, ["face2"], "the ED's 11deg threshold selects face2 alone");
   // the test intends both faces to survive (so weight can pick face1). Recorded, not fitted.
 });
+
+// css/css-fonts/font-face-style-auto-variable.html and font-face-style-default-variable.html
+// (assert: "font-style: auto applies automatic slant range for variable fonts"; the reference
+// document pins the axis with font-variation-settings 'slnt' -10 / -5 / 0). Font: Inter,
+// slnt -10..0. Both pass on Chrome, Firefox and Safari (wpt.fyi, 2026-09-18).
+import { expected } from "../src/expected.mjs";
+test("font-face-style-auto-variable.html / -default-variable.html: auto applies the requested angle within the font's range", () => {
+  const inter = { slnt: [-10, 0], ital: null };
+  for (const descriptor of ["auto", undefined]) {
+    for (const [request, slnt] of [["oblique 10deg", -10], ["oblique 5deg", -5]]) {
+      const e = expected({ faces: [{ id: "Inter", descriptor }], font: inter, request });
+      assert.deepEqual(e.allowed, [{ kind: "axis", axis: "slnt", value: slnt }], `${descriptor} ${request}`);
+      assert.equal(e.status, "specified");
+    }
+    assert.deepEqual(expected({ faces: [{ id: "Inter", descriptor }], font: inter, request: "oblique 0deg" }).allowed, [{ kind: "upright" }]);
+  }
+});

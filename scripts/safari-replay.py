@@ -115,9 +115,11 @@ def main():
     ap.add_argument("--reps", type=int, default=3)
     ap.add_argument("--record", action="store_true", help="append stable results to results/browser-matrix.md")
     ap.add_argument("--prefix", default="", help="only replay tests whose id starts with this (e.g. matrix-)")
+    ap.add_argument("--tests", default="", help="only replay these test ids (comma separated)")
     args = ap.parse_args()
 
-    pages = [p for p in test_pages() if p[0].startswith(args.prefix)]
+    only = {t for t in args.tests.split(",") if t}
+    pages = [p for p in test_pages() if p[0].startswith(args.prefix) and (not only or p[0] in only)]
     http = subprocess.Popen([sys.executable, "-m", "http.server", str(HTTP_PORT), "--directory", str(TESTS_DIR)],
                             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     driver = subprocess.Popen(["/usr/bin/safaridriver", "-p", str(DRIVER_PORT)],

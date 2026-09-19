@@ -5,6 +5,9 @@
 //   5.2  "For families that lack any italic or oblique faces, user agents may create
 //        artificial oblique faces, if this is permitted by the value of the
 //        font-synthesis property."
+//   5.2  a variable font with a slnt axis matches an oblique request by setting the axis;
+//        "otherwise" a fallback match is made by geometric shearing. So an auto face on a
+//        font with slnt is never sheared for an oblique request (4.4: auto does not clamp).
 //   2.8.2 none: not allowed. oblique-only: allowed, "but they must not be used as
 //        fallback if italic is specified".
 // 2.3 says "will be generated" and 5.2 says "may create": whether synthesis is
@@ -20,9 +23,10 @@ import { DEFAULT_OBLIQUE_ANGLE } from "./style.mjs";
  * @param {{kind:string, angle:number|null}} request
  * @param {{id:string, style:{kind:string}}[]} family  every face in the family
  * @param {'auto'|'none'|'oblique-only'} synthesisStyle
+ * @param {{font?: {slnt: number[]|null}}} [opts]  the font file's axes
  * @returns {{eligible:boolean, angle:number, reason:string}}
  */
-export function resolveSynthesis(request, family, synthesisStyle) {
+export function resolveSynthesis(request, family, synthesisStyle, opts = {}) {
   const angle = request.kind === "oblique" ? request.angle : DEFAULT_OBLIQUE_ANGLE;
   const no = (reason) => ({ eligible: false, angle, reason });
 
@@ -33,6 +37,9 @@ export function resolveSynthesis(request, family, synthesisStyle) {
     return no("oblique-only: a synthesized oblique must not stand in for italic");
   }
 
+  if (request.kind === "oblique" && opts.font?.slnt && family.some((f) => f.style.kind === "auto")) {
+    return no("an auto face on a font with a slnt axis is matched by the axis; shearing is only the fallback (5.2)");
+  }
   const hasOblique = family.some((f) => f.style.kind === "oblique");
   const hasItalic = family.some((f) => f.style.kind === "italic");
   if (request.kind === "oblique" && hasOblique) return no("an oblique face exists (2.3)");

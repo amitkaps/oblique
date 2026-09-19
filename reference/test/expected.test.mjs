@@ -56,9 +56,27 @@ test("an italic-declared face on a slnt-only font permits upright or the axis (5
   assert.equal(e.status, "unspecified");
 });
 
-test("an auto face leaves the value open, so nothing is asserted", () => {
-  for (const request of ["italic", "oblique", "oblique 11deg"]) assert.equal(run(undefined, request).status, "unspecified", request);
+test("an auto face on a slnt font: an oblique request sets the axis to the requested angle, unclamped by the descriptor, never sheared", () => {
+  // 4.4: auto selects "as if normal" but "clamping does not occur"; 5.2: a slnt font matches by the axis
+  for (const [request, slnt] of [["oblique", -11], ["oblique 11deg", -11], ["oblique 10deg", -10], ["oblique 5deg", -5], ["oblique 45deg", -11], ["oblique -5deg", 5], ["oblique -11deg", 11]]) {
+    const e = run(undefined, request);
+    assert.deepEqual(keys(e), [`slnt=${slnt}`], request);
+    assert.equal(e.status, "specified", request);
+    assert.equal(e.allowed.some((o) => o.kind === "synth"), false, request);
+  }
+  assert.deepEqual(keys(run(undefined, "oblique 0deg")), ["upright"]);
   assert.equal(run(undefined, "normal").status, "specified");
+});
+
+test("an auto face and an italic request stays open: upright, the axis, or a synthesized skew", () => {
+  const e = run(undefined, "italic");
+  assert.deepEqual(keys(e), ["slnt=-11", "synth", "upright"]);
+  assert.equal(e.status, "unspecified");
+});
+
+test("an auto face on a font WITHOUT a slnt axis is a normal face: shearing is the only oblique", () => {
+  const e = expected({ faces: [{ id: "f", descriptor: undefined }], font: { slnt: null, ital: null }, request: "oblique 10deg" });
+  assert.deepEqual(keys(e), ["synth", "upright"]);
 });
 
 test("font-variation-settings wins over the font-style variations (7.2)", () => {

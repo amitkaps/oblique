@@ -27,9 +27,9 @@ for a cell: `upright`, `axis slnt=n`, or `synth`. A stacked axis plus synthesis 
 
 | Status | Meaning | Cells now |
 |---|---|---|
-| specified | one testable outcome; a reftest with one `match` reference | 17 |
+| specified | one testable outcome; a reftest with one `match` reference | 19 |
 | constrained | several outcomes, or synthesis, are allowed but something is forbidden; several `match` references or a `mismatch` | 4 |
-| unspecified | the spec excludes nothing testable; no test, browsers are only measured | 9 |
+| unspecified | the spec excludes nothing testable; no test, browsers are only measured | 7 |
 
 Two signals agree in every cell: the reftests (Chrome and Firefox via `wpt run`, Safari via
 `scripts/safari-replay.py`) and a separate measurement of the glyph's lean (`scripts/survey.py`).
@@ -41,7 +41,13 @@ Spec rules that decide cells (quoted in `reference/spec/css-fonts-4-excerpts.txt
 - Bare `oblique` is a one-point range at 14deg; `normal` is `oblique 0deg`.
 - A `font-style` descriptor "is used in place of the style implied by the underlying font data" (4.4), so
   a `normal`-declared face never reaches the `slnt` axis.
-- `auto` is "selected as if normal", and "clamping does not occur".
+- `auto` (descriptor omitted): §4.4 scopes its two clauses separately. For *selection* the face is treated as
+  normal; for *variation clamping* "clamping does not occur". So an oblique request on an `auto` face of a font
+  with a `slnt` axis sets the axis to the requested angle, limited only by the font (§5.2: a variable font with
+  `slnt` matches by the axis, shearing is only the fallback). Upstream `font-face-style-auto-variable` and
+  `-default-variable` assert this and pass on all three engines, and cells A3 and A4 agree. Italic and `<em>` on
+  an `auto` face stay open (§5.2's italic steps never set `slnt`), so A2 and A5 are only observed: Chrome and
+  Firefox slant, Safari stays upright.
 - `italic` has no defined angle: "the angle and direction of slant is unspecified" (2.3).
 - Synthesis "will be generated" in 2.3 but a UA "may create" it in 5.2, so it is permitted, not required.
 - CSS angle and OpenType `slnt` have opposite signs: `oblique 11deg` is `slnt -11`.
@@ -81,7 +87,10 @@ Their pass/fail is recorded but their expectations were not re-derived with the 
    `oblique-only`); columns `oblique 0deg 11deg`, `oblique 5deg 20deg`, `oblique -11deg 0deg`. Review as a
    table before generating. Addresses are permanent: append, never renumber.
 2. **Multi-face families** (the real 11deg ordering among several faces) are implemented and unit-tested
-   in `reference/` but cannot be told apart on screen with one font. Needs another OFL font subset: ask first.
+   in `reference/`. They do not need another font: several `@font-face` rules can point at the same Cairo file
+   with different descriptors, and which face was chosen shows in the lean because each descriptor clamps
+   differently (for example faces `oblique 5deg` and `oblique 20deg`: `oblique 10deg` gives slnt -5,
+   `oblique 11deg` gives slnt -11). Not yet in the grid.
 3. **Re-base the hand-written tests** on the Cairo subset, judging each with the reference; the last unbuilt
    gap is a `normal` face plus a bare-`oblique` face in one family (the way vizchitra-fonts ships Cairo).
 4. **Why `wpt run safari` is wrong** here was not isolated (a loading race was tested and ruled out).

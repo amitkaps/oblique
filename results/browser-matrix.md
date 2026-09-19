@@ -127,6 +127,12 @@ run via the official WPT runner — see `docs/running.md`. Rows are appended by 
 | matrix-slnt-normal | safari | 27.0 | no (safaridriver automation) | pass | direct safaridriver replay of the reftest, exact pixel compare, 3 agreeing repetitions; `wpt run safari` disagreed, see docs/running.md |
 | matrix-slnt-oblique | safari | 27.0 | no (safaridriver automation) | pass | direct safaridriver replay of the reftest, exact pixel compare, 3 agreeing repetitions; `wpt run safari` disagreed, see docs/running.md |
 | matrix-slnt-oblrange | safari | 27.0 | no (safaridriver automation) | pass | direct safaridriver replay of the reftest, exact pixel compare, 3 agreeing repetitions; `wpt run safari` disagreed, see docs/running.md |
+| matrix-obl11-auto | chrome | 153.0.8010.48 | no | pass | wpt status: PASS |
+| matrix-oblique-auto | chrome | 153.0.8010.48 | no | pass | wpt status: PASS |
+| matrix-obl11-auto | firefox | 156.0 | no | pass | wpt status: PASS |
+| matrix-oblique-auto | firefox | 156.0 | no | pass | wpt status: PASS |
+| matrix-obl11-auto | safari | 27.0 | no (safaridriver automation) | pass | direct safaridriver replay of the reftest, exact pixel compare, 3 agreeing repetitions; `wpt run safari` disagreed, see docs/running.md |
+| matrix-oblique-auto | safari | 27.0 | no (safaridriver automation) | pass | direct safaridriver replay of the reftest, exact pixel compare, 3 agreeing repetitions; `wpt run safari` disagreed, see docs/running.md |
 
 `result` ∈ `pass` / `fail` / `synthesis-fallback` / `untested`.
 `real_device` ∈ `yes` / `no`.
