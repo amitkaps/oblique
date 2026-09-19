@@ -147,27 +147,23 @@ safari):
    ./wpt make-hosts-file | sudo tee -a /etc/hosts
    ```
 
+**Do not use `wpt run safari` for results.** Measured on Safari 27.0 (see
+`docs/investigation-log.md` section 11): it reports FAIL for ~20 of 44 tests
+whose test and reference screenshots are pixel-identical, passes one test that
+really fails, and 5 results flip between identical runs. Use the direct replay
+instead, which loads each test and reference through `safaridriver`, waits for
+`reftest-wait`, and compares pixels exactly:
+
 ```
-./wpt run safari css/css-fonts/variable-oblique-interop/ \
-  --webdriver-binary=/usr/bin/safaridriver \
-  --log-wptreport=../results/latest-safari.json
+uv run --with pillow scripts/safari-replay.py            # prints pass/fail, 3 repetitions
+uv run --with pillow scripts/safari-replay.py --record   # also appends stable rows to results/browser-matrix.md
 ```
 
-**Before trusting a Safari result, read `docs/investigation-log.md`'s "Safari —
-attempted, no reliable result" section.** In this environment, `wpt run`
-reported all three tests FAIL identically across four runs. This is *not*
-a font-validity problem (an early theory blaming `fontTools`-generated
-fonts was investigated and disproved) — isolating WPT's own pristine
-official test font alone, with no custom font of ours involved, still
-FAILs under `wpt run safari`. Three identical trials driving `safaridriver`
-directly (same page, same fresh-session setup, same wait) produced two
-different outcomes. This is genuine nondeterminism in Safari/WebKit's
-font-loading-to-compositor pipeline under WebDriver automation, not
-something fixable from this repo. Don't trust a single `wpt run safari`
-result in either direction; a real physical device running Safari's actual
-UI (not `safaridriver`) is the trustworthy path, per
-vizchitra-fonts/docs/compat.md's own reason for keeping a manual `/compat`
-page.
+If `safaridriver` reports "session not created ... timed out", Remote
+Automation is not actually reaching Safari: quit Safari fully (Cmd-Q), check
+System Settings > Privacy & Security > Automation for your terminal app, and
+retry. (`wpt run --channel=stable` is needed to use system Safari at all, since
+the default is Safari Technology Preview.)
 
 Then record results into `results/browser-matrix.md` — never hand-transcribe:
 

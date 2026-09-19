@@ -798,3 +798,67 @@ keywords but drops an explicit angle entirely; whether that is a bug or a choice
 is not established). Recorded in `results/browser-matrix.md` for Chrome
 153.0.8010.48 and Firefox 156.0 (wpt run). Every other test in the folder kept
 its earlier result.
+
+## 11. Safari runs (2026-09-19): `wpt run` is unreliable, a direct replay is not
+
+Safari 27.0 (macOS 15.8) finally accepted a `safaridriver` session after Remote
+Automation was enabled, Safari was fully quit, and the terminal app's own
+Automation permission was refreshed; the earlier "session timed out" was a
+permissions problem on this machine, not a fault in the tests. Then two things
+were tried.
+
+**Loading race ruled out.** WPT's own docs and tests give no Safari-specific
+loading trick: `matching/README.md` step 3 is the same `reftest-wait` +
+`document.fonts.ready` pattern we use, `variations/font-weight-matching.html`
+adds a `requestAnimationFrame` polling fallback for unstable loads, and eight
+tests use `document.fonts.load()`. I suspected our scripts (placed before the
+text) let `ready` resolve before the load began, so I ran the old pattern and an
+explicit `document.fonts.load()`-style pattern 10 times each on fresh font URLs
+in Safari: 10/10 correct for both (Cairo `I`, 88px tall, 16px lean). Nothing to
+fix in the tests; no test was rewritten.
+
+**`wpt run safari --channel=stable` disagrees with the actual rendering.** Two
+identical runs over the 44 tests: 39 agreed and 5 flipped
+(`boundary-0deg-normal-fallback`, `matrix-face-auto-use-slnt`,
+`matrix-face-oblique-bare-use-normal`, `matrix-face-oblique-bare-use-slnt`,
+`matrix-face-oblique-range-use-normal`), and of the stable results ~20 tests
+reported FAIL although a direct screenshot of the test and its reference is
+pixel-identical (0 differing pixels): `slnt-axis-activation` (WPT's own font),
+`independence`, `italic-no-extra-synthesis`, `matrix-face-auto-use-oblique`,
+`matrix-face-oblique-bare-use-*`, and more. It also PASSED
+`italic-oblique-equivalence`, which really fails (976 differing pixels). So
+`wpt run` on Safari here cannot be used as a signal in either direction, which
+matches the earlier finding that even a pristine WPT test failed. The cause
+inside wptrunner was not isolated.
+
+**Direct replay.** `scripts/safari-replay.py` does what a reftest runner does
+without wptrunner: load the test, wait for `reftest-wait` to clear, screenshot,
+load each reference the same way, compare pixels exactly (match must be
+identical, every mismatch must differ). Repeated 3 times, all 44 tests agreed
+each time (0 flaky), and the differences are always either 0 pixels or 700+,
+never antialiasing-sized. Result: **34 pass, 10 fail**, recorded in
+`results/browser-matrix.md` as Safari 27.0 with `real_device` "no (safaridriver
+automation)" and a note pointing here (a different method from the Chrome and
+Firefox rows, which are `wpt run`; the notes column says which).
+
+Lean of the stem in Safari (px; upright 0, real slnt -11 16, synthetic 21,
+stacked 36), next to what Chrome and Firefox measured:
+
+| use-site \ `@font-face` | auto | normal | italic | oblique | oblique range |
+|---|---|---|---|---|---|
+| `normal` | 0 | 0 | 16 | 16 | 0 |
+| `italic` | **0** | 21 | 0 | 16 | **21** |
+| `oblique` | 16 | 21 | 16 | 16 | **36** |
+| `oblique 11deg` | 16 | **0** | 16 | 16 | 16 |
+| `<em>` | **0** | 21 | 0 | 16 | **21** |
+| `slnt -11` | 16 | 16 | 16 | 16 | 16 |
+
+Safari differs from the expected value in 6 cells, and it is a third profile,
+not a copy of either engine: `italic` and `<em>` never reach the axis on an
+auto-derived face (upright), on a ranged face they become a pure synthetic skew
+with no axis at all (21px, not the expected 16), bare `oblique` on a ranged face
+stacks like Chrome (36px), `oblique 11deg` against a normal face is dropped like
+Chrome (0px), and the italic-declared face stays upright like Firefox. This
+matches vizchitra-fonts' independent Safari 27 findings: WebKit's "pure synthetic
+skew, no axis contribution" for italic on a ranged face, the stacked skew for
+bare oblique, and `oblique 11deg` against a range being fine.

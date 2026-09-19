@@ -380,12 +380,12 @@
         "test_result": {
           "chrome": {"version": "153.0.8010.48", "result": "pass"},
           "firefox": {"version": "156.0", "result": "pass"},
-          "safari": "not attempted (local safaridriver session unavailable at test time; see docs/investigation-log.md's Safari nondeterminism section before ever trusting a single local Safari run for this class of test)"
+          "safari": {"version": "27.0 (safaridriver direct replay, see investigation-log section 11)", "result": "fail", "note": "auto-derived-range-clamp.html: bare italic resolves upright on Safari, bare oblique is fine"}
         },
         "test_result_cairo_symmetric": {
           "chrome": {"version": "153.0.8010.48", "result": "pass"},
           "firefox": {"version": "156.0", "result": "pass"},
-          "safari": "not attempted (safaridriver binary unavailable at test time, 2026-09-19)"
+          "safari": {"version": "27.0 (safaridriver direct replay, see investigation-log section 11)", "result": "fail", "note": "same clamp question on the Cairo-range font: the italic paragraph stays upright"}
         },
         "corroborating_fonts": [
           {"name": "Cairo", "range": "-11 to 11", "source": "vizchitra-fonts/docs/compat.md", "role": "motivating case — the real-world bug this repo exists to document"},
@@ -405,7 +405,7 @@
         "test_result": {
           "chrome": {"version": "153.0.8010.48", "result": "fail"},
           "firefox": {"version": "156.0", "result": "pass"},
-          "safari": "not attempted (safaridriver binary unavailable at test time, 2026-09-19)"
+          "safari": {"version": "27.0 (safaridriver direct replay, see investigation-log section 11)", "result": "fail", "note": "Safari does not stack on italic: it synthesizes a skew instead of using the axis (21px); bare oblique stacks (36px)"}
         },
         "corroborating_evidence": {
           "kind": "independently measured, in a separate real production codebase (vizchitra-fonts), not just cited as a historical bug report",
@@ -425,7 +425,7 @@
         "test_result": {
           "chrome": {"version": "153.0.8010.48", "result": "fail"},
           "firefox": {"version": "156.0", "result": "pass"},
-          "safari": "not attempted (safaridriver binary unavailable at test time, 2026-09-19)"
+          "safari": {"version": "27.0 (safaridriver direct replay, see investigation-log section 11)", "result": "pass", "note": "Safari, like Firefox, leaves the italic-declared face upright for italic and <em>"}
         },
         "corroborating_evidence": {
           "kind": "same underlying phenomenon already documented for a different font shape in this repo's own suite",
@@ -445,7 +445,7 @@
         "test_result": {
           "chrome": {"version": "153.0.8010.48", "result": "fail"},
           "firefox": {"version": "156.0", "result": "pass"},
-          "safari": "not attempted (safaridriver binary unavailable at test time, 2026-09-19)"
+          "safari": {"version": "27.0 (safaridriver direct replay, see investigation-log section 11)", "result": "fail", "note": "Safari, like Chrome, does not synthesize an explicit angle against a normal face"}
         },
         "summary": "A face declared font-style: normal has no oblique face (CSS Fonts 4 section 4.4: the descriptor replaces the style implied by the font data, so the font's own slnt axis is not consulted for matching). A request for font-style: oblique 11deg against it should therefore be synthesized (section 2.8.2). Measured at 8em: Firefox leans 16px, consistent with a synthesized 11deg; Chrome renders upright (0px) — it synthesizes for bare oblique/italic/<em> (21px, its fixed skew) but NOT for an explicit angle. The reftest asserts the rendering must not be upright.",
         "why_it_matters": "Unlike the bare keywords, both of which synthesize on both engines, the explicit-angle form drops the requested slant entirely on Chrome. This is the same request vizchitra-fonts uses as its recommended pattern (font-style: oblique 11deg), and it is a real hazard whenever a stylesheet's family carries only a normal face. Whether upright is a Chrome bug or a deliberate choice is not established here; only that the two engines disagree and the spec text points to synthesis.",
@@ -475,7 +475,7 @@
         "test_result": {
           "chrome": {"version": "153.0.8010.48", "result": "pass"},
           "firefox": {"version": "156.0", "result": "pass"},
-          "safari": "not attempted — local safaridriver unreliable in this environment, see docs/investigation-log.md"
+          "safari": {"version": "27.0 (safaridriver direct replay, see investigation-log section 11)", "result": "pass", "note": "matches Chrome and Firefox"}
         },
         "summary": "Closed: tests/oblique-style-matching/style-plus-explicit-variation-settings.html pairs font-style: oblique 5deg with a conflicting explicit font-variation-settings: 'slnt' -11 on the same rule and confirms the explicit value wins, per CSS Fonts 4 §7.2 'Feature and variation precedence' (font-variation-settings the property is listed after font-style's implied variation in that section's explicit ascending-precedence order).",
         "why_it_matters": "The spec's recommended pattern for authors is to pair the two (e.g. font-style: italic; font-variation-settings: 'ital' 1;) for compatibility with non-variable fallback faces. This closes the general upstream-coverage gap and confirms both Chrome and Firefox resolve the conflict per §7.2's ordering — but, unlike auto-range-default-angle and normal-plus-bare-oblique-same-family, it still has no specific corroborating broken font or production practice behind it (lacks_corroborating_font: true) — a spec-completeness closure, not evidence a real author-facing bug was reproduced.",
@@ -490,7 +490,7 @@
         "test_result": {
           "chrome": {"version": "153.0.8010.48", "result": "fail"},
           "firefox": {"version": "156.0", "result": "pass"},
-          "safari": "not attempted — local safaridriver unreliable in this environment, see docs/investigation-log.md"
+          "safari": {"version": "27.0 (safaridriver direct replay, see investigation-log section 11)", "result": "pass", "note": "matches Chrome and Firefox"}
         },
         "corroborating_fonts": [
           {"name": "resources/oblique-dual-axis.ttf (purpose-built)", "range": "slnt -11..11, ital 0..1", "source": "tests/oblique-style-matching/resources/build-fonts.py", "role": "this project's first font exposing both axes for real, built specifically to close this gap — no known real-world font combines both, so this remains a purpose-built rather than corroborated-by-shipping-font case"}

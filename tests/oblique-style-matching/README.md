@@ -121,13 +121,13 @@ passes all 30: the explicit-range face with bare italic, bare oblique and
 `<em>`, and the normal face with `oblique 11deg` (Chrome does not synthesize an
 explicit angle). Full writeup: `docs/investigation-log.md` section 10.
 
-## Known Safari caveat
+## Safari
 
-An earlier investigation (`docs/investigation-log.md`'s "Safari — attempted,
-no reliable result" section) traced inconsistent `wpt run safari` results to
-genuine `safaridriver`/WebDriver-automation nondeterminism — reproduced even
-against WPT's own pristine, unmodified test font, so it is not a
-font-construction issue with any file in this folder. That investigation is
-not reopened here: Safari is attempted for every test below, but a result is
-only recorded if it's stable across repeated runs; otherwise it's marked
-"not run" / "flaky, not recorded" rather than guessed.
+`wpt run safari` is unreliable here and is not used for results: it disagrees
+with the actual rendering on about 20 of 44 tests and flips on 5 between
+identical runs (`docs/investigation-log.md` section 11). Safari results come
+from `scripts/safari-replay.py`, a direct `safaridriver` replay with exact pixel
+comparison, 3 agreeing repetitions per test. Safari 27.0 passes 34 and fails 10;
+the 6 grid cells it fails are `italic` and `<em>` on the auto face, `italic`,
+`oblique` and `<em>` on the explicit-range face, and `oblique 11deg` on the
+normal face.
