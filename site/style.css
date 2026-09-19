@@ -2,7 +2,8 @@
   color-scheme: light;
   --pass: #1a7f37;
   --fail: #cf222e;
-  --unknown: #9a6700;
+  --differ: #d29922;
+  --differ-text: #8a5a00;
   --border: #d0d7de;
   --accent-upstream: #0969da;
   --accent-this-repo: #8250df;
@@ -74,9 +75,10 @@ body {
 .row-num { color: var(--muted); font-weight: 600; }
 
 .matrix td { border-left-width: 3px; }
-.matrix td.status-pass { border-left-color: var(--pass); }
+.matrix td.status-same { border-left-color: var(--pass); }
 .matrix td.status-fail { border-left-color: var(--fail); }
-.matrix td.status-partial, .matrix td.status-unknown { border-left-color: var(--unknown); }
+.matrix td.status-differ { border-left-color: var(--differ); }
+.matrix td.status-unknown { border-left-color: var(--border); }
 .matrix td.status-blank { color: var(--muted); text-align: center; vertical-align: middle; }
 .blank-cell { display: block; font-size: 1.2rem; }
 
@@ -119,6 +121,8 @@ body {
 .b-badge .logo { width: 15px; height: 15px; }
 .b-badge.pass { border-color: var(--pass); }
 .b-badge.fail { border-color: var(--fail); }
+.b-badge.differ { border-color: var(--differ); }
+.b-badge.untested { border-style: dashed; }
 .b-badge.unknown { border-color: var(--border); border-style: dashed; }
 .b-badge.unknown .logo { opacity: 0.4; }
 
@@ -194,14 +198,12 @@ body {
   font-weight: 700;
 }
 .row-num { display: inline-block; padding: 0 0.35rem; border: 1px solid var(--border); border-radius: 3px; }
-.matrix td.status-observed { border-left-color: var(--accent-upstream); }
-.b-badge.observed { border-color: var(--accent-upstream); border-style: dotted; }
 
 /* results, in the shape wpt.fyi uses */
 .results { margin: 2.5rem 0; }
 .results h2 { font-size: 1.05rem; margin-top: 0; }
 .rgrid { font-size: 0.82rem; border-top: 1px solid var(--border); }
-.rrow { display: grid; grid-template-columns: minmax(0, 1fr) repeat(3, 8.5rem); border-bottom: 1px solid var(--border); }
+.rrow { display: grid; grid-template-columns: minmax(0, 1fr) repeat(3, 8.5rem) 8rem; border-bottom: 1px solid var(--border); }
 .rrow > div { padding: 0.45rem 0.6rem; min-width: 0; }
 .rhead { font-weight: 600; color: var(--muted); }
 .rhead .rcell, .rcell { text-align: right; }
@@ -214,23 +216,29 @@ body {
 .rcell.all { background: color-mix(in srgb, var(--pass) 16%, transparent); }
 .rcell.some { background: color-mix(in srgb, var(--fail) 14%, transparent); }
 .rcell.zero { background: color-mix(in srgb, var(--fail) 22%, transparent); }
+.rcell.differ { background: color-mix(in srgb, var(--differ) 22%, transparent); }
 .rtest .rdesc { padding-left: 1.7rem; }
 .rtest .rcell { font-size: 0.76rem; }
 .rtest code { font-size: 0.74rem; }
 .rgrid .addr, .rsum .addr { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.7rem; font-weight: 600; margin-right: 0.3rem; }
 .rgrid .spec { display: inline; margin-left: 0.6rem; }
 .did { display: block; color: var(--fail); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.66rem; }
+.did.did-differ, .did.did-obs { color: var(--differ-text); }
 .rnote { padding: 0.35rem 0.6rem 0.5rem 1.7rem; color: var(--muted); font-size: 0.74rem; border-bottom: 1px solid var(--border); }
 .rtotal { font-weight: 400; border-bottom: 2px solid var(--border); }
 .rgrid a { color: inherit; }
 .findings { margin: 1.5rem 0 0; }
-@media (max-width: 720px) { .rrow { grid-template-columns: minmax(0, 1fr) repeat(3, 4.6rem); } }
+@media (max-width: 720px) { .rrow { grid-template-columns: minmax(0, 1fr) repeat(3, 4.6rem) 4rem; } }
 
 /* per-engine lines in a matrix cell */
 .eng-line { display: flex; align-items: center; gap: 0.4rem; margin-top: 0.2rem; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.64rem; line-height: 1.4; min-width: 0; }
 .eng-line .rings { display: inline-flex; gap: 0.15rem; flex: none; }
 .eng-line .eng-val { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
 .eng-line.fail .eng-val { color: var(--fail); }
+.eng-line.differ .eng-val { color: var(--differ-text); }
+.c-fail { color: var(--fail); }
+.c-differ { color: var(--differ-text); }
+.notest { margin-left: 0.4rem; font-size: 0.66rem; color: var(--muted); border: 1px dashed var(--border); border-radius: 3px; padding: 0 0.25rem; }
 .eng-line .b-badge { width: 20px; height: 20px; flex: none; border-width: 2px; }
 .eng-line .b-badge .logo { width: 14px; height: 14px; }
 .col-name { display: block; font-weight: 600; margin: 0.2rem 0 0.15rem; }

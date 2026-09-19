@@ -12,7 +12,7 @@ generalises them.
 ## How it works
 
 ```
-reference/cases/matrix.json   6 @font-face descriptors (A-F) x 10 use-site requests (1-10)
+reference/cases/matrix.json   6 @font-face descriptors (A-F) x 9 use-site requests (1-9)
         |
 reference/                    JS implementation of the CSS Fonts 4 matching rules: what may each cell render?
         |  mise run generate
@@ -23,16 +23,17 @@ Chrome, Firefox (wpt run) + Safari (safaridriver)  ->  results/browser-matrix.md
 site/                         the grid, live in your browser, with pass/fail per engine  ->  oblique.amitkaps.com
 ```
 
-The browser is the system under test; the reference never asks one. All 60 cells use one real font, the
+The browser is the system under test; the reference never asks one. All 54 cells use one real font, the
 [Cairo](https://fonts.google.com/specimen/Cairo) variable font (SIL OFL, `slnt` -11..11) subset to the letters
 of `OBLIQUE`, and test the capital `I`, which shears cleanly. A cell is written `A2`: column A, row 2.
 
 ## Current result
 
-Chrome, Firefox and Safari agree with the spec in 54 of 60 cells. Where a face is declared with a range (the font's own,
+Chrome, Firefox and Safari all stay within what the spec allows in 48 of 54 cells. Where a face is declared with a range (the font's own,
 or a narrower one), `italic`, bare `oblique` and `oblique 45deg` make Chrome stack a synthetic skew on top of the real axis,
 and Safari do the same or drop the axis; Firefox is correct. A range wider than the font's own passes in all three. Where the
-spec is open, the engines mostly differ (2 of 8 cells agree). Details, the claims that were withdrawn, and what is open:
+spec allows several outcomes, the engines mostly differ (2 of 8 cells agree), so interop, which counts a cell only when
+all three engines render the same allowed thing, is 44 of 56 (79%) against 89% or 100% pass rates. Details, the claims that were withdrawn, and what is open:
 [docs/findings.md](docs/findings.md). Scope is oblique and `slnt`: italic fonts are out of scope.
 
 ## Run it

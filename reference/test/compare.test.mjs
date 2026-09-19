@@ -41,3 +41,24 @@ test("a backslant synthesized skew is not mistaken for a stack (Firefox on a nor
   const normalFace = cell([UPRIGHT, synth(-5)], [axis(5), axis(-11)]);
   assert.equal(describeLean(normalFace, -7, font, "pass"), "synth ~-5\u00B0");
 });
+
+import { cellState, sameRendering } from "../src/compare.mjs";
+
+const eng = (label, lean, ok = true) => ({ label, lean, ok });
+const per = (c, f, s) => ({ chrome: c, firefox: f, safari: s });
+
+test("interop state: fail beats differ, differ needs every engine allowed but not all the same", () => {
+  const up = eng("slnt 0", 0);
+  assert.equal(cellState(per(up, up, up)), "same");
+  assert.equal(cellState(per(up, eng("synth ~10°", 15), up)), "differ");
+  assert.equal(cellState(per(up, eng("slnt -11", 16, false), up)), "fail");
+  assert.equal(cellState(per(up, eng("slnt -11", 16, false), eng("synth ~14°", 21))), "fail");
+  assert.equal(cellState(per(up, up, eng(null, null, null))), "unknown");
+});
+
+test("two synthesized skews within a few px are the same rendering; a skew and upright are not", () => {
+  assert.equal(sameRendering(eng("synth ~14°", 21), eng("synth ~15°", 22)), true);
+  assert.equal(sameRendering(eng("synth ~14°", 21), eng("synth ~43°", 82)), false);
+  assert.equal(sameRendering(eng("synth ~14°", 21), eng("slnt 0", 0)), false);
+  assert.equal(sameRendering(eng("slnt -11", 16), eng("slnt -11", 16)), true);
+});

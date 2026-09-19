@@ -56,13 +56,7 @@
         "matrix-oblnone-oblique": 16,
         "matrix-oblnone-oblonesided": 15,
         "matrix-oblnone-oblrange": 16,
-        "matrix-oblnone-oblwide": 16,
-        "matrix-slnt-auto": 16,
-        "matrix-slnt-normal": 16,
-        "matrix-slnt-oblique": 16,
-        "matrix-slnt-oblonesided": 16,
-        "matrix-slnt-oblrange": 16,
-        "matrix-slnt-oblwide": 16
+        "matrix-oblnone-oblwide": 16
       },
       "version": "153.0.8010.48"
     },
@@ -121,13 +115,7 @@
         "matrix-oblnone-oblique": 16,
         "matrix-oblnone-oblonesided": 15,
         "matrix-oblnone-oblrange": 16,
-        "matrix-oblnone-oblwide": 16,
-        "matrix-slnt-auto": 16,
-        "matrix-slnt-normal": 16,
-        "matrix-slnt-oblique": 16,
-        "matrix-slnt-oblonesided": 16,
-        "matrix-slnt-oblrange": 16,
-        "matrix-slnt-oblwide": 16
+        "matrix-oblnone-oblwide": 16
       },
       "version": "156.0"
     },
@@ -186,13 +174,7 @@
         "matrix-oblnone-oblique": 16,
         "matrix-oblnone-oblonesided": 15,
         "matrix-oblnone-oblrange": 16,
-        "matrix-oblnone-oblwide": 16,
-        "matrix-slnt-auto": 16,
-        "matrix-slnt-normal": 16,
-        "matrix-slnt-oblique": 16,
-        "matrix-slnt-oblonesided": 16,
-        "matrix-slnt-oblrange": 16,
-        "matrix-slnt-oblwide": 16
+        "matrix-oblnone-oblwide": 16
       },
       "version": "27.0"
     }

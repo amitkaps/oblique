@@ -30,10 +30,11 @@
       independent JavaScript implementation of CSS Fonts 4 font-style matching
       (<code>reference/</code>) computes it, and never uses a browser to do so.
       Every cell states what the reference expects. Where the spec pins the outcome down
-      (&ldquo;spec: slnt &minus;11&rdquo;) the cell is a WPT test for that one rendering; where it leaves latitude
-      (&ldquo;spec*: slnt 0 / synth&rdquo;) the test only forbids what the spec forbids; where it is silent,
-      the cell is only observed. <code>font-synthesis</code> is left at its default in rows 1 to 8, since synthesis should apply only
-      when a face is missing; rows 9 and 10 set it on purpose. Each specimen is live in <em>your</em> browser:
+      (&ldquo;spec: slnt &minus;11&rdquo;) the cell is a WPT test for that one rendering. Where it allows several
+      outcomes (&ldquo;spec*: slnt 0 / synth&rdquo;) a test can only forbid some of them, so an engine can pass and
+      still render something different from the others: that is an <em>interop</em> problem, and the cell is amber.
+      Where nothing testable is excluded, the cell is only measured. <code>font-synthesis</code> is left at its default in rows 1 to 7, since synthesis should apply only
+      when a face is missing; rows 8 and 9 set it on purpose. Each specimen is live in <em>your</em> browser:
       <b class="ov-pink">pink</b> is a rendering the spec accepts, <b class="ov-cyan">cyan</b> is the CSS
       under test; aligned they merge into dark blue, and <strong>visible pink is a failure</strong>. The circles
       are recorded results: Chromium and Firefox from <code>wpt run</code>, Safari from a direct
@@ -46,19 +47,22 @@
   <section class="results">
     <h2>Results</h2>
     <p class="matrix-intro">
-      Passes over WPT tests, per <code>@font-face</code> descriptor; open a row for the tests behind it. Only cells
-      with a test are scored. Group Z holds the two hand-written tests that are not cells of the grid.
+      Per <code>@font-face</code> descriptor; open a row for the cells behind it. Every column counts the same items:
+      each cell, and each of the two standalone tests in group Z. An engine column counts where that engine renders an
+      allowed outcome, which a loose WPT test can pass (a cell with no test, where nothing can fail, counts when the engine
+      rendered anything). <strong>Interop</strong> is stricter: it counts an item only when all three engines render the
+      same allowed thing, so where the spec allows several outcomes and the engines chose differently, it does not count.
     </p>
     <!--RESULTS-->
     <div class="findings">
       <p>
-        Cells A2, A3, A7 and C2, C3, C7 (<code>italic</code>, bare <code>oblique</code> and <code>oblique 45deg</code>
+        Cells A2, A3, A6 and C2, C3, C6 (<code>italic</code>, bare <code>oblique</code> and <code>oblique 45deg</code>
         against a face declared <code>oblique -11deg 11deg</code> or <code>0deg 10deg</code>, default synthesis): the axis
         must clamp and nothing may be synthesized on top. Firefox does that. Chrome stacks a synthetic skew on the axis
         (36px lean, expected 16px). Safari stacks for bare <code>oblique</code> and <code>oblique 45deg</code>, and gives a
-        pure synthetic skew, no axis at all, for <code>italic</code>. Rows 9 and 10 repeat rows 2 and 3 with synthesis off
+        pure synthetic skew, no axis at all, for <code>italic</code>. Rows 8 and 9 repeat rows 2 and 3 with synthesis off
         and pass everywhere, so the failure is the extra skew and nothing else. A range wider than the font's own
-        (column B, <code>-20deg 20deg</code>) passes all ten rows in all three engines.
+        (column B, <code>-20deg 20deg</code>) passes all nine rows in all three engines.
       </p>
     </div>
   </section>

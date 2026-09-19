@@ -15,7 +15,6 @@ export function loadMatrix(path = MATRIX_JSON) {
 
 /** The inline CSS the generated test puts on its paragraph. */
 export function useSiteCss(row) {
-  if (row.fvs) return Object.entries(row.fvs).map(([axis, v]) => `font-variation-settings: '${axis}' ${v};`).join(" ");
   return `font-style: ${row.request};${row.extraCss ? " " + row.extraCss : ""}`;
 }
 
@@ -27,7 +26,6 @@ export function cells(matrix) {
         faces: [{ id: "face", descriptor: col.descriptor }],
         font: { slnt: matrix.font.slnt, ital: matrix.font.ital },
         request: row.request,
-        fvs: row.fvs ?? null,
         synthesis: row.synthesis ?? {},
         resolutions: matrix.resolutions,
       });
