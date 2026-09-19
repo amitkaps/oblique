@@ -111,6 +111,15 @@ export function resolveVariation(match, request, font) {
     }
   }
 
+  // the axis value the request itself would set, whatever the descriptors say: what a buggy
+  // engine would apply on a face that forbids it (used to build "must not be" references)
+  const requestedAxis =
+    request.kind === "normal"
+      ? []
+      : request.kind === "oblique"
+        ? [slntOutcome(request.angle, font)]
+        : [slntOutcome(ITALIC_AS_OBLIQUE_ANGLE, font), slntOutcome(DEFAULT_OBLIQUE_ANGLE, font)];
+
   if (match.faces.length > 1) assumptions.push("tie: more than one face remained; the UA may pick any");
-  return { allowed: unique(allowed), notes, assumptions };
+  return { allowed: unique(allowed), notes, assumptions, requestedAxis };
 }

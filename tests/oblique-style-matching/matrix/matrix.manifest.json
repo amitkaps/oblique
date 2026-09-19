@@ -102,6 +102,69 @@
       "lines": [
         "font-variation-settings: 'slnt' -11;"
       ]
+    },
+    {
+      "address": "7",
+      "slug": "obl5",
+      "request": "oblique 5deg",
+      "lines": [
+        "font-style: oblique 5deg;"
+      ]
+    },
+    {
+      "address": "8",
+      "slug": "obl45",
+      "request": "oblique 45deg",
+      "lines": [
+        "font-style: oblique 45deg;"
+      ]
+    },
+    {
+      "address": "9",
+      "slug": "oblm5",
+      "request": "oblique -5deg",
+      "lines": [
+        "font-style: oblique -5deg;"
+      ]
+    },
+    {
+      "address": "10",
+      "slug": "italicnone",
+      "request": "italic",
+      "lines": [
+        "font-style: italic;",
+        "font-synthesis-style: none;"
+      ],
+      "synthesis": {
+        "fontSynthesisStyle": "none"
+      },
+      "extraCss": "font-synthesis-style: none;"
+    },
+    {
+      "address": "11",
+      "slug": "oblnone",
+      "request": "oblique",
+      "lines": [
+        "font-style: oblique;",
+        "font-synthesis: none;"
+      ],
+      "synthesis": {
+        "fontSynthesis": "none"
+      },
+      "extraCss": "font-synthesis: none;"
+    },
+    {
+      "address": "12",
+      "slug": "italicobo",
+      "request": "italic",
+      "lines": [
+        "font-style: italic;",
+        "font-synthesis-style: oblique-only;"
+      ],
+      "synthesis": {
+        "fontSynthesisStyle": "oblique-only"
+      },
+      "extraCss": "font-synthesis-style: oblique-only;"
     }
   ],
   "cells": [
@@ -1331,6 +1394,1264 @@
         "matrix-slnt-oblrange.html",
         "matrix-slnt-oblrange-slnt-11-ref.html"
       ]
+    },
+    {
+      "address": "A7",
+      "id": "matrix-obl5-auto",
+      "row": "obl5",
+      "column": "auto",
+      "request": "oblique 5deg",
+      "descriptor": null,
+      "css": "font-style: oblique 5deg;",
+      "status": "specified",
+      "allowed": [
+        {
+          "kind": "axis",
+          "axis": "slnt",
+          "value": -5
+        }
+      ],
+      "plan": {
+        "match": [
+          {
+            "kind": "axis",
+            "axis": "slnt",
+            "value": -5
+          }
+        ],
+        "mismatch": []
+      },
+      "selected": [
+        "face"
+      ],
+      "stage": "oblique 5: oblique <= 0 descending",
+      "assumptions": [],
+      "why": [
+        "selected face face (stage: oblique 5: oblique <= 0 descending)",
+        "auto face, oblique request, font with slnt: the axis is set to the requested angle, limited by the font only (5.2, 4.4)",
+        "no synthesis: an auto face on a font with a slnt axis is matched by the axis; shearing is only the fallback (5.2)"
+      ],
+      "wpt": true,
+      "files": [
+        "matrix-obl5-auto.html",
+        "matrix-obl5-auto-slnt-5-ref.html"
+      ]
+    },
+    {
+      "address": "B7",
+      "id": "matrix-obl5-normal",
+      "row": "obl5",
+      "column": "normal",
+      "request": "oblique 5deg",
+      "descriptor": "normal",
+      "css": "font-style: oblique 5deg;",
+      "status": "constrained",
+      "allowed": [
+        {
+          "kind": "upright"
+        },
+        {
+          "kind": "synth",
+          "angle": 5
+        }
+      ],
+      "plan": {
+        "match": [],
+        "mismatch": [
+          {
+            "kind": "axis",
+            "axis": "slnt",
+            "value": -11
+          },
+          {
+            "kind": "axis",
+            "axis": "slnt",
+            "value": -5
+          }
+        ]
+      },
+      "selected": [
+        "face"
+      ],
+      "stage": "oblique 5: oblique <= 0 descending",
+      "assumptions": [],
+      "why": [
+        "selected face face (stage: oblique 5: oblique <= 0 descending)",
+        "normal face: descriptor replaces the font data's style (4.4); applied value clamped to [0,0]",
+        "synthesis permitted: no oblique face exists (2.3); not required (2.3 \"will be generated\" vs 5.2 \"may create\")"
+      ],
+      "wpt": true,
+      "files": [
+        "matrix-obl5-normal.html",
+        "matrix-obl5-normal-slnt-11-notref.html",
+        "matrix-obl5-normal-slnt-5-notref.html"
+      ]
+    },
+    {
+      "address": "C7",
+      "id": "matrix-obl5-italic",
+      "row": "obl5",
+      "column": "italic",
+      "request": "oblique 5deg",
+      "descriptor": "italic",
+      "css": "font-style: oblique 5deg;",
+      "status": "constrained",
+      "allowed": [
+        {
+          "kind": "upright"
+        },
+        {
+          "kind": "axis",
+          "axis": "slnt",
+          "value": -11
+        },
+        {
+          "kind": "synth",
+          "angle": 5
+        }
+      ],
+      "plan": {
+        "match": [],
+        "mismatch": [
+          {
+            "kind": "axis",
+            "axis": "slnt",
+            "value": -5
+          }
+        ]
+      },
+      "selected": [
+        "face"
+      ],
+      "stage": "oblique 5: italic faces",
+      "assumptions": [
+        "italic-value-1-gap: the a<11 italic stage text excludes an italic value of exactly 1"
+      ],
+      "why": [
+        "selected face face (stage: oblique 5: italic faces)",
+        "italic face, no ital axis: nothing to set, or (UA not distinguishing italic/oblique, 5.2) italic 1 = oblique 11deg",
+        "synthesis permitted: no oblique face exists (2.3); not required (2.3 \"will be generated\" vs 5.2 \"may create\")"
+      ],
+      "wpt": true,
+      "files": [
+        "matrix-obl5-italic.html",
+        "matrix-obl5-italic-slnt-5-notref.html"
+      ]
+    },
+    {
+      "address": "D7",
+      "id": "matrix-obl5-oblique",
+      "row": "obl5",
+      "column": "oblique",
+      "request": "oblique 5deg",
+      "descriptor": "oblique",
+      "css": "font-style: oblique 5deg;",
+      "status": "specified",
+      "allowed": [
+        {
+          "kind": "axis",
+          "axis": "slnt",
+          "value": -11
+        }
+      ],
+      "plan": {
+        "match": [
+          {
+            "kind": "axis",
+            "axis": "slnt",
+            "value": -11
+          }
+        ],
+        "mismatch": []
+      },
+      "selected": [
+        "face"
+      ],
+      "stage": "oblique 5: nearest oblique (below descending, then above ascending)",
+      "assumptions": [],
+      "why": [
+        "selected face face (stage: oblique 5: nearest oblique (below descending, then above ascending))",
+        "oblique face [14, 14]: closest matching value 14, clamped to the descriptor, then to the font",
+        "no synthesis: an oblique face exists (2.3)"
+      ],
+      "wpt": true,
+      "files": [
+        "matrix-obl5-oblique.html",
+        "matrix-obl5-oblique-slnt-11-ref.html"
+      ]
+    },
+    {
+      "address": "E7",
+      "id": "matrix-obl5-oblrange",
+      "row": "obl5",
+      "column": "oblrange",
+      "request": "oblique 5deg",
+      "descriptor": "oblique -11deg 11deg",
+      "css": "font-style: oblique 5deg;",
+      "status": "specified",
+      "allowed": [
+        {
+          "kind": "axis",
+          "axis": "slnt",
+          "value": -5
+        }
+      ],
+      "plan": {
+        "match": [
+          {
+            "kind": "axis",
+            "axis": "slnt",
+            "value": -5
+          }
+        ],
+        "mismatch": []
+      },
+      "selected": [
+        "face"
+      ],
+      "stage": "oblique 5: faces containing the angle",
+      "assumptions": [],
+      "why": [
+        "selected face face (stage: oblique 5: faces containing the angle)",
+        "oblique face [-11, 11]: closest matching value 5, clamped to the descriptor, then to the font",
+        "no synthesis: an oblique face exists (2.3)"
+      ],
+      "wpt": true,
+      "files": [
+        "matrix-obl5-oblrange.html",
+        "matrix-obl5-oblrange-slnt-5-ref.html"
+      ]
+    },
+    {
+      "address": "A8",
+      "id": "matrix-obl45-auto",
+      "row": "obl45",
+      "column": "auto",
+      "request": "oblique 45deg",
+      "descriptor": null,
+      "css": "font-style: oblique 45deg;",
+      "status": "specified",
+      "allowed": [
+        {
+          "kind": "axis",
+          "axis": "slnt",
+          "value": -11
+        }
+      ],
+      "plan": {
+        "match": [
+          {
+            "kind": "axis",
+            "axis": "slnt",
+            "value": -11
+          }
+        ],
+        "mismatch": []
+      },
+      "selected": [
+        "face"
+      ],
+      "stage": "oblique 45: oblique <= 0 descending",
+      "assumptions": [],
+      "why": [
+        "selected face face (stage: oblique 45: oblique <= 0 descending)",
+        "auto face, oblique request, font with slnt: the axis is set to the requested angle, limited by the font only (5.2, 4.4)",
+        "no synthesis: an auto face on a font with a slnt axis is matched by the axis; shearing is only the fallback (5.2)"
+      ],
+      "wpt": true,
+      "files": [
+        "matrix-obl45-auto.html",
+        "matrix-obl45-auto-slnt-11-ref.html"
+      ]
+    },
+    {
+      "address": "B8",
+      "id": "matrix-obl45-normal",
+      "row": "obl45",
+      "column": "normal",
+      "request": "oblique 45deg",
+      "descriptor": "normal",
+      "css": "font-style: oblique 45deg;",
+      "status": "constrained",
+      "allowed": [
+        {
+          "kind": "upright"
+        },
+        {
+          "kind": "synth",
+          "angle": 45
+        }
+      ],
+      "plan": {
+        "match": [],
+        "mismatch": [
+          {
+            "kind": "axis",
+            "axis": "slnt",
+            "value": -11
+          }
+        ]
+      },
+      "selected": [
+        "face"
+      ],
+      "stage": "oblique 45: oblique <= 0 descending",
+      "assumptions": [],
+      "why": [
+        "selected face face (stage: oblique 45: oblique <= 0 descending)",
+        "normal face: descriptor replaces the font data's style (4.4); applied value clamped to [0,0]",
+        "synthesis permitted: no oblique face exists (2.3); not required (2.3 \"will be generated\" vs 5.2 \"may create\")"
+      ],
+      "wpt": true,
+      "files": [
+        "matrix-obl45-normal.html",
+        "matrix-obl45-normal-slnt-11-notref.html"
+      ]
+    },
+    {
+      "address": "C8",
+      "id": "matrix-obl45-italic",
+      "row": "obl45",
+      "column": "italic",
+      "request": "oblique 45deg",
+      "descriptor": "italic",
+      "css": "font-style: oblique 45deg;",
+      "status": "unspecified",
+      "allowed": [
+        {
+          "kind": "upright"
+        },
+        {
+          "kind": "axis",
+          "axis": "slnt",
+          "value": -11
+        },
+        {
+          "kind": "synth",
+          "angle": 45
+        }
+      ],
+      "plan": {
+        "match": [],
+        "mismatch": []
+      },
+      "selected": [
+        "face"
+      ],
+      "stage": "oblique 45: italic faces",
+      "assumptions": [],
+      "why": [
+        "selected face face (stage: oblique 45: italic faces)",
+        "italic face, no ital axis: nothing to set, or (UA not distinguishing italic/oblique, 5.2) italic 1 = oblique 11deg",
+        "synthesis permitted: no oblique face exists (2.3); not required (2.3 \"will be generated\" vs 5.2 \"may create\")"
+      ],
+      "wpt": false,
+      "files": []
+    },
+    {
+      "address": "D8",
+      "id": "matrix-obl45-oblique",
+      "row": "obl45",
+      "column": "oblique",
+      "request": "oblique 45deg",
+      "descriptor": "oblique",
+      "css": "font-style: oblique 45deg;",
+      "status": "specified",
+      "allowed": [
+        {
+          "kind": "axis",
+          "axis": "slnt",
+          "value": -11
+        }
+      ],
+      "plan": {
+        "match": [
+          {
+            "kind": "axis",
+            "axis": "slnt",
+            "value": -11
+          }
+        ],
+        "mismatch": []
+      },
+      "selected": [
+        "face"
+      ],
+      "stage": "oblique 45: nearest oblique (above ascending, then below descending)",
+      "assumptions": [],
+      "why": [
+        "selected face face (stage: oblique 45: nearest oblique (above ascending, then below descending))",
+        "oblique face [14, 14]: closest matching value 14, clamped to the descriptor, then to the font",
+        "no synthesis: an oblique face exists (2.3)"
+      ],
+      "wpt": true,
+      "files": [
+        "matrix-obl45-oblique.html",
+        "matrix-obl45-oblique-slnt-11-ref.html"
+      ]
+    },
+    {
+      "address": "E8",
+      "id": "matrix-obl45-oblrange",
+      "row": "obl45",
+      "column": "oblrange",
+      "request": "oblique 45deg",
+      "descriptor": "oblique -11deg 11deg",
+      "css": "font-style: oblique 45deg;",
+      "status": "specified",
+      "allowed": [
+        {
+          "kind": "axis",
+          "axis": "slnt",
+          "value": -11
+        }
+      ],
+      "plan": {
+        "match": [
+          {
+            "kind": "axis",
+            "axis": "slnt",
+            "value": -11
+          }
+        ],
+        "mismatch": []
+      },
+      "selected": [
+        "face"
+      ],
+      "stage": "oblique 45: nearest oblique (above ascending, then below descending)",
+      "assumptions": [],
+      "why": [
+        "selected face face (stage: oblique 45: nearest oblique (above ascending, then below descending))",
+        "oblique face [-11, 11]: closest matching value 11, clamped to the descriptor, then to the font",
+        "no synthesis: an oblique face exists (2.3)"
+      ],
+      "wpt": true,
+      "files": [
+        "matrix-obl45-oblrange.html",
+        "matrix-obl45-oblrange-slnt-11-ref.html"
+      ]
+    },
+    {
+      "address": "A9",
+      "id": "matrix-oblm5-auto",
+      "row": "oblm5",
+      "column": "auto",
+      "request": "oblique -5deg",
+      "descriptor": null,
+      "css": "font-style: oblique -5deg;",
+      "status": "specified",
+      "allowed": [
+        {
+          "kind": "axis",
+          "axis": "slnt",
+          "value": 5
+        }
+      ],
+      "plan": {
+        "match": [
+          {
+            "kind": "axis",
+            "axis": "slnt",
+            "value": 5
+          }
+        ],
+        "mismatch": []
+      },
+      "selected": [
+        "face"
+      ],
+      "stage": "oblique -5: oblique <= 0 descending",
+      "assumptions": [
+        "negative-angle: spec says only 'negated values and opposite directions'"
+      ],
+      "why": [
+        "selected face face (stage: oblique -5: oblique <= 0 descending)",
+        "auto face, oblique request, font with slnt: the axis is set to the requested angle, limited by the font only (5.2, 4.4)",
+        "no synthesis: an auto face on a font with a slnt axis is matched by the axis; shearing is only the fallback (5.2)"
+      ],
+      "wpt": true,
+      "files": [
+        "matrix-oblm5-auto.html",
+        "matrix-oblm5-auto-slnt5-ref.html"
+      ]
+    },
+    {
+      "address": "B9",
+      "id": "matrix-oblm5-normal",
+      "row": "oblm5",
+      "column": "normal",
+      "request": "oblique -5deg",
+      "descriptor": "normal",
+      "css": "font-style: oblique -5deg;",
+      "status": "constrained",
+      "allowed": [
+        {
+          "kind": "upright"
+        },
+        {
+          "kind": "synth",
+          "angle": -5
+        }
+      ],
+      "plan": {
+        "match": [],
+        "mismatch": [
+          {
+            "kind": "axis",
+            "axis": "slnt",
+            "value": -11
+          },
+          {
+            "kind": "axis",
+            "axis": "slnt",
+            "value": 5
+          }
+        ]
+      },
+      "selected": [
+        "face"
+      ],
+      "stage": "oblique -5: oblique <= 0 descending",
+      "assumptions": [
+        "negative-angle: spec says only 'negated values and opposite directions'"
+      ],
+      "why": [
+        "selected face face (stage: oblique -5: oblique <= 0 descending)",
+        "normal face: descriptor replaces the font data's style (4.4); applied value clamped to [0,0]",
+        "synthesis permitted: no oblique face exists (2.3); not required (2.3 \"will be generated\" vs 5.2 \"may create\")"
+      ],
+      "wpt": true,
+      "files": [
+        "matrix-oblm5-normal.html",
+        "matrix-oblm5-normal-slnt-11-notref.html",
+        "matrix-oblm5-normal-slnt5-notref.html"
+      ]
+    },
+    {
+      "address": "C9",
+      "id": "matrix-oblm5-italic",
+      "row": "oblm5",
+      "column": "italic",
+      "request": "oblique -5deg",
+      "descriptor": "italic",
+      "css": "font-style: oblique -5deg;",
+      "status": "constrained",
+      "allowed": [
+        {
+          "kind": "upright"
+        },
+        {
+          "kind": "axis",
+          "axis": "slnt",
+          "value": -11
+        },
+        {
+          "kind": "synth",
+          "angle": -5
+        }
+      ],
+      "plan": {
+        "match": [],
+        "mismatch": [
+          {
+            "kind": "axis",
+            "axis": "slnt",
+            "value": 5
+          }
+        ]
+      },
+      "selected": [
+        "face"
+      ],
+      "stage": "oblique -5: italic faces",
+      "assumptions": [
+        "negative-angle: spec says only 'negated values and opposite directions'",
+        "italic-value-1-gap: the a<11 italic stage text excludes an italic value of exactly 1",
+        "negative-angle-italic-stage: mirrored italic values are not defined"
+      ],
+      "why": [
+        "selected face face (stage: oblique -5: italic faces)",
+        "italic face, no ital axis: nothing to set, or (UA not distinguishing italic/oblique, 5.2) italic 1 = oblique 11deg",
+        "synthesis permitted: no oblique face exists (2.3); not required (2.3 \"will be generated\" vs 5.2 \"may create\")"
+      ],
+      "wpt": true,
+      "files": [
+        "matrix-oblm5-italic.html",
+        "matrix-oblm5-italic-slnt5-notref.html"
+      ]
+    },
+    {
+      "address": "D9",
+      "id": "matrix-oblm5-oblique",
+      "row": "oblm5",
+      "column": "oblique",
+      "request": "oblique -5deg",
+      "descriptor": "oblique",
+      "css": "font-style: oblique -5deg;",
+      "status": "specified",
+      "allowed": [
+        {
+          "kind": "axis",
+          "axis": "slnt",
+          "value": -11
+        }
+      ],
+      "plan": {
+        "match": [
+          {
+            "kind": "axis",
+            "axis": "slnt",
+            "value": -11
+          }
+        ],
+        "mismatch": []
+      },
+      "selected": [
+        "face"
+      ],
+      "stage": "oblique -5: oblique <= 0 descending",
+      "assumptions": [
+        "negative-angle: spec says only 'negated values and opposite directions'"
+      ],
+      "why": [
+        "selected face face (stage: oblique -5: oblique <= 0 descending)",
+        "oblique face [14, 14]: closest matching value 14, clamped to the descriptor, then to the font",
+        "no synthesis: an oblique face exists (2.3)"
+      ],
+      "wpt": true,
+      "files": [
+        "matrix-oblm5-oblique.html",
+        "matrix-oblm5-oblique-slnt-11-ref.html"
+      ]
+    },
+    {
+      "address": "E9",
+      "id": "matrix-oblm5-oblrange",
+      "row": "oblm5",
+      "column": "oblrange",
+      "request": "oblique -5deg",
+      "descriptor": "oblique -11deg 11deg",
+      "css": "font-style: oblique -5deg;",
+      "status": "specified",
+      "allowed": [
+        {
+          "kind": "axis",
+          "axis": "slnt",
+          "value": 5
+        }
+      ],
+      "plan": {
+        "match": [
+          {
+            "kind": "axis",
+            "axis": "slnt",
+            "value": 5
+          }
+        ],
+        "mismatch": []
+      },
+      "selected": [
+        "face"
+      ],
+      "stage": "oblique -5: faces containing the angle",
+      "assumptions": [
+        "negative-angle: spec says only 'negated values and opposite directions'"
+      ],
+      "why": [
+        "selected face face (stage: oblique -5: faces containing the angle)",
+        "oblique face [-11, 11]: closest matching value -5, clamped to the descriptor, then to the font",
+        "no synthesis: an oblique face exists (2.3)"
+      ],
+      "wpt": true,
+      "files": [
+        "matrix-oblm5-oblrange.html",
+        "matrix-oblm5-oblrange-slnt5-ref.html"
+      ]
+    },
+    {
+      "address": "A10",
+      "id": "matrix-italicnone-auto",
+      "row": "italicnone",
+      "column": "auto",
+      "request": "italic",
+      "descriptor": null,
+      "css": "font-style: italic; font-synthesis-style: none;",
+      "status": "unspecified",
+      "allowed": [
+        {
+          "kind": "upright"
+        },
+        {
+          "kind": "axis",
+          "axis": "slnt",
+          "value": -11
+        }
+      ],
+      "plan": {
+        "match": [],
+        "mismatch": []
+      },
+      "selected": [
+        "face"
+      ],
+      "stage": "italic: oblique <= 0 descending",
+      "assumptions": [
+        "auto-italic: no step applies slnt for an italic request (5.2); UAs may map italic to oblique 11deg"
+      ],
+      "why": [
+        "selected face face (stage: italic: oblique <= 0 descending)",
+        "no synthesis: font-synthesis-style: none forbids synthesis"
+      ],
+      "wpt": false,
+      "files": []
+    },
+    {
+      "address": "B10",
+      "id": "matrix-italicnone-normal",
+      "row": "italicnone",
+      "column": "normal",
+      "request": "italic",
+      "descriptor": "normal",
+      "css": "font-style: italic; font-synthesis-style: none;",
+      "status": "specified",
+      "allowed": [
+        {
+          "kind": "upright"
+        }
+      ],
+      "plan": {
+        "match": [
+          {
+            "kind": "upright"
+          }
+        ],
+        "mismatch": []
+      },
+      "selected": [
+        "face"
+      ],
+      "stage": "italic: oblique <= 0 descending",
+      "assumptions": [],
+      "why": [
+        "selected face face (stage: italic: oblique <= 0 descending)",
+        "normal face: descriptor replaces the font data's style (4.4); applied value clamped to [0,0]",
+        "no synthesis: font-synthesis-style: none forbids synthesis"
+      ],
+      "wpt": true,
+      "files": [
+        "matrix-italicnone-normal.html",
+        "matrix-italicnone-normal-upright-ref.html"
+      ]
+    },
+    {
+      "address": "C10",
+      "id": "matrix-italicnone-italic",
+      "row": "italicnone",
+      "column": "italic",
+      "request": "italic",
+      "descriptor": "italic",
+      "css": "font-style: italic; font-synthesis-style: none;",
+      "status": "unspecified",
+      "allowed": [
+        {
+          "kind": "upright"
+        },
+        {
+          "kind": "axis",
+          "axis": "slnt",
+          "value": -11
+        }
+      ],
+      "plan": {
+        "match": [],
+        "mismatch": []
+      },
+      "selected": [
+        "face"
+      ],
+      "stage": "italic: italic faces",
+      "assumptions": [],
+      "why": [
+        "selected face face (stage: italic: italic faces)",
+        "italic face, no ital axis: nothing to set, or (UA not distinguishing italic/oblique, 5.2) italic 1 = oblique 11deg",
+        "no synthesis: font-synthesis-style: none forbids synthesis"
+      ],
+      "wpt": false,
+      "files": []
+    },
+    {
+      "address": "D10",
+      "id": "matrix-italicnone-oblique",
+      "row": "italicnone",
+      "column": "oblique",
+      "request": "italic",
+      "descriptor": "oblique",
+      "css": "font-style: italic; font-synthesis-style: none;",
+      "status": "specified",
+      "allowed": [
+        {
+          "kind": "axis",
+          "axis": "slnt",
+          "value": -11
+        }
+      ],
+      "plan": {
+        "match": [
+          {
+            "kind": "axis",
+            "axis": "slnt",
+            "value": -11
+          }
+        ],
+        "mismatch": []
+      },
+      "selected": [
+        "face"
+      ],
+      "stage": "italic: oblique >= 11deg ascending, then < 11deg descending",
+      "assumptions": [],
+      "why": [
+        "selected face face (stage: italic: oblique >= 11deg ascending, then < 11deg descending)",
+        "italic request on an oblique face: slant angle unspecified (2.3); use the stage's closest value or the 14deg default",
+        "no synthesis: font-synthesis-style: none forbids synthesis"
+      ],
+      "wpt": true,
+      "files": [
+        "matrix-italicnone-oblique.html",
+        "matrix-italicnone-oblique-slnt-11-ref.html"
+      ]
+    },
+    {
+      "address": "E10",
+      "id": "matrix-italicnone-oblrange",
+      "row": "italicnone",
+      "column": "oblrange",
+      "request": "italic",
+      "descriptor": "oblique -11deg 11deg",
+      "css": "font-style: italic; font-synthesis-style: none;",
+      "status": "specified",
+      "allowed": [
+        {
+          "kind": "axis",
+          "axis": "slnt",
+          "value": -11
+        }
+      ],
+      "plan": {
+        "match": [
+          {
+            "kind": "axis",
+            "axis": "slnt",
+            "value": -11
+          }
+        ],
+        "mismatch": []
+      },
+      "selected": [
+        "face"
+      ],
+      "stage": "italic: oblique >= 11deg ascending, then < 11deg descending",
+      "assumptions": [],
+      "why": [
+        "selected face face (stage: italic: oblique >= 11deg ascending, then < 11deg descending)",
+        "italic request on an oblique face: slant angle unspecified (2.3); use the stage's closest value or the 14deg default",
+        "no synthesis: font-synthesis-style: none forbids synthesis"
+      ],
+      "wpt": true,
+      "files": [
+        "matrix-italicnone-oblrange.html",
+        "matrix-italicnone-oblrange-slnt-11-ref.html"
+      ]
+    },
+    {
+      "address": "A11",
+      "id": "matrix-oblnone-auto",
+      "row": "oblnone",
+      "column": "auto",
+      "request": "oblique",
+      "descriptor": null,
+      "css": "font-style: oblique; font-synthesis: none;",
+      "status": "specified",
+      "allowed": [
+        {
+          "kind": "axis",
+          "axis": "slnt",
+          "value": -11
+        }
+      ],
+      "plan": {
+        "match": [
+          {
+            "kind": "axis",
+            "axis": "slnt",
+            "value": -11
+          }
+        ],
+        "mismatch": []
+      },
+      "selected": [
+        "face"
+      ],
+      "stage": "oblique 14: oblique <= 0 descending",
+      "assumptions": [],
+      "why": [
+        "selected face face (stage: oblique 14: oblique <= 0 descending)",
+        "auto face, oblique request, font with slnt: the axis is set to the requested angle, limited by the font only (5.2, 4.4)",
+        "no synthesis: font-synthesis-style: none forbids synthesis"
+      ],
+      "wpt": true,
+      "files": [
+        "matrix-oblnone-auto.html",
+        "matrix-oblnone-auto-slnt-11-ref.html"
+      ]
+    },
+    {
+      "address": "B11",
+      "id": "matrix-oblnone-normal",
+      "row": "oblnone",
+      "column": "normal",
+      "request": "oblique",
+      "descriptor": "normal",
+      "css": "font-style: oblique; font-synthesis: none;",
+      "status": "specified",
+      "allowed": [
+        {
+          "kind": "upright"
+        }
+      ],
+      "plan": {
+        "match": [
+          {
+            "kind": "upright"
+          }
+        ],
+        "mismatch": []
+      },
+      "selected": [
+        "face"
+      ],
+      "stage": "oblique 14: oblique <= 0 descending",
+      "assumptions": [],
+      "why": [
+        "selected face face (stage: oblique 14: oblique <= 0 descending)",
+        "normal face: descriptor replaces the font data's style (4.4); applied value clamped to [0,0]",
+        "no synthesis: font-synthesis-style: none forbids synthesis"
+      ],
+      "wpt": true,
+      "files": [
+        "matrix-oblnone-normal.html",
+        "matrix-oblnone-normal-upright-ref.html"
+      ]
+    },
+    {
+      "address": "C11",
+      "id": "matrix-oblnone-italic",
+      "row": "oblnone",
+      "column": "italic",
+      "request": "oblique",
+      "descriptor": "italic",
+      "css": "font-style: oblique; font-synthesis: none;",
+      "status": "unspecified",
+      "allowed": [
+        {
+          "kind": "upright"
+        },
+        {
+          "kind": "axis",
+          "axis": "slnt",
+          "value": -11
+        }
+      ],
+      "plan": {
+        "match": [],
+        "mismatch": []
+      },
+      "selected": [
+        "face"
+      ],
+      "stage": "oblique 14: italic faces",
+      "assumptions": [],
+      "why": [
+        "selected face face (stage: oblique 14: italic faces)",
+        "italic face, no ital axis: nothing to set, or (UA not distinguishing italic/oblique, 5.2) italic 1 = oblique 11deg",
+        "no synthesis: font-synthesis-style: none forbids synthesis"
+      ],
+      "wpt": false,
+      "files": []
+    },
+    {
+      "address": "D11",
+      "id": "matrix-oblnone-oblique",
+      "row": "oblnone",
+      "column": "oblique",
+      "request": "oblique",
+      "descriptor": "oblique",
+      "css": "font-style: oblique; font-synthesis: none;",
+      "status": "specified",
+      "allowed": [
+        {
+          "kind": "axis",
+          "axis": "slnt",
+          "value": -11
+        }
+      ],
+      "plan": {
+        "match": [
+          {
+            "kind": "axis",
+            "axis": "slnt",
+            "value": -11
+          }
+        ],
+        "mismatch": []
+      },
+      "selected": [
+        "face"
+      ],
+      "stage": "oblique 14: faces containing the angle",
+      "assumptions": [],
+      "why": [
+        "selected face face (stage: oblique 14: faces containing the angle)",
+        "oblique face [14, 14]: closest matching value 14, clamped to the descriptor, then to the font",
+        "no synthesis: font-synthesis-style: none forbids synthesis"
+      ],
+      "wpt": true,
+      "files": [
+        "matrix-oblnone-oblique.html",
+        "matrix-oblnone-oblique-slnt-11-ref.html"
+      ]
+    },
+    {
+      "address": "E11",
+      "id": "matrix-oblnone-oblrange",
+      "row": "oblnone",
+      "column": "oblrange",
+      "request": "oblique",
+      "descriptor": "oblique -11deg 11deg",
+      "css": "font-style: oblique; font-synthesis: none;",
+      "status": "specified",
+      "allowed": [
+        {
+          "kind": "axis",
+          "axis": "slnt",
+          "value": -11
+        }
+      ],
+      "plan": {
+        "match": [
+          {
+            "kind": "axis",
+            "axis": "slnt",
+            "value": -11
+          }
+        ],
+        "mismatch": []
+      },
+      "selected": [
+        "face"
+      ],
+      "stage": "oblique 14: nearest oblique (above ascending, then below descending)",
+      "assumptions": [],
+      "why": [
+        "selected face face (stage: oblique 14: nearest oblique (above ascending, then below descending))",
+        "oblique face [-11, 11]: closest matching value 11, clamped to the descriptor, then to the font",
+        "no synthesis: font-synthesis-style: none forbids synthesis"
+      ],
+      "wpt": true,
+      "files": [
+        "matrix-oblnone-oblrange.html",
+        "matrix-oblnone-oblrange-slnt-11-ref.html"
+      ]
+    },
+    {
+      "address": "A12",
+      "id": "matrix-italicobo-auto",
+      "row": "italicobo",
+      "column": "auto",
+      "request": "italic",
+      "descriptor": null,
+      "css": "font-style: italic; font-synthesis-style: oblique-only;",
+      "status": "unspecified",
+      "allowed": [
+        {
+          "kind": "upright"
+        },
+        {
+          "kind": "axis",
+          "axis": "slnt",
+          "value": -11
+        }
+      ],
+      "plan": {
+        "match": [],
+        "mismatch": []
+      },
+      "selected": [
+        "face"
+      ],
+      "stage": "italic: oblique <= 0 descending",
+      "assumptions": [
+        "auto-italic: no step applies slnt for an italic request (5.2); UAs may map italic to oblique 11deg"
+      ],
+      "why": [
+        "selected face face (stage: italic: oblique <= 0 descending)",
+        "no synthesis: oblique-only: a synthesized oblique must not stand in for italic"
+      ],
+      "wpt": false,
+      "files": []
+    },
+    {
+      "address": "B12",
+      "id": "matrix-italicobo-normal",
+      "row": "italicobo",
+      "column": "normal",
+      "request": "italic",
+      "descriptor": "normal",
+      "css": "font-style: italic; font-synthesis-style: oblique-only;",
+      "status": "specified",
+      "allowed": [
+        {
+          "kind": "upright"
+        }
+      ],
+      "plan": {
+        "match": [
+          {
+            "kind": "upright"
+          }
+        ],
+        "mismatch": []
+      },
+      "selected": [
+        "face"
+      ],
+      "stage": "italic: oblique <= 0 descending",
+      "assumptions": [],
+      "why": [
+        "selected face face (stage: italic: oblique <= 0 descending)",
+        "normal face: descriptor replaces the font data's style (4.4); applied value clamped to [0,0]",
+        "no synthesis: oblique-only: a synthesized oblique must not stand in for italic"
+      ],
+      "wpt": true,
+      "files": [
+        "matrix-italicobo-normal.html",
+        "matrix-italicobo-normal-upright-ref.html"
+      ]
+    },
+    {
+      "address": "C12",
+      "id": "matrix-italicobo-italic",
+      "row": "italicobo",
+      "column": "italic",
+      "request": "italic",
+      "descriptor": "italic",
+      "css": "font-style: italic; font-synthesis-style: oblique-only;",
+      "status": "unspecified",
+      "allowed": [
+        {
+          "kind": "upright"
+        },
+        {
+          "kind": "axis",
+          "axis": "slnt",
+          "value": -11
+        }
+      ],
+      "plan": {
+        "match": [],
+        "mismatch": []
+      },
+      "selected": [
+        "face"
+      ],
+      "stage": "italic: italic faces",
+      "assumptions": [],
+      "why": [
+        "selected face face (stage: italic: italic faces)",
+        "italic face, no ital axis: nothing to set, or (UA not distinguishing italic/oblique, 5.2) italic 1 = oblique 11deg",
+        "no synthesis: oblique-only: a synthesized oblique must not stand in for italic"
+      ],
+      "wpt": false,
+      "files": []
+    },
+    {
+      "address": "D12",
+      "id": "matrix-italicobo-oblique",
+      "row": "italicobo",
+      "column": "oblique",
+      "request": "italic",
+      "descriptor": "oblique",
+      "css": "font-style: italic; font-synthesis-style: oblique-only;",
+      "status": "specified",
+      "allowed": [
+        {
+          "kind": "axis",
+          "axis": "slnt",
+          "value": -11
+        }
+      ],
+      "plan": {
+        "match": [
+          {
+            "kind": "axis",
+            "axis": "slnt",
+            "value": -11
+          }
+        ],
+        "mismatch": []
+      },
+      "selected": [
+        "face"
+      ],
+      "stage": "italic: oblique >= 11deg ascending, then < 11deg descending (last resort under oblique-only)",
+      "assumptions": [],
+      "why": [
+        "selected face face (stage: italic: oblique >= 11deg ascending, then < 11deg descending (last resort under oblique-only))",
+        "italic request on an oblique face: slant angle unspecified (2.3); use the stage's closest value or the 14deg default",
+        "no synthesis: oblique-only: a synthesized oblique must not stand in for italic"
+      ],
+      "wpt": true,
+      "files": [
+        "matrix-italicobo-oblique.html",
+        "matrix-italicobo-oblique-slnt-11-ref.html"
+      ]
+    },
+    {
+      "address": "E12",
+      "id": "matrix-italicobo-oblrange",
+      "row": "italicobo",
+      "column": "oblrange",
+      "request": "italic",
+      "descriptor": "oblique -11deg 11deg",
+      "css": "font-style: italic; font-synthesis-style: oblique-only;",
+      "status": "unspecified",
+      "allowed": [
+        {
+          "kind": "upright"
+        },
+        {
+          "kind": "axis",
+          "axis": "slnt",
+          "value": -11
+        }
+      ],
+      "plan": {
+        "match": [],
+        "mismatch": []
+      },
+      "selected": [
+        "face"
+      ],
+      "stage": "italic: oblique <= 0 descending",
+      "assumptions": [],
+      "why": [
+        "selected face face (stage: italic: oblique <= 0 descending)",
+        "italic request on an oblique face: slant angle unspecified (2.3); use the stage's closest value or the 14deg default",
+        "no synthesis: oblique-only: a synthesized oblique must not stand in for italic"
+      ],
+      "wpt": false,
+      "files": []
     }
   ]
 }

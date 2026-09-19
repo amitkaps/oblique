@@ -4,7 +4,7 @@ The single folder that would be proposed to WPT (`css/css-fonts/variable-oblique
 This README is not copied into `.wpt/`.
 
 ```
-matrix/       23 generated reftests + matrix.manifest.json (never edited by hand)
+matrix/       46 generated reftests + matrix.manifest.json (never edited by hand)
 standalone/   14 hand-written tests, kept while they are re-based on the Cairo subset
 resources/    fonts (each with a .headers sidecar for WPT) and the scripts that build them
 oblique-matching.css   shared fixed-size layout, so pixel diffs do not depend on font metrics
@@ -14,7 +14,9 @@ oblique-matching.css   shared fixed-size layout, so pixel diffs do not depend on
 
 Columns are the `@font-face` `font-style` descriptor (A omitted, B `normal`, C `italic`, D bare `oblique`,
 E `oblique -11deg 11deg`); rows are the use-site request (1 `normal`, 2 `italic`, 3 `oblique`,
-4 `oblique 11deg`, 5 `<em>`, 6 `font-variation-settings: 'slnt' -11`). A cell is `E2`; its file is
+4 `oblique 11deg`, 5 `<em>`, 6 `font-variation-settings: 'slnt' -11`, 7 `oblique 5deg`, 8 `oblique 45deg`,
+9 `oblique -5deg`, 10 `italic` with `font-synthesis-style: none`, 11 `oblique` with `font-synthesis: none`,
+12 `italic` with `font-synthesis-style: oblique-only`). A cell is `E2`; its file is
 `matrix-{row slug}-{column slug}.html` (`matrix-italic-oblrange.html`). Every cell uses
 `resources/Cairo.var.subset.ttf` and the capital `I`.
 
@@ -26,7 +28,7 @@ E `oblique -11deg 11deg`); rows are the use-site request (1 `normal`, 2 `italic`
 - **unspecified**: no file; the spec is silent, so the cell is only measured (`scripts/survey.py`).
 
 References are plain faces with the axis pinned through `font-variation-settings`, so they never depend on the
-descriptor under test. No test sets `font-synthesis`. Results and what they mean: [../../docs/findings.md](../../docs/findings.md).
+descriptor under test. Only rows 10 to 12 set `font-synthesis`; that is their point. Results and what they mean: [../../docs/findings.md](../../docs/findings.md).
 
 ## standalone/
 

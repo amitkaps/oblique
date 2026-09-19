@@ -91,7 +91,7 @@ function testHtml(cell, matrix, refs) {
   Cell ${cell.address}: @font-face ${desc}, request "${cell.row.request}"${cell.row.em ? " (through <em>)" : ""}${cell.row.fvs ? " (through font-variation-settings)" : ""}.
   Status: ${e.status}. The reference algorithm permits: ${allowed}.
   ${e.why.join("\n  ")}${e.assumptions.length ? "\n  Assumptions: " + e.assumptions.join("; ") : ""}
-  font-synthesis is left at its default: a matched request must not be synthesized.
+  ${cell.row.extraCss && /synthesis/.test(cell.row.extraCss) ? `The row sets ${cell.row.extraCss}` : "font-synthesis is left at its default: a matched request must not be synthesized."}
 -->
 ${links}
 <meta name="assert"

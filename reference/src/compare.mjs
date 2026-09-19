@@ -21,27 +21,44 @@ import { ROOT, MATRIX_DIR } from "./cases.mjs";
 export const ENGINES = ["chrome", "firefox", "safari"];
 const TOL = 1.5;
 
-/** lean (px) an allowed outcome predicts, from the font's calibration */
+/** lean (px, positive = forward slant) an allowed outcome predicts, from the font's calibration */
 export function predictedLean(o, font) {
   if (o.kind === "upright") return 0;
-  if (o.kind === "axis") return Math.abs(o.value) * font.pxPerSlntUnit;
-  return Math.tan((o.angle * Math.PI) / 180) * font.glyphHeightPx;
+  if (o.kind === "axis") return -o.value * font.pxPerSlntUnit; // slnt and CSS angle have opposite signs
+  return Math.sign(o.angle) * Math.tan((Math.abs(o.angle) * Math.PI) / 180) * font.glyphHeightPx;
 }
+
+const SYNTH_MIN = 3;
+const SYNTH_MAX = 90;
 
 /** What a measured lean looks like, for reporting. */
 export function leanLabel(lean, font) {
-  const axisMax = Math.abs(font.slnt[0]) * font.pxPerSlntUnit;
-  const synth14 = predictedLean({ kind: "synth", angle: 14 }, font);
+  const px = font.pxPerSlntUnit;
   const near = (v, t) => Math.abs(lean - v) <= t;
+  const synth14 = predictedLean({ kind: "synth", angle: 14 }, font);
+  const axisMax = Math.abs(font.slnt[0]) * px;
   if (near(0, TOL)) return "upright";
-  if (near(axisMax, TOL)) return `axis ${font.slnt[0]}`;
+  const v = -lean / px;
+  if (Math.abs(v) <= Math.max(Math.abs(font.slnt[0]), Math.abs(font.slnt[1])) + 0.5 && near(-Math.round(v) * px, TOL)) {
+    return `axis ${Math.round(v)}`;
+  }
   if (near(synth14, TOL)) return "synthetic 14deg";
   if (near(axisMax + synth14, 3)) return "stacked (axis + synthetic)";
   return `lean ${lean}px`;
 }
 
+/**
+ * Is a measured lean one the cell allows? Axis and upright outcomes predict an exact lean.
+ * A synthesized skew has an engine-chosen angle (Firefox follows the request, Chrome and Safari
+ * use their own), so any forward or backward skew of plausible size in the requested direction
+ * counts, and it cannot be told apart from an axis by size alone.
+ */
 export function withinAllowed(cell, lean, font) {
-  return cell.allowed.some((o) => Math.abs(predictedLean(o, font) - lean) <= TOL);
+  return cell.allowed.some((o) =>
+    o.kind === "synth"
+      ? Math.sign(lean) === Math.sign(o.angle) && Math.abs(lean) >= SYNTH_MIN && Math.abs(lean) <= SYNTH_MAX
+      : Math.abs(predictedLean(o, font) - lean) <= TOL,
+  );
 }
 
 export function readBrowserMatrix(path = join(ROOT, "results", "browser-matrix.md")) {

@@ -66,9 +66,13 @@ export function expected(c) {
 
   const hasSynth = allowed.some((o) => o.kind === "synth");
   const constructible = allowed.filter((o) => o.kind !== "synth");
-  // the outcomes a reference can be built for, in the direction a forward slant takes
+  // the outcomes a reference can be built for: upright, the font's full forward slant (an engine
+  // that saturates the axis), and the axis value THIS request would set if the descriptor were
+  // ignored (an engine that applies the request where the face forbids it)
   const universe = [UPRIGHT];
-  if (font.slnt && font.slnt[0] < 0) universe.push({ kind: "axis", axis: "slnt", value: font.slnt[0] });
+  const addAxis = (o) => o.kind === "axis" && !universe.some((u) => key(u) === key(o)) && universe.push(o);
+  if (font.slnt && font.slnt[0] < 0) addAxis({ kind: "axis", axis: "slnt", value: font.slnt[0] });
+  for (const o of variation.requestedAxis) addAxis(o);
   const allowedKeys = new Set(allowed.map(key));
 
   let plan;

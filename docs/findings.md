@@ -1,10 +1,14 @@
 # Findings
 
 What the tests show and what is still open. Chrome 153.0.8010.48, Firefox 156.0, Safari 27.0
-(macOS 15.8). The grid is the 5 `@font-face` descriptors (A to E) by 6 use-site requests (1 to 6)
+(macOS 15.8). The grid is the 5 `@font-face` descriptors (A to E) by 12 use-site requests (1 to 12)
 on the Cairo `OBLIQUE` subset; a cell is written `E2` (column E, row 2).
 
-## Confirmed failures: cells E2, E3, E5
+## Confirmed failures
+
+Five cells have a spec-decided outcome that Chrome and Safari get wrong; Firefox passes all of them.
+
+### Cells E2, E3, E5 and E8: synthesis stacked on the axis
 
 `italic`, bare `oblique` and `<em>` against a face declared `font-style: oblique -11deg 11deg`, with
 `font-synthesis` left at its default. A real oblique face exists, so the spec (2.3 "if no oblique faces
@@ -18,7 +22,18 @@ exist" is not satisfied) says the axis must clamp to `slnt -11` and nothing may 
 
 Lean is measured at 8em on the capital `I`: upright 0px, real `slnt -11` 16px, synthetic 14deg 21px,
 stacked 36px. The same behaviour was measured independently in the sibling `vizchitra-fonts` project.
-These are the only cells where the spec decides the outcome and an engine gets it wrong.
+Row 8 (`oblique 45deg`, past the font's range) fails the same way on the same face: Chrome and Safari stack
+(36px), Firefox clamps to the axis (16px). Rows 10 and 11 (`E10`, `E11`) repeat rows 2 and 3 with
+`font-synthesis-style: none` / `font-synthesis: none` and pass everywhere, so the failures are the synthetic skew
+on top of the axis and nothing else.
+
+### Cell B12: `oblique-only` synthesizes for an italic request
+
+`font-style: italic` with `font-synthesis-style: oblique-only` against a face declared `normal`: 2.8.2 says a
+synthesized oblique "must not be used as fallback if italic is specified", so the glyph must be upright. Firefox
+is upright; Chrome and Safari synthesize (21px). Upstream `font-synthesis-style-oblique-only` fails on the same two
+engines. Cell E12 (the same request on the explicit-range face) shows the stacking again in Chrome and Safari but
+is only measured, because the reference is not sure what `oblique-only` does to a real oblique face.
 
 ## How a cell is decided
 
@@ -27,13 +42,13 @@ for a cell: `upright`, `axis slnt=n`, or `synth`. A stacked axis plus synthesis 
 
 | Status | Meaning | Cells now |
 |---|---|---|
-| specified | one testable outcome; a reftest with one `match` reference | 19 |
-| constrained | several outcomes, or synthesis, are allowed but something is forbidden; several `match` references or a `mismatch` | 4 |
-| unspecified | the spec excludes nothing testable; no test, browsers are only measured | 7 |
+| specified | one testable outcome; a reftest with one `match` reference | 37 |
+| constrained | several outcomes, or synthesis, are allowed but something is forbidden; several `match` references or a `mismatch` | 9 |
+| unspecified | the spec excludes nothing testable; no test, browsers are only measured | 14 |
 
 Two signals agree in every cell: the reftests (Chrome and Firefox via `wpt run`, Safari via
 `scripts/safari-replay.py`) and a separate measurement of the glyph's lean (`scripts/survey.py`).
-`mise run compare`: 27 cells agree, 3 diverge (E2, E3, E5), none is `reference-suspect` (a cell every
+`mise run compare`: 54 of 60 cells agree, 6 diverge (E2, E3, E5, E8, B12, and E12 which has no test), none is `reference-suspect` (a cell every
 engine fails, which would point at the reference or a spec gap rather than at three browsers).
 
 Spec rules that decide cells (quoted in `reference/spec/css-fonts-4-excerpts.txt`):
@@ -51,8 +66,11 @@ Spec rules that decide cells (quoted in `reference/spec/css-fonts-4-excerpts.txt
 - `italic` has no defined angle: "the angle and direction of slant is unspecified" (2.3).
 - Synthesis "will be generated" in 2.3 but a UA "may create" it in 5.2, so it is permitted, not required.
 - CSS angle and OpenType `slnt` have opposite signs: `oblique 11deg` is `slnt -11`.
-- No generated test sets `font-synthesis`: the spec synthesizes only for a missing face, so forcing it off
-  would hide an engine that synthesizes on top of a matched face.
+- Rows 1 to 9 never set `font-synthesis`: the spec synthesizes only for a missing face, so forcing it off
+  would hide an engine that synthesizes on top of a matched face. Rows 10 to 12 exist to set it.
+- The size of a synthesized skew is not tested (a reftest cannot build one). Observed: for `oblique 5deg` on a
+  `normal` face Firefox skews about 5deg, Chrome and Safari leave it upright; for `oblique 45deg` Chrome and
+  Safari skew 14deg while Firefox skews far more. 5.2 says "geometric shearing to the specified oblique value".
 
 ## Claims withdrawn
 
@@ -82,10 +100,12 @@ Their pass/fail is recorded but their expectations were not re-derived with the 
 
 ## Open
 
-1. **Grow the grid.** Proposed, not built: rows `oblique 10deg`, `12deg`, `-8deg`, `-11deg`, `45deg` (past
-   the font's range) and synthesis rows (`font-synthesis-style: none`, `font-synthesis: none`,
-   `oblique-only`); columns `oblique 0deg 11deg`, `oblique 5deg 20deg`, `oblique -11deg 0deg`. Review as a
-   table before generating. Addresses are permanent: append, never renumber.
+1. **Grow the grid.** Rows 7 to 12 are in (`oblique 5deg`, `45deg`, `-5deg`, and the three synthesis rows).
+   Held back: `oblique 10deg` and `-11deg` (same outcome as rows 7 and 9 on one face; useful once a family has
+   several faces) and `oblique 5deg` plus `font-variation-settings` (the reference must model 7.2 for a non-normal
+   request first). Columns come next, each reviewed as a table: `oblique 0deg 10deg`, `oblique 5deg`,
+   `oblique -20deg -5deg`, `oblique -10deg 0deg`, then families of several faces. Addresses are permanent:
+   append, never renumber.
 2. **Multi-face families** (the real 11deg ordering among several faces) are implemented and unit-tested
    in `reference/`. They do not need another font: several `@font-face` rules can point at the same Cairo file
    with different descriptors, and which face was chosen shows in the lean because each descriptor clamps

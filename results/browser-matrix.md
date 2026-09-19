@@ -133,6 +133,75 @@ run via the official WPT runner — see `docs/running.md`. Rows are appended by 
 | matrix-oblique-auto | firefox | 156.0 | no | pass | wpt status: PASS |
 | matrix-obl11-auto | safari | 27.0 | no (safaridriver automation) | pass | direct safaridriver replay of the reftest, exact pixel compare, 3 agreeing repetitions; `wpt run safari` disagreed, see docs/running.md |
 | matrix-oblique-auto | safari | 27.0 | no (safaridriver automation) | pass | direct safaridriver replay of the reftest, exact pixel compare, 3 agreeing repetitions; `wpt run safari` disagreed, see docs/running.md |
+| matrix-italicnone-normal | chrome | 153.0.8010.48 | no | pass | wpt status: PASS |
+| matrix-italicnone-oblique | chrome | 153.0.8010.48 | no | pass | wpt status: PASS |
+| matrix-italicnone-oblrange | chrome | 153.0.8010.48 | no | pass | wpt status: PASS |
+| matrix-italicobo-normal | chrome | 153.0.8010.48 | no | fail | wpt status: FAIL |
+| matrix-italicobo-oblique | chrome | 153.0.8010.48 | no | pass | wpt status: PASS |
+| matrix-obl45-auto | chrome | 153.0.8010.48 | no | pass | wpt status: PASS |
+| matrix-obl45-normal | chrome | 153.0.8010.48 | no | pass | wpt status: PASS |
+| matrix-obl45-oblique | chrome | 153.0.8010.48 | no | pass | wpt status: PASS |
+| matrix-obl45-oblrange | chrome | 153.0.8010.48 | no | fail | wpt status: FAIL |
+| matrix-obl5-auto | chrome | 153.0.8010.48 | no | pass | wpt status: PASS |
+| matrix-obl5-italic | chrome | 153.0.8010.48 | no | pass | wpt status: PASS |
+| matrix-obl5-normal | chrome | 153.0.8010.48 | no | pass | wpt status: PASS |
+| matrix-obl5-oblique | chrome | 153.0.8010.48 | no | pass | wpt status: PASS |
+| matrix-obl5-oblrange | chrome | 153.0.8010.48 | no | pass | wpt status: PASS |
+| matrix-oblm5-auto | chrome | 153.0.8010.48 | no | pass | wpt status: PASS |
+| matrix-oblm5-italic | chrome | 153.0.8010.48 | no | pass | wpt status: PASS |
+| matrix-oblm5-normal | chrome | 153.0.8010.48 | no | pass | wpt status: PASS |
+| matrix-oblm5-oblique | chrome | 153.0.8010.48 | no | pass | wpt status: PASS |
+| matrix-oblm5-oblrange | chrome | 153.0.8010.48 | no | pass | wpt status: PASS |
+| matrix-oblnone-auto | chrome | 153.0.8010.48 | no | pass | wpt status: PASS |
+| matrix-oblnone-normal | chrome | 153.0.8010.48 | no | pass | wpt status: PASS |
+| matrix-oblnone-oblique | chrome | 153.0.8010.48 | no | pass | wpt status: PASS |
+| matrix-oblnone-oblrange | chrome | 153.0.8010.48 | no | pass | wpt status: PASS |
+| matrix-italicnone-normal | firefox | 156.0 | no | pass | wpt status: PASS |
+| matrix-italicnone-oblique | firefox | 156.0 | no | pass | wpt status: PASS |
+| matrix-italicnone-oblrange | firefox | 156.0 | no | pass | wpt status: PASS |
+| matrix-italicobo-normal | firefox | 156.0 | no | pass | wpt status: PASS |
+| matrix-italicobo-oblique | firefox | 156.0 | no | pass | wpt status: PASS |
+| matrix-obl45-auto | firefox | 156.0 | no | pass | wpt status: PASS |
+| matrix-obl45-normal | firefox | 156.0 | no | pass | wpt status: PASS |
+| matrix-obl45-oblique | firefox | 156.0 | no | pass | wpt status: PASS |
+| matrix-obl45-oblrange | firefox | 156.0 | no | pass | wpt status: PASS |
+| matrix-obl5-auto | firefox | 156.0 | no | pass | wpt status: PASS |
+| matrix-obl5-italic | firefox | 156.0 | no | pass | wpt status: PASS |
+| matrix-obl5-normal | firefox | 156.0 | no | pass | wpt status: PASS |
+| matrix-obl5-oblique | firefox | 156.0 | no | pass | wpt status: PASS |
+| matrix-obl5-oblrange | firefox | 156.0 | no | pass | wpt status: PASS |
+| matrix-oblm5-auto | firefox | 156.0 | no | pass | wpt status: PASS |
+| matrix-oblm5-italic | firefox | 156.0 | no | pass | wpt status: PASS |
+| matrix-oblm5-normal | firefox | 156.0 | no | pass | wpt status: PASS |
+| matrix-oblm5-oblique | firefox | 156.0 | no | pass | wpt status: PASS |
+| matrix-oblm5-oblrange | firefox | 156.0 | no | pass | wpt status: PASS |
+| matrix-oblnone-auto | firefox | 156.0 | no | pass | wpt status: PASS |
+| matrix-oblnone-normal | firefox | 156.0 | no | pass | wpt status: PASS |
+| matrix-oblnone-oblique | firefox | 156.0 | no | pass | wpt status: PASS |
+| matrix-oblnone-oblrange | firefox | 156.0 | no | pass | wpt status: PASS |
+| matrix-italicnone-normal | safari | 27.0 | no (safaridriver automation) | pass | direct safaridriver replay of the reftest, exact pixel compare, 3 agreeing repetitions; `wpt run safari` disagreed, see docs/running.md |
+| matrix-italicnone-oblique | safari | 27.0 | no (safaridriver automation) | pass | direct safaridriver replay of the reftest, exact pixel compare, 3 agreeing repetitions; `wpt run safari` disagreed, see docs/running.md |
+| matrix-italicnone-oblrange | safari | 27.0 | no (safaridriver automation) | pass | direct safaridriver replay of the reftest, exact pixel compare, 3 agreeing repetitions; `wpt run safari` disagreed, see docs/running.md |
+| matrix-italicobo-normal | safari | 27.0 | no (safaridriver automation) | fail | direct safaridriver replay of the reftest, exact pixel compare, 3 agreeing repetitions; `wpt run safari` disagreed, see docs/running.md |
+| matrix-italicobo-oblique | safari | 27.0 | no (safaridriver automation) | pass | direct safaridriver replay of the reftest, exact pixel compare, 3 agreeing repetitions; `wpt run safari` disagreed, see docs/running.md |
+| matrix-obl45-auto | safari | 27.0 | no (safaridriver automation) | pass | direct safaridriver replay of the reftest, exact pixel compare, 3 agreeing repetitions; `wpt run safari` disagreed, see docs/running.md |
+| matrix-obl45-normal | safari | 27.0 | no (safaridriver automation) | pass | direct safaridriver replay of the reftest, exact pixel compare, 3 agreeing repetitions; `wpt run safari` disagreed, see docs/running.md |
+| matrix-obl45-oblique | safari | 27.0 | no (safaridriver automation) | pass | direct safaridriver replay of the reftest, exact pixel compare, 3 agreeing repetitions; `wpt run safari` disagreed, see docs/running.md |
+| matrix-obl45-oblrange | safari | 27.0 | no (safaridriver automation) | fail | direct safaridriver replay of the reftest, exact pixel compare, 3 agreeing repetitions; `wpt run safari` disagreed, see docs/running.md |
+| matrix-obl5-auto | safari | 27.0 | no (safaridriver automation) | pass | direct safaridriver replay of the reftest, exact pixel compare, 3 agreeing repetitions; `wpt run safari` disagreed, see docs/running.md |
+| matrix-obl5-italic | safari | 27.0 | no (safaridriver automation) | pass | direct safaridriver replay of the reftest, exact pixel compare, 3 agreeing repetitions; `wpt run safari` disagreed, see docs/running.md |
+| matrix-obl5-normal | safari | 27.0 | no (safaridriver automation) | pass | direct safaridriver replay of the reftest, exact pixel compare, 3 agreeing repetitions; `wpt run safari` disagreed, see docs/running.md |
+| matrix-obl5-oblique | safari | 27.0 | no (safaridriver automation) | pass | direct safaridriver replay of the reftest, exact pixel compare, 3 agreeing repetitions; `wpt run safari` disagreed, see docs/running.md |
+| matrix-obl5-oblrange | safari | 27.0 | no (safaridriver automation) | pass | direct safaridriver replay of the reftest, exact pixel compare, 3 agreeing repetitions; `wpt run safari` disagreed, see docs/running.md |
+| matrix-oblm5-auto | safari | 27.0 | no (safaridriver automation) | pass | direct safaridriver replay of the reftest, exact pixel compare, 3 agreeing repetitions; `wpt run safari` disagreed, see docs/running.md |
+| matrix-oblm5-italic | safari | 27.0 | no (safaridriver automation) | pass | direct safaridriver replay of the reftest, exact pixel compare, 3 agreeing repetitions; `wpt run safari` disagreed, see docs/running.md |
+| matrix-oblm5-normal | safari | 27.0 | no (safaridriver automation) | pass | direct safaridriver replay of the reftest, exact pixel compare, 3 agreeing repetitions; `wpt run safari` disagreed, see docs/running.md |
+| matrix-oblm5-oblique | safari | 27.0 | no (safaridriver automation) | pass | direct safaridriver replay of the reftest, exact pixel compare, 3 agreeing repetitions; `wpt run safari` disagreed, see docs/running.md |
+| matrix-oblm5-oblrange | safari | 27.0 | no (safaridriver automation) | pass | direct safaridriver replay of the reftest, exact pixel compare, 3 agreeing repetitions; `wpt run safari` disagreed, see docs/running.md |
+| matrix-oblnone-auto | safari | 27.0 | no (safaridriver automation) | pass | direct safaridriver replay of the reftest, exact pixel compare, 3 agreeing repetitions; `wpt run safari` disagreed, see docs/running.md |
+| matrix-oblnone-normal | safari | 27.0 | no (safaridriver automation) | pass | direct safaridriver replay of the reftest, exact pixel compare, 3 agreeing repetitions; `wpt run safari` disagreed, see docs/running.md |
+| matrix-oblnone-oblique | safari | 27.0 | no (safaridriver automation) | pass | direct safaridriver replay of the reftest, exact pixel compare, 3 agreeing repetitions; `wpt run safari` disagreed, see docs/running.md |
+| matrix-oblnone-oblrange | safari | 27.0 | no (safaridriver automation) | pass | direct safaridriver replay of the reftest, exact pixel compare, 3 agreeing repetitions; `wpt run safari` disagreed, see docs/running.md |
 
 `result` ∈ `pass` / `fail` / `synthesis-fallback` / `untested`.
 `real_device` ∈ `yes` / `no`.

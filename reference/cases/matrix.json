@@ -3,7 +3,10 @@
   "font": {
     "file": "../resources/Cairo.var.subset.ttf",
     "note": "real Cairo subset (slnt -11..11, wght 200..1000, no ital); the test glyph is the capital I",
-    "slnt": [-11, 11],
+    "slnt": [
+      -11,
+      11
+    ],
     "ital": null,
     "glyph": "I",
     "fontSize": "8em",
@@ -11,18 +14,157 @@
     "pxPerSlntUnit": 1.4545
   },
   "columns": [
-    { "address": "A", "slug": "auto", "descriptor": null, "code": "@font-face { /* font-style omitted */ }", "note": "Descriptor omitted, which is defined as auto: matched as if normal" },
-    { "address": "B", "slug": "normal", "descriptor": "normal", "code": "@font-face { font-style: normal; }", "note": "Declared upright" },
-    { "address": "C", "slug": "italic", "descriptor": "italic", "code": "@font-face { font-style: italic; }", "note": "Declared italic (binary, no angle)" },
-    { "address": "D", "slug": "oblique", "descriptor": "oblique", "code": "@font-face { font-style: oblique; }", "note": "Declared oblique, no range (14deg)" },
-    { "address": "E", "slug": "oblrange", "descriptor": "oblique -11deg 11deg", "code": "@font-face { font-style: oblique -11deg 11deg; }", "note": "Declared oblique with the font's true slnt range" }
+    {
+      "address": "A",
+      "slug": "auto",
+      "descriptor": null,
+      "code": "@font-face { /* font-style omitted */ }",
+      "note": "Descriptor omitted, which is defined as auto: matched as if normal"
+    },
+    {
+      "address": "B",
+      "slug": "normal",
+      "descriptor": "normal",
+      "code": "@font-face { font-style: normal; }",
+      "note": "Declared upright"
+    },
+    {
+      "address": "C",
+      "slug": "italic",
+      "descriptor": "italic",
+      "code": "@font-face { font-style: italic; }",
+      "note": "Declared italic (binary, no angle)"
+    },
+    {
+      "address": "D",
+      "slug": "oblique",
+      "descriptor": "oblique",
+      "code": "@font-face { font-style: oblique; }",
+      "note": "Declared oblique, no range (14deg)"
+    },
+    {
+      "address": "E",
+      "slug": "oblrange",
+      "descriptor": "oblique -11deg 11deg",
+      "code": "@font-face { font-style: oblique -11deg 11deg; }",
+      "note": "Declared oblique with the font's true slnt range"
+    }
   ],
   "rows": [
-    { "address": "1", "slug": "normal", "request": "normal", "lines": ["font-style: normal;"] },
-    { "address": "2", "slug": "italic", "request": "italic", "lines": ["font-style: italic;"] },
-    { "address": "3", "slug": "oblique", "request": "oblique", "lines": ["font-style: oblique;"] },
-    { "address": "4", "slug": "obl11", "request": "oblique 11deg", "lines": ["font-style: oblique 11deg;"] },
-    { "address": "5", "slug": "em", "request": "italic", "em": true, "lines": ["<em>"] },
-    { "address": "6", "slug": "slnt", "request": "normal", "fvs": { "slnt": -11 }, "lines": ["font-variation-settings: 'slnt' -11;"] }
+    {
+      "address": "1",
+      "slug": "normal",
+      "request": "normal",
+      "lines": [
+        "font-style: normal;"
+      ]
+    },
+    {
+      "address": "2",
+      "slug": "italic",
+      "request": "italic",
+      "lines": [
+        "font-style: italic;"
+      ]
+    },
+    {
+      "address": "3",
+      "slug": "oblique",
+      "request": "oblique",
+      "lines": [
+        "font-style: oblique;"
+      ]
+    },
+    {
+      "address": "4",
+      "slug": "obl11",
+      "request": "oblique 11deg",
+      "lines": [
+        "font-style: oblique 11deg;"
+      ]
+    },
+    {
+      "address": "5",
+      "slug": "em",
+      "request": "italic",
+      "em": true,
+      "lines": [
+        "<em>"
+      ]
+    },
+    {
+      "address": "6",
+      "slug": "slnt",
+      "request": "normal",
+      "fvs": {
+        "slnt": -11
+      },
+      "lines": [
+        "font-variation-settings: 'slnt' -11;"
+      ]
+    },
+    {
+      "address": "7",
+      "slug": "obl5",
+      "request": "oblique 5deg",
+      "lines": [
+        "font-style: oblique 5deg;"
+      ]
+    },
+    {
+      "address": "8",
+      "slug": "obl45",
+      "request": "oblique 45deg",
+      "lines": [
+        "font-style: oblique 45deg;"
+      ]
+    },
+    {
+      "address": "9",
+      "slug": "oblm5",
+      "request": "oblique -5deg",
+      "lines": [
+        "font-style: oblique -5deg;"
+      ]
+    },
+    {
+      "address": "10",
+      "slug": "italicnone",
+      "request": "italic",
+      "lines": [
+        "font-style: italic;",
+        "font-synthesis-style: none;"
+      ],
+      "synthesis": {
+        "fontSynthesisStyle": "none"
+      },
+      "extraCss": "font-synthesis-style: none;"
+    },
+    {
+      "address": "11",
+      "slug": "oblnone",
+      "request": "oblique",
+      "lines": [
+        "font-style: oblique;",
+        "font-synthesis: none;"
+      ],
+      "synthesis": {
+        "fontSynthesis": "none"
+      },
+      "extraCss": "font-synthesis: none;"
+    },
+    {
+      "address": "12",
+      "slug": "italicobo",
+      "request": "italic",
+      "lines": [
+        "font-style: italic;",
+        "font-synthesis-style: oblique-only;"
+      ],
+      "synthesis": {
+        "fontSynthesisStyle": "oblique-only"
+      },
+      "extraCss": "font-synthesis-style: oblique-only;"
+    }
   ]
 }

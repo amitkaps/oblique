@@ -12,7 +12,7 @@ generalises them.
 ## How it works
 
 ```
-reference/cases/matrix.json   5 @font-face descriptors (A-E) x 6 use-site requests (1-6)
+reference/cases/matrix.json   5 @font-face descriptors (A-E) x 12 use-site requests (1-12)
         |
 reference/                    JS implementation of the CSS Fonts 4 matching rules: what may each cell render?
         |  mise run generate
@@ -23,16 +23,17 @@ Chrome, Firefox (wpt run) + Safari (safaridriver)  ->  results/browser-matrix.md
 site/                         the grid, live in your browser, with pass/fail per engine  ->  oblique.amitkaps.com
 ```
 
-The browser is the system under test; the reference never asks one. All 30 cells use one real font, the
+The browser is the system under test; the reference never asks one. All 60 cells use one real font, the
 [Cairo](https://fonts.google.com/specimen/Cairo) variable font (SIL OFL, `slnt` -11..11) subset to the letters
 of `OBLIQUE`, and test the capital `I`, which shears cleanly. A cell is written `E2`: column E, row 2.
 
 ## Current result
 
-Chrome, Firefox and Safari agree with the spec in 27 of 30 cells. In three (`italic`, bare `oblique` and
-`<em>` against a face declared `oblique -11deg 11deg`) Firefox is correct, Chrome stacks a synthetic skew on
-top of the real axis, and Safari does the same or drops the axis. Details, the claims that were withdrawn, and
-what is open: [docs/findings.md](docs/findings.md).
+Chrome, Firefox and Safari agree with the spec in 54 of 60 cells. In four (`italic`, bare `oblique`, `<em>`
+and `oblique 45deg` against a face declared `oblique -11deg 11deg`) Firefox is correct, Chrome stacks a
+synthetic skew on top of the real axis, and Safari does the same or drops the axis. In a fifth, `italic` with
+`font-synthesis-style: oblique-only` against a `normal` face, Chrome and Safari synthesize when the spec
+forbids it. Details, the claims that were withdrawn, and what is open: [docs/findings.md](docs/findings.md).
 
 ## Run it
 
