@@ -8,8 +8,9 @@ and Safari. It catalogs existing upstream WPT coverage
 tests for the gaps that catalog confirms.
 
 For the full narrative — every claim sourced, every wrong turn documented —
-see [`docs/investigation-log.md`](investigation-log.md). This file is the
-terse version; the live dashboard is
+see [`docs/investigation-log.md`](investigation-log.md), and for the current
+state, how to run everything and what is open, [`docs/handoff.md`](handoff.md).
+This file is the terse version; the live dashboard is
 [oblique.amitkaps.com](https://oblique.amitkaps.com).
 
 ## Confirmed gaps
