@@ -11,9 +11,8 @@ Usage (from repo root):
 --real-device marks rows as real_device=yes (e.g. an actual Safari run on a
 physical device, matching vizchitra-fonts/docs/compat.md's convention).
 Omit it for `wpt run`'s own automated browser instances (chrome/firefox
-launched by the runner itself) — those are "no (emulated/Playwright)" per
-the schema, even though they are real browser binaries, because they are
-CI/automation-driven rather than a hands-on physical-device check.
+launched by the runner itself): those are "no", they are real browser
+binaries driven by automation, not a hands-on physical-device check.
 """
 
 import argparse
@@ -56,7 +55,7 @@ def main():
     run_info = report.get("run_info", {})
     engine = run_info.get("product", "unknown")
     version = run_info.get("browser_version", run_info.get("version", "unknown"))
-    real_device = "yes" if args.real_device else "no (emulated/Playwright)"
+    real_device = "yes" if args.real_device else "no"
 
     rows = []
     for result in report.get("results", []):

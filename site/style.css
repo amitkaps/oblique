@@ -154,108 +154,13 @@ body {
 .legend-note { color: var(--muted); font-style: italic; }
 .legend-versions { color: var(--muted); }
 
-.card-section { margin: 2.5rem 0; }
-.card-section h2 {
-  border-bottom: 3px solid var(--border);
-  padding-bottom: 0.4rem;
-}
-.card-section-upstream h2 { border-bottom-color: var(--accent-upstream); }
-.card-section-this-repo h2 { border-bottom-color: var(--accent-this-repo); }
+.card-section, .findings { margin: 2.5rem 0; }
+.card-section h2, .findings h2 { font-size: 1.05rem; padding-bottom: 0.3rem; border-bottom: 2px solid var(--accent-this-repo); }
+.findings p { max-width: 760px; font-size: 0.9rem; }
+.standalone { border-collapse: collapse; font-size: 0.85rem; }
+.standalone th, .standalone td { text-align: left; padding: 0.3rem 0.9rem 0.3rem 0; border-bottom: 1px solid var(--border); }
+.standalone a { color: inherit; }
 
-.card-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 1rem;
-  margin-top: 1rem;
-}
-
-.card {
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-.card-section-upstream .card { border-top: 3px solid var(--accent-upstream); }
-.card-section-this-repo .card { border-top: 3px solid var(--accent-this-repo); }
-
-.card h3 { margin: 0; font-size: 1rem; }
-.one-liner { margin: 0; font-size: 0.88rem; }
-.why-it-matters { margin: 0; font-size: 0.8rem; color: var(--muted); }
-.card-links { margin: 0; font-size: 0.8rem; }
-.card-links a { color: inherit; }
-
-.engines { display: flex; flex-wrap: wrap; gap: 0.35rem; }
-.engine {
-  font-size: 0.75rem;
-  font-weight: 600;
-  padding: 0.15rem 0.5rem;
-  border-radius: 999px;
-}
-.engine-pass { background: color-mix(in srgb, var(--pass) 15%, transparent); color: var(--pass); }
-.engine-fail { background: color-mix(in srgb, var(--fail) 15%, transparent); color: var(--fail); }
-.engine-unknown, .engine-not-run { background: color-mix(in srgb, var(--unknown) 15%, transparent); color: var(--unknown); }
-
-.empty-state {
-  margin: 0;
-  font-size: 0.85rem;
-  font-style: italic;
-  color: var(--unknown);
-}
-
-.badge {
-  align-self: flex-start;
-  font-size: 0.72rem;
-  font-weight: 600;
-  padding: 0.15rem 0.5rem;
-  border-radius: 4px;
-  border: 1px solid currentColor;
-}
-.badge-safari-only-failure,
-.badge-chrome-only-failure,
-.badge-firefox-only-failure,
-.badge-cross-engine-failure { color: var(--fail); }
-.badge-closed-by-this-project,
-.badge-candidate-for-upstreaming { color: var(--accent-this-repo); }
-.badge-planned { color: var(--muted); }
-
-.test-detail {
-  margin-top: 0.25rem;
-  font-size: 0.82rem;
-}
-.test-detail summary {
-  cursor: pointer;
-  color: var(--accent-upstream);
-  font-weight: 600;
-}
-.card-section-this-repo .test-detail summary { color: var(--accent-this-repo); }
-.test-detail summary:hover { text-decoration: underline; }
-
-.test-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
-  margin-top: 0.6rem;
-  padding-top: 0.6rem;
-  border-top: 1px solid var(--border);
-}
-
-.test-row {
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-  padding: 0.4rem 0;
-  border-bottom: 1px dashed var(--border);
-}
-.test-row:last-child { border-bottom: none; }
-.test-path { font-size: 0.75rem; color: inherit; word-break: break-all; }
-.test-path code { font-size: 0.72rem; }
-.test-assertion { margin: 0; font-size: 0.78rem; color: var(--muted); }
-.test-row .engines { margin: 0.1rem 0; }
-.test-row .engine { font-size: 0.68rem; padding: 0.1rem 0.4rem; }
-
-.checklist-tags { display: flex; flex-wrap: wrap; gap: 0.3rem; }
 .tag {
   font-size: 0.65rem;
   color: var(--muted);
@@ -263,8 +168,6 @@ body {
   border-radius: 3px;
   padding: 0.05rem 0.35rem;
 }
-
-.wpt-fyi-link { font-size: 0.72rem; color: inherit; align-self: flex-start; }
 
 .page-footer {
   margin-top: 3rem;

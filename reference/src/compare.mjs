@@ -54,6 +54,17 @@ export function readBrowserMatrix(path = join(ROOT, "results", "browser-matrix.m
   return out;
 }
 
+/** {engine: version} of the latest recorded row per engine. */
+export function readEngineVersions(path = join(ROOT, "results", "browser-matrix.md")) {
+  const out = {};
+  for (const line of readFileSync(path, "utf8").split("\n")) {
+    if (!line.startsWith("|") || line.startsWith("|---") || line.includes("test_id")) continue;
+    const c = line.split("|").slice(1, -1).map((s) => s.trim());
+    if (c.length >= 5 && ENGINES.includes(c[1])) out[c[1]] = c[2];
+  }
+  return out;
+}
+
 export function compare(manifest, matrixResults, survey) {
   return manifest.cells.map((cell) => {
     const per = {};

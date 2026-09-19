@@ -3,3 +3,56 @@ python = "3.12"
 uv = "latest"
 node = "24.21.0"
 pnpm = "12.4.2"
+
+# `mise run <task>`. Everything runs from the repo root.
+[tasks.install]
+description = "Install the Node dependencies (vite)"
+run = "pnpm install"
+
+[tasks.test]
+description = "Unit tests for the reference implementation (and that generated tests are up to date)"
+run = "pnpm test"
+
+[tasks.generate]
+description = "Regenerate tests/oblique-style-matching/matrix-* from reference/cases/matrix.json"
+run = "pnpm generate"
+
+[tasks.compare]
+description = "Reference expectations vs recorded browser results"
+run = "pnpm compare"
+
+[tasks.wpt-setup]
+description = "Fetch the sparse WPT checkout into .wpt/ (once)"
+run = "scripts/setup-wpt.sh"
+
+[tasks.wpt-sync]
+description = "Mirror tests/ into .wpt/ (after any change under tests/)"
+run = "scripts/sync-tests-to-wpt.sh"
+
+[tasks.wpt-lint]
+description = "wpt lint on the test folder"
+run = "scripts/sync-tests-to-wpt.sh && cd .wpt && ./wpt lint css/css-fonts/variable-oblique-interop/oblique-style-matching/"
+
+[tasks.wpt-chrome]
+description = "Run the tests in Chrome via wpt and record the results"
+run = "scripts/wpt-run.sh chrome"
+
+[tasks.wpt-firefox]
+description = "Run the tests in Firefox via wpt and record the results"
+run = "scripts/wpt-run.sh firefox"
+
+[tasks.safari]
+description = "Run the tests in Safari via safaridriver and record the results"
+run = "uv run scripts/safari-replay.py --record"
+
+[tasks.survey]
+description = "Measure the lean of every cell in Chrome, Firefox and Safari (results/survey.json)"
+run = "uv run scripts/survey.py"
+
+[tasks.site]
+description = "Build the site into dist/"
+run = "pnpm build"
+
+[tasks.site-dev]
+description = "Serve the site with hot reload"
+run = "pnpm dev"

@@ -1,7 +1,7 @@
 """Replay this folder's reftests in real Safari through safaridriver, directly.
 
 Why this exists: `./wpt run safari` was measured to disagree with the actual
-rendering (docs/investigation-log.md section 11): ~20 of 44 tests reported FAIL
+rendering (docs/running.md): ~20 of 44 tests reported FAIL
 although a direct screenshot of the test and its reference is pixel-identical,
 and it PASSED a test that really fails; 5 more flipped between two identical
 runs. This script does what a reftest runner does, without wptrunner in the
@@ -19,8 +19,8 @@ Prerequisites: Safari > Develop > Allow Remote Automation ticked (or
 sessions time out.
 
 Usage (from repo root):
-  uv run --with pillow scripts/safari-replay.py            # print a table
-  uv run --with pillow scripts/safari-replay.py --record   # also append rows
+  uv run scripts/safari-replay.py            # print a table
+  uv run scripts/safari-replay.py --record   # also append rows
                                                              # to results/browser-matrix.md
 """
 import argparse
@@ -150,7 +150,7 @@ def main():
     if args.record:
         note = ("direct safaridriver replay of the reftest, exact pixel compare, "
                 f"{args.reps} agreeing repetitions; `wpt run safari` disagreed, see "
-                "docs/investigation-log.md section 11")
+                "docs/running.md")
         rows = [f"| {t} | safari | {version} | no (safaridriver automation) | {res} | {note} |"
                 for t, res in stable.items()]
         record(rows)

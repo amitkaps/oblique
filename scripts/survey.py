@@ -13,9 +13,9 @@ reference algorithm ALLOWS predicts. That gives a verdict for every cell, includ
   synthetic 14deg ~21 px       stacked (axis + synthetic) ~36 px
 
 Usage (from repo root):
-  uv run --with pillow scripts/survey.py                          # chrome, firefox, safari
-  uv run --with pillow scripts/survey.py --engines chrome,firefox
-Writes results/survey.json. Safari needs Remote Automation enabled (see README).
+  uv run scripts/survey.py                          # chrome, firefox, safari
+  uv run scripts/survey.py --engines chrome,firefox
+Writes results/survey.json. Safari needs Remote Automation enabled (docs/running.md).
 """
 import argparse
 import base64

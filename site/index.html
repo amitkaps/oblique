@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Oblique — slnt/ital interop tracker</title>
-<meta name="description" content="Live-tracked pass/fail for CSS Fonts 4 oblique/slnt/ital matching across Chrome, Firefox, and Safari.">
-<link rel="stylesheet" href="/src/style.css">
+<title>Oblique — font-style matching</title>
+<meta name="description" content="CSS Fonts 4 oblique, italic and slnt matching, tested in Chrome, Firefox and Safari against a reference implementation of the spec.">
+<link rel="stylesheet" href="/style.css">
 <style>
 <!--MATRIX_FONT_FACE-->
 </style>
@@ -14,12 +14,10 @@
   <header class="page-header">
     <h1>Oblique</h1>
     <p class="tagline">
-      Live-tracked pass/fail for CSS Fonts 4 <code>slnt</code>/<code>ital</code>
-      variable-axis <code>font-style</code> matching across Chrome, Firefox,
-      and Safari — what's already tested by WPT, and what this project built
-      to fill the gaps.
+      Do Chrome, Firefox and Safari match <code>font-style</code> (<code>normal</code>,
+      <code>italic</code>, <code>oblique</code>, <code>slnt</code>) the way CSS Fonts 4 says?
+      A reference implementation of the spec decides what each case should do; the browsers are tested against it.
     </p>
-    <p class="synced-banner"><!--SYNCED_BANNER--></p>
   </header>
 
   <section class="coverage-matrix" aria-label="Test coverage by @font-face font-style descriptor and use-site CSS">
@@ -44,19 +42,27 @@
     <!--MATRIX-->
   </section>
 
-  <section class="card-section card-section-upstream">
-    <h2>Already tested by WPT</h2>
-    <div class="card-grid"><!--CARDS_UPSTREAM--></div>
+  <section class="findings">
+    <h2>Findings</h2>
+    <p>
+      Cells E2, E3 and E5 (<code>italic</code>, bare <code>oblique</code> and <code>&lt;em&gt;</code>
+      against a face declared <code>oblique -11deg 11deg</code>, default synthesis): the axis must clamp
+      to &minus;11 and nothing may be synthesized on top. Firefox does that. Chrome stacks a synthetic
+      skew on the axis (36px lean, expected 16px). Safari stacks for bare <code>oblique</code> and gives a
+      pure synthetic skew, no axis at all, for <code>italic</code> and <code>&lt;em&gt;</code>.
+    </p>
   </section>
 
-  <section class="card-section card-section-this-repo">
-    <h2>New tests from this project</h2>
-    <div class="card-grid"><!--CARDS_THIS_REPO--></div>
+  <section class="card-section standalone-section">
+    <h2>Hand-written tests</h2>
+    <p class="matrix-intro">Older tests written before the matrix, on several fonts. Kept while they are
+      re-based on the Cairo subset.</p>
+    <!--STANDALONE-->
   </section>
 
   <footer class="page-footer">
     <a href="https://github.com/amitkaps/oblique">github.com/amitkaps/oblique</a>
-    · <a href="https://github.com/web-platform-tests/interop/issues/64">WPT PR (not yet open)</a>
+    · <a href="https://github.com/web-platform-tests/interop/issues/64">2022 interop proposal (closed)</a>
     · <a href="https://drafts.csswg.org/css-fonts-4/#font-style-prop">CSS Fonts 4 §5.2</a>
   </footer>
 </body>

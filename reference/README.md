@@ -64,7 +64,7 @@ is allowed the test asserts only what is forbidden, for example "must not use th
 ## Validating the reference
 
 Upstream WPT tests are checked against what they INTEND (read from each test and its
-reference), not against browsers, several of which fail them (`results/upstream.json`).
+reference), not against browsers, several of which fail them.
 `test/upstream.test.mjs` covers `italic-oblique-fallback`, `font-synthesis-style-oblique-only`,
 and records `oblique-last-resort-weight-selection` as a **known disagreement** with the spec
 text (the test assumes an italic request is a 14deg slope; the text says 11deg).

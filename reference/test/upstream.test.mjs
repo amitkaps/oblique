@@ -1,6 +1,6 @@
 // The reference must agree with what upstream WPT tests INTEND, read from each test's
 // own comments and reference file (not from how browsers happen to render them: several
-// of these tests fail on some engines, see results/upstream.json). Where the reference
+// of these tests fail on some engines). Where the reference
 // and a test disagree, that is recorded below as a known disagreement with the reason,
 // not silently bent to fit.
 import { test } from "node:test";

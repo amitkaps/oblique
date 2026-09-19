@@ -1,0 +1,19 @@
+{
+  "name": "oblique",
+  "private": true,
+  "type": "module",
+  "description": "CSS Fonts 4 oblique/italic/slnt matching: a JS reference implementation, the WPT reftests it generates, and the site that shows the results.",
+  "scripts": {
+    "test": "node --test reference/test/*.test.mjs",
+    "generate": "node reference/src/cli.mjs generate",
+    "compare": "node reference/src/cli.mjs compare",
+    "build": "vite build",
+    "dev": "vite"
+  },
+  "devDependencies": {
+    "vite": "^8.3.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": ["esbuild"]
+  }
+}
