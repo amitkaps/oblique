@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # installs the versions pinned in .mise.toml (node, pnpm, python, uv)
+      - uses: jdx/mise-action@v2
+
+      - run: mise run install
+      - name: Reference implementation tests
+        run: mise run test
+      - name: Generated WPT tests are up to date
+        run: node reference/src/cli.mjs generate --check
+      - name: wpt lint
+        run: mise run wpt-setup && mise run wpt-lint
+      - name: Build the site
+        run: mise run site
+
+      - uses: actions/upload-pages-artifact@v3
+        if: github.ref == 'refs/heads/main'
+        with:
+          path: dist
+
+  deploy:
+    needs: check
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
