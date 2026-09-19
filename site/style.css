@@ -24,7 +24,7 @@
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-  max-width: 1240px;
+  max-width: 1480px;
   margin: 0 auto;
   padding: 0 1rem 3rem;
   line-height: 1.5;
@@ -155,7 +155,7 @@ body {
 .spec, .cell-fail {
   display: block;
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 0.66rem;
+  font-size: 0.64rem;
   line-height: 1.5;
   white-space: nowrap;
   overflow: hidden;
@@ -234,3 +234,17 @@ body {
 .rgrid a { color: inherit; }
 .findings { margin: 1.5rem 0 0; }
 @media (max-width: 720px) { .rrow { grid-template-columns: minmax(0, 1fr) repeat(3, 4.6rem); } }
+
+/* per-engine lines in a matrix cell */
+.eng-line { display: flex; align-items: center; gap: 0.4rem; margin-top: 0.2rem; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.64rem; line-height: 1.4; min-width: 0; }
+.eng-line .rings { display: inline-flex; gap: 0.15rem; flex: none; }
+.eng-line .eng-val { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.eng-line.fail .eng-val { color: var(--fail); }
+.eng-line .b-badge { width: 17px; height: 17px; flex: none; border-width: 2px; }
+.eng-line .b-badge .logo { width: 10px; height: 10px; }
+.col-name { display: block; font-weight: 600; margin: 0.2rem 0 0.15rem; }
+.rsum .col-name { display: inline; margin: 0 0.4rem 0 0; }
+.agree { margin-top: 1.25rem; font-size: 0.85rem; }
+.agree p { max-width: 760px; }
+.ragree summary { cursor: pointer; color: var(--muted); font-size: 0.8rem; margin: 0.4rem 0; }
+.ragree .rgrid { margin-top: 0.4rem; }

@@ -17,7 +17,7 @@
 import { readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { ROOT, MATRIX_DIR } from "./cases.mjs";
-import { label, synth } from "./outcome.mjs";
+import { axis, label, synth } from "./outcome.mjs";
 
 export const ENGINES = ["chrome", "firefox", "safari"];
 const TOL = 1.5;
@@ -31,19 +31,40 @@ export function predictedLean(o, font) {
 const SYNTH_MIN = 3;
 const SYNTH_MAX = 90;
 
-/** What a measured lean looks like, in the same words as an expectation: slnt 0, slnt -11, synth. */
-export function leanLabel(lean, font) {
+/**
+ * What a measured lean looks like, in the same words as an expectation: `slnt 0`, `slnt -11`,
+ * `synth ~14°`, or a stack of both. A lean alone is ambiguous (an axis at -5 and a 5deg synthesized
+ * skew lean the same), so the cell narrows it down:
+ *   - axis values the cell allows are always plausible;
+ *   - axis values it forbids are plausible only if the engine FAILED the reftest: a pass means the
+ *     glyph differs, pixel for pixel, from the forbidden axis rendering, so it is a synthesized skew;
+ *   - a stacked rendering is an axis value plus about one default skew (14deg, ~22px);
+ *   - anything else that leans is a synthesized skew, labelled with its angle.
+ */
+export function describeLean(cell, lean, font, reftest = null) {
+  if (lean === null || lean === undefined) return null;
   const px = font.pxPerSlntUnit;
-  const near = (v, t) => Math.abs(lean - v) <= t;
-  const synth14 = predictedLean(synth(14), font);
-  const axisMax = Math.abs(font.slnt[0]) * px;
-  if (near(0, TOL)) return "slnt 0";
-  const v = -lean / px;
-  if (Math.abs(v) <= Math.max(Math.abs(font.slnt[0]), Math.abs(font.slnt[1])) + 0.5 && near(-Math.round(v) * px, TOL)) {
-    return `slnt ${Math.round(v)}`;
+  const near = (v, t = TOL) => Math.abs(lean - v) <= t;
+  if (near(0)) return label(axis(0));
+
+  const allowedAxes = cell.allowed.filter((o) => o.kind === "axis").map((o) => o.value);
+  const forbiddenAxes = (cell.plan?.mismatch ?? []).filter((o) => o.kind === "axis").map((o) => o.value);
+  const plausible = new Set(allowedAxes);
+  if (reftest !== "pass") for (const v of forbiddenAxes) plausible.add(v);
+  for (const v of plausible) if (v !== 0 && near(-v * px)) return label(axis(v));
+
+  const synth14 = Math.abs(predictedLean(synth(14), font));
+  const stacked = [...new Set([...allowedAxes, ...forbiddenAxes, font.slnt[0]])]
+    .filter((v) => v !== 0)
+    .map((v) => ({ v, off: Math.abs(lean + v * px - synth14) })) // what is left over must be a forward default skew
+    .filter((c) => c.off <= 3)
+    .sort((x, y) => x.off - y.off)[0];
+  if (stacked) return `${label(axis(stacked.v))} + synth`;
+
+  if (Math.abs(lean) >= SYNTH_MIN) {
+    const deg = Math.abs(lean) - synth14 <= TOL && synth14 - Math.abs(lean) <= TOL ? 14 : Math.round((Math.atan(Math.abs(lean) / font.glyphHeightPx) * 180) / Math.PI);
+    return `synth ~${lean < 0 ? "-" : ""}${deg}\u00B0`;
   }
-  if (near(synth14, TOL)) return "synth";
-  if (near(axisMax + synth14, 3)) return `slnt ${font.slnt[0]} + synth`; // stacked: never allowed
   return `lean ${lean}px`;
 }
 
@@ -93,7 +114,7 @@ export function compare(manifest, matrixResults, survey) {
       per[e] = {
         reftest,
         lean,
-        label: lean === null ? null : leanLabel(lean, manifest.font),
+        label: describeLean(cell, lean, manifest.font, reftest),
         ok: verdicts.length ? verdicts.every(Boolean) : null,
       };
     }

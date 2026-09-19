@@ -53,16 +53,17 @@
     <!--RESULTS-->
     <div class="findings">
       <p>
-        Cells A2, A3, A5 and A8 (<code>italic</code>, bare <code>oblique</code>, <code>&lt;em&gt;</code> and
-        <code>oblique 45deg</code> against a face declared <code>oblique -11deg 11deg</code>, default synthesis):
-        the axis must clamp to &minus;11 and nothing may be synthesized on top. Firefox does that. Chrome stacks a
+        Cells A2, A3, A5, A8 and C2, C3, C5, C8 (<code>italic</code>, bare <code>oblique</code>, <code>&lt;em&gt;</code> and
+        <code>oblique 45deg</code> against a face declared <code>oblique -11deg 11deg</code> or <code>-5deg 5deg</code>, default
+        synthesis): the axis must clamp and nothing may be synthesized on top. Firefox does that. Chrome stacks a
         synthetic skew on the axis (36px lean, expected 16px). Safari stacks for bare <code>oblique</code> and
         <code>oblique 45deg</code>, and gives a pure synthetic skew, no axis at all, for <code>italic</code> and
         <code>&lt;em&gt;</code>. Rows 10 and 11 repeat rows 2 and 3 with synthesis off and pass everywhere, so the
-        failure is the extra skew and nothing else.
+        failure is the extra skew and nothing else. A range wider than the font's own (column B,
+        <code>-20deg 20deg</code>) passes all twelve rows in all three engines.
       </p>
       <p>
-        Cell C12: <code>italic</code> with <code>font-synthesis-style: oblique-only</code> against a face declared
+        Cell E12: <code>italic</code> with <code>font-synthesis-style: oblique-only</code> against a face declared
         <code>normal</code> must stay upright (a synthesized oblique must not stand in for italic). Firefox does;
         Chrome and Safari synthesize.
       </p>

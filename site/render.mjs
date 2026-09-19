@@ -22,7 +22,6 @@ import { TESTS_DIR, MATRIX_DIR, STANDALONE_DIR } from "../reference/src/cases.mj
 import { pinCss } from "../reference/src/outcome.mjs";
 import {
   compare,
-  leanLabel,
   loadManifest,
   loadSurvey,
   readBrowserMatrix,
@@ -94,23 +93,30 @@ function specimen(manifest, cell) {
   return `<div class="overlap">${ref}${test}</div>`;
 }
 
-function badges(manifest, survey, cell, perEngine) {
-  const lis = ENGINES.map((eng) => {
-    const status = perEngine[eng.key];
-    const lean = survey.engines?.[eng.key]?.cells?.[cell.id];
-    const label = lean == null ? null : leanLabel(lean, manifest.font);
-    let cls, word;
-    if (status === "observed") {
-      cls = "observed";
-      word = `observed: ${label}`;
-    } else {
-      cls = status === "pass" || status === "fail" ? status : "unknown";
-      word = status === "pass" ? "pass" : status === "fail" ? "fail" : "not run";
-      if (label && status === "fail") word += ` (measured: ${label})`;
-    }
-    return `<li class="b-badge ${cls}" title="${esc(`${eng.label}: ${word}`)}"><img class="logo" src="/browsers/${eng.id}.svg" alt="${esc(eng.label)}"></li>`;
+/** what one engine did in one cell: the ring (pass, fail, observed) and the words for what it rendered */
+function engineView(cell, results, verdict) {
+  return ENGINES.map((e) => {
+    const v = verdict[cell.address][e.key];
+    let ring;
+    if (cell.wpt) ring = reftestStatus(results, cell.id, e.key);
+    else ring = v.label == null ? "not-run" : v.ok === false ? "fail" : "observed"; // untested, but outside what the spec allows
+    return { engine: e, ring: ring === "pass" || ring === "fail" || ring === "observed" ? ring : "unknown", label: v.label ?? "not run" };
   });
-  return `<ul class="verdicts">${lis.join("")}</ul>`;
+}
+
+const badge = (view) =>
+  `<span class="b-badge ${view.ring}" title="${esc(`${view.engine.label}: ${view.label}`)}"><img class="logo" src="/browsers/${view.engine.id}.svg" alt="${esc(view.engine.label)}"></span>`;
+
+/**
+ * What the engines did. When all three did the same, one line; when they differ, a line each, so
+ * disagreement is what stands out.
+ */
+function engineLines(views) {
+  const same = views.every((v) => v.label === views[0].label && v.ring === views[0].ring && v.label !== "not run");
+  if (same) {
+    return `<div class="eng-line ${views[0].ring}"><span class="rings" title="Chromium, Firefox and Safari, all the same">${views.map(badge).join("")}</span><span class="eng-val">${esc(views[0].label)}</span></div>`;
+  }
+  return views.map((v) => `<div class="eng-line ${v.ring}">${badge(v)}<span class="eng-val">${esc(v.label)}</span></div>`).join("");
 }
 
 function cellStatus(cell, perEngine) {
@@ -151,7 +157,7 @@ function renderMatrix(manifest, results, survey, versions) {
   );
   out.push('<div class="matrix-wrap"><table class="matrix"><thead><tr><th></th>');
   for (const c of columns)
-    out.push(`<th><span class="addr">${esc(c.address)}</span><code>${esc(c.code)}</code><span class="col-note">${esc(c.note)}</span></th>`);
+    out.push(`<th><span class="addr">${esc(c.address)}</span><span class="col-name">${esc(c.name)}</span><code>${esc(c.code)}</code><span class="col-note">${esc(c.note)}</span></th>`);
   out.push("</tr></thead><tbody>");
   for (const row of rows) {
     const lines = row.lines.map(esc).join("<br>");
@@ -160,17 +166,13 @@ function renderMatrix(manifest, results, survey, versions) {
       const cell = byAddr[`${col.address}${row.address}`];
       const res = perCell[cell.address];
       const url = MATRIX_URL + (cell.wpt ? cell.files[0] : "matrix.manifest.json");
-      // every cell says what the reference expects, on one line, in the same words as the badges
+      // every cell says what the reference expects on one line, then what the engines did
       const line = cell.spec;
-      const tags = `<span class="spec ${line.decided ? "spec-decided" : "spec-open"}" title="${esc(cell.why.join("; "))}">${line.decided ? "spec:" : "spec*:"} ${esc(line.text)}</span>`;
-      // what an engine did where it is outside what the spec allows
-      const fails = ENGINES.filter((e) => verdict[cell.address][e.key].ok === false)
-        .map((e) => `<span class="cell-fail">${esc(e.label)}: ${esc(verdict[cell.address][e.key].label)}</span>`)
-        .join("");
+      const spec = `<span class="spec ${line.decided ? "spec-decided" : "spec-open"}" title="${esc(cell.why.join("; "))}">${line.decided ? "spec:" : "spec*:"} ${esc(line.text)}</span>`;
       out.push(
         `<td class="status-${cellStatus(cell, res)}"><span class="cell-addr">${esc(cell.address)}</span>` +
           `<a class="specimen-link" href="${esc(url)}" title="${esc(cell.id)}">${specimen(manifest, cell)}</a>` +
-          `${badges(manifest, survey, cell, res)}<div class="cell-tags">${tags}${fails}</div></td>`,
+          `<div class="cell-tags">${spec}${engineLines(engineView(cell, results, verdict))}</div></td>`,
       );
     }
     out.push("</tr>");
@@ -180,12 +182,12 @@ function renderMatrix(manifest, results, survey, versions) {
     '<ul class="legend">' +
       '<li><span class="b-badge pass"></span> pass</li>' +
       '<li><span class="b-badge fail"></span> fail</li>' +
-      '<li><span class="b-badge observed"></span> observed (the spec allows it, nothing to pass or fail)</li>' +
+      '<li><span class="b-badge observed"></span> observed: no test, the spec allows several outcomes</li>' +
       '<li><span class="b-badge unknown"></span> not run</li>' +
-      '<li class="legend-note"><strong>spec:</strong> the spec decides, one rendering. <strong>spec*:</strong> it allows any of these. ' +
+      '<li class="legend-note">Each engine line is what it rendered; three rings on one line means all three did the same. A red ring on an untested cell means what it did is outside what the spec allows. ' +
+      '<strong>spec:</strong> the spec decides, one rendering. <strong>spec*:</strong> it allows any of these. ' +
       '<code>slnt -11</code> is an 11&deg; forward slant (CSS angle and <code>slnt</code> have opposite signs), <code>slnt 0</code> is upright, ' +
-      '<code>synth</code> is a synthesized skew. A red line is what an engine did outside that.</li>' +
-      '<li class="legend-note">Hover a circle for the engine and what it was measured to do. Click a specimen for its test file.</li>' +
+      '<code>synth</code> is a synthesized skew (<code>~14&deg;</code> its angle), <code>+ synth</code> is one stacked on the axis. Click a specimen for its test file.</li>' +
       "</ul>",
   );
   const ver = ENGINES.map((e) => {
@@ -202,6 +204,31 @@ const pct = (pass, total) => (total ? `${Math.round((100 * pass) / total)}%` : "
 /** one row of the results grid: a description and one cell per engine */
 const gridRow = (first, engineCells, cls = "") =>
   `<div class="rrow ${cls}"><div class="rdesc">${first}</div>${engineCells.map((c) => `<div class="rcell ${c.cls}">${c.html}</div>`).join("")}</div>`;
+
+/**
+ * Where the spec leaves the outcome open: do the engines still render the same thing? Where all three
+ * converge, that is evidence the spec could simply say so; where they differ, it is the list to take to CSSWG.
+ */
+function renderAgreement(manifest, results, survey) {
+  const verdict = Object.fromEntries(compare(manifest, results, survey).map((r) => [r.address, r.per]));
+  const open = manifest.cells.filter((c) => c.status !== "specified");
+  const labels = (c) => ENGINES.map((e) => verdict[c.address][e.key].label);
+  const agree = open.filter((c) => labels(c).every((l) => l != null && l === labels(c)[0]));
+  const differ = open.filter((c) => !agree.includes(c));
+  const row = (c) => {
+    const col = manifest.columns.find((x) => x.slug === c.column);
+    const rw = manifest.rows.find((x) => x.slug === c.row);
+    const desc = `<span class="addr">${esc(c.address)}</span> ${esc(col.name)} <code>${esc(rw.lines.join(" "))}</code> <span class="spec spec-open">spec*: ${esc(c.spec.text)}</span>`;
+    return gridRow(desc, ENGINES.map((e) => ({ cls: "", html: esc(verdict[c.address][e.key].label ?? "not run") })), "rtest");
+  };
+  const group = (title, cells) =>
+    `<div class="rrow rhead rsection"><div class="rdesc">${title} (${cells.length})</div>${ENGINES.map(() => '<div class="rcell"></div>').join("")}</div>${cells.map(row).join("")}`;
+  return (
+    `<div class="agree"><p><strong>Where the spec is open,</strong> all three engines render the same in <strong>${agree.length} of ${open.length}</strong> cells. ` +
+    `Where they converge, the spec could say so; where they differ is the list to take to the spec authors.</p>` +
+    `<details class="ragree"><summary>Show the ${open.length} cells</summary><div class="rgrid">${group("All three agree", agree)}${group("The engines differ", differ)}</div></details></div>`
+  );
+}
 
 /**
  * The results, in the shape wpt.fyi uses: a row per @font-face descriptor with passes over tests for each
@@ -241,7 +268,7 @@ function renderResults(manifest, results, survey) {
       .join("");
     const note = open.length ? `<div class="rnote">Not scored, the spec leaves them open: ${open.map((c) => esc(c.address)).join(", ")}</div>` : "";
     out.push(
-      `<details class="rgroup"${anyFail ? " open" : ""}><summary>${gridRow(`<span class="addr">${esc(col.address)}</span> <code>${esc(col.code)}</code>`, frac, "rsum")}</summary>${lines}${note}</details>`,
+      `<details class="rgroup"${anyFail ? " open" : ""}><summary>${gridRow(`<span class="addr">${esc(col.address)}</span> <span class="col-name">${esc(col.name)}</span> <code>${esc(col.code)}</code>`, frac, "rsum")}</summary>${lines}${note}</details>`,
     );
   }
   out.push(
@@ -270,7 +297,7 @@ function renderResults(manifest, results, survey) {
     })), "rtotal"),
   );
   out.push("</div>");
-  return out.join("");
+  return out.join("") + renderAgreement(manifest, results, survey);
 }
 
 export function matrixPage() {

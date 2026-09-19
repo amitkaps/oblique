@@ -4,7 +4,7 @@ The single folder that would be proposed to WPT (`css/css-fonts/variable-oblique
 This README is not copied into `.wpt/`.
 
 ```
-matrix/       46 generated reftests + matrix.manifest.json (never edited by hand)
+matrix/       69 generated reftests + matrix.manifest.json (never edited by hand)
 standalone/   8 additional hand-written tests (see below)
 resources/    fonts (each with a .headers sidecar for WPT) and the scripts that build them
 oblique-matching.css   shared fixed-size layout, so pixel diffs do not depend on font metrics
@@ -12,8 +12,8 @@ oblique-matching.css   shared fixed-size layout, so pixel diffs do not depend on
 
 ## matrix/
 
-Columns are the `@font-face` `font-style` descriptor (A omitted, B `normal`, C `italic`, D bare `oblique`,
-E `oblique -11deg 11deg`); rows are the use-site request (1 `normal`, 2 `italic`, 3 `oblique`,
+Columns are the `@font-face` `font-style` descriptor (A the font's own range `oblique -11deg 11deg`, B a wider range
+`oblique -20deg 20deg`, C a narrow range `oblique -5deg 5deg`, D bare `oblique`, E `normal`, F `auto` (omitted), G `italic`); rows are the use-site request (1 `normal`, 2 `italic`, 3 `oblique`,
 4 `oblique 11deg`, 5 `<em>`, 6 `font-variation-settings: 'slnt' -11`, 7 `oblique 5deg`, 8 `oblique 45deg`,
 9 `oblique -5deg`, 10 `italic` with `font-synthesis-style: none`, 11 `oblique` with `font-synthesis: none`,
 12 `italic` with `font-synthesis-style: oblique-only`). A cell is `A2`; its file is
@@ -36,7 +36,7 @@ Additional tests, shown at the bottom of the site's results. Each quotes the CSS
 
 | Test | Font | Claim | Status |
 |---|---|---|---|
-| `auto-keyword-equals-omitted` | Cairo | `font-style: auto` renders exactly like an omitted descriptor (4.4: `auto` is the initial value), for seven requests. Holds even where the spec is open. Not a column: it would repeat column D | keep |
+| `auto-keyword-equals-omitted` | Cairo | `font-style: auto` renders exactly like an omitted descriptor (4.4: `auto` is the initial value), for seven requests. Holds even where the spec is open. Not a column: it would repeat column F | keep |
 | `explicit-descriptor-range-clamp` | oblique-onesided-neg | an explicit descriptor range clamps the request | replace by a matrix column |
 | `boundary-0deg-normal-fallback` | oblique-nozero | `normal` against a backslant-only face: 3-stage fallback | replace by a matrix column |
 | `multi-branch-fallback-chain` | oblique-nozero | `italic`: 4-stage fallback | replace by a matrix column |
@@ -47,8 +47,8 @@ Additional tests, shown at the bottom of the site's results. Each quotes the CSS
 The four `ital` tests wait for a real font with an `ital` axis (one to subset, OFL). Their expectations were not
 re-derived with the reference, which does not model `ital` on an `auto` face yet, so treat their verdicts as unchecked.
 
-Seven earlier tests were removed because the matrix covers them: the two `boundary-11deg` tests (D4 and the
-backslant row), both `auto-derived-range-clamp` tests (D3, D8 and upstream `font-face-style-auto-variable`),
+Seven earlier tests were removed because the matrix covers them: the two `boundary-11deg` tests (F4 and the
+backslant row), both `auto-derived-range-clamp` tests (F3, F8 and upstream `font-face-style-auto-variable`),
 `slnt-axis-activation`, `explicit-range-bare-keyword-synthesis-stacking` (A2, A3) and
 `style-plus-explicit-variation-settings` (font-variation-settings always wins by the cascade; row 6 covers it).
 They remain in git history at the `pre-simplification` tag and before commit "Results table".
