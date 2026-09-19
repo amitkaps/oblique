@@ -1,5 +1,5 @@
 :root {
-  color-scheme: light dark;
+  color-scheme: light;
   --pass: #1a7f37;
   --fail: #cf222e;
   --unknown: #9a6700;
@@ -11,20 +11,11 @@
   --muted: #656d76;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #0d1117;
-    --fg: #e6edf3;
-    --muted: #8d96a0;
-    --border: #30363d;
-  }
-}
-
 * { box-sizing: border-box; }
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-  max-width: 1480px;
+  max-width: 1080px;
   margin: 0 auto;
   padding: 0 1rem 3rem;
   line-height: 1.5;
@@ -89,14 +80,14 @@ body {
 .matrix td.status-blank { color: var(--muted); text-align: center; vertical-align: middle; }
 .blank-cell { display: block; font-size: 1.2rem; }
 
-/* The live specimen: the word OBLIQUE twice, screen-blended on a dark panel.
-   Pink = the test's own reference rendering, cyan = the CSS under test. Aligned
-   they blend to a pale colour; visible pink is a failure. */
+/* The live specimen: the word OBLIQUE twice, multiplied on a light panel.
+   Pink = the test's own reference rendering, cyan = the CSS under test. Aligned they
+   merge into dark blue; visible pink is a failure (the reference is not covered). */
 .specimen-link { display: block; text-decoration: none; }
 .overlap {
   position: relative;
   isolation: isolate;
-  background: #0b0d10;
+  background: #f4f6f8;
   border-radius: 4px;
   padding: 0.35rem 0.5rem;
   font-size: 1.7rem;
@@ -104,10 +95,10 @@ body {
   white-space: nowrap;
   overflow: hidden;
 }
-.overlap span { display: block; font-synthesis: weight style; mix-blend-mode: screen; }
-.ov-control { position: absolute; top: 0.35rem; left: 0.5rem; color: #ff3d9a; }
-.ov-test { position: relative; color: #22d3ee; }
-.overlap-single .ov-test { color: #e6edf3; }
+.overlap span { display: block; font-synthesis: weight style; mix-blend-mode: multiply; }
+.ov-control { position: absolute; top: 0.35rem; left: 0.5rem; color: #ff2d95; }
+.ov-test { position: relative; color: #00b4e6; }
+.overlap-single .ov-test { color: var(--fg); }
 
 .verdicts {
   display: flex;
@@ -179,8 +170,8 @@ body {
   .overlap { font-size: 1.4rem; }
 }
 
-.ov-pink { color: #ff3d9a; }
-.ov-cyan { color: #22d3ee; }
+.ov-pink { color: #ff2d95; }
+.ov-cyan { color: #00b4e6; }
 
 /* generated-matrix additions: spreadsheet addresses and "observed" cells */
 .matrix td { position: relative; }
@@ -240,11 +231,20 @@ body {
 .eng-line .rings { display: inline-flex; gap: 0.15rem; flex: none; }
 .eng-line .eng-val { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
 .eng-line.fail .eng-val { color: var(--fail); }
-.eng-line .b-badge { width: 17px; height: 17px; flex: none; border-width: 2px; }
-.eng-line .b-badge .logo { width: 10px; height: 10px; }
+.eng-line .b-badge { width: 20px; height: 20px; flex: none; border-width: 2px; }
+.eng-line .b-badge .logo { width: 14px; height: 14px; }
 .col-name { display: block; font-weight: 600; margin: 0.2rem 0 0.15rem; }
 .rsum .col-name { display: inline; margin: 0 0.4rem 0 0; }
 .agree { margin-top: 1.25rem; font-size: 0.85rem; }
 .agree p { max-width: 760px; }
 .ragree summary { cursor: pointer; color: var(--muted); font-size: 0.8rem; margin: 0.4rem 0; }
 .ragree .rgrid { margin-top: 0.4rem; }
+
+/* the grid breaks out of the reading column; everything else stays contained */
+.coverage-matrix .matrix-wrap {
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(calc(100vw - 3rem), 1800px);
+}
+.hlogo { width: 16px; height: 16px; vertical-align: -3px; margin-right: 0.35rem; }

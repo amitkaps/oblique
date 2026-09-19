@@ -241,7 +241,7 @@ function renderResults(manifest, results, survey) {
   const total = Object.fromEntries(ENGINES.map((e) => [e.key, { pass: 0, n: 0 }]));
   const out = [];
   out.push(
-    `<div class="rgrid"><div class="rrow rhead"><div class="rdesc">Description</div>${ENGINES.map((e) => `<div class="rcell">${esc(e.label)}</div>`).join("")}</div>`,
+    `<div class="rgrid"><div class="rrow rhead"><div class="rdesc">Description</div>${ENGINES.map((e) => `<div class="rcell"><img class="hlogo" src="/browsers/${e.id}.svg" alt="">${esc(e.label)}</div>`).join("")}</div>`,
   );
 
   for (const col of manifest.columns) {
