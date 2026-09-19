@@ -163,24 +163,6 @@ are dropped; git keeps the history. See `docs/running.md`.
 | matrix-oblnone-oblwide | chrome | 153.0.8010.48 | no | pass | wpt status: PASS |
 | matrix-oblnone-oblwide | firefox | 156.0 | no | pass | wpt status: PASS |
 | matrix-oblnone-oblwide | safari | 27.0 | no (safaridriver automation) | pass | direct safaridriver replay of the reftest, exact pixel compare, 3 agreeing repetitions; `wpt run safari` disagreed, see docs/running.md |
-| matrix-slnt-auto | chrome | 153.0.8010.48 | no | pass | wpt status: PASS |
-| matrix-slnt-auto | firefox | 156.0 | no | pass | wpt status: PASS |
-| matrix-slnt-auto | safari | 27.0 | no (safaridriver automation) | pass | direct safaridriver replay of the reftest, exact pixel compare, 3 agreeing repetitions; `wpt run safari` disagreed, see docs/running.md |
-| matrix-slnt-normal | chrome | 153.0.8010.48 | no | pass | wpt status: PASS |
-| matrix-slnt-normal | firefox | 156.0 | no | pass | wpt status: PASS |
-| matrix-slnt-normal | safari | 27.0 | no (safaridriver automation) | pass | direct safaridriver replay of the reftest, exact pixel compare, 3 agreeing repetitions; `wpt run safari` disagreed, see docs/running.md |
-| matrix-slnt-oblique | chrome | 153.0.8010.48 | no | pass | wpt status: PASS |
-| matrix-slnt-oblique | firefox | 156.0 | no | pass | wpt status: PASS |
-| matrix-slnt-oblique | safari | 27.0 | no (safaridriver automation) | pass | direct safaridriver replay of the reftest, exact pixel compare, 3 agreeing repetitions; `wpt run safari` disagreed, see docs/running.md |
-| matrix-slnt-oblonesided | chrome | 153.0.8010.48 | no | pass | wpt status: PASS |
-| matrix-slnt-oblonesided | firefox | 156.0 | no | pass | wpt status: PASS |
-| matrix-slnt-oblonesided | safari | 27.0 | no (safaridriver automation) | pass | direct safaridriver replay of the reftest, exact pixel compare, 3 agreeing repetitions; `wpt run safari` disagreed, see docs/running.md |
-| matrix-slnt-oblrange | chrome | 153.0.8010.48 | no | pass | wpt status: PASS |
-| matrix-slnt-oblrange | firefox | 156.0 | no | pass | wpt status: PASS |
-| matrix-slnt-oblrange | safari | 27.0 | no (safaridriver automation) | pass | direct safaridriver replay of the reftest, exact pixel compare, 3 agreeing repetitions; `wpt run safari` disagreed, see docs/running.md |
-| matrix-slnt-oblwide | chrome | 153.0.8010.48 | no | pass | wpt status: PASS |
-| matrix-slnt-oblwide | firefox | 156.0 | no | pass | wpt status: PASS |
-| matrix-slnt-oblwide | safari | 27.0 | no (safaridriver automation) | pass | direct safaridriver replay of the reftest, exact pixel compare, 3 agreeing repetitions; `wpt run safari` disagreed, see docs/running.md |
 | standalone-auto-keyword-equals-omitted | chrome | 153.0.8010.48 | no | pass | wpt status: PASS |
 | standalone-auto-keyword-equals-omitted | firefox | 156.0 | no | pass | wpt status: PASS |
 | standalone-auto-keyword-equals-omitted | safari | 27.0 | no (safaridriver automation) | pass | direct safaridriver replay of the reftest, exact pixel compare, 3 agreeing repetitions; `wpt run safari` disagreed, see docs/running.md |

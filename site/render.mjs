@@ -195,7 +195,6 @@ const pct = (pass, total) => (total ? `${Math.round((100 * pass) / total)}%` : "
 const gridRow = (first, cells, cls = "") =>
   `<div class="rrow ${cls}"><div class="rdesc">${first}</div>${cells.map((c) => `<div class="rcell ${c.cls}">${c.html}</div>`).join("")}</div>`;
 
-const BLANK = { cls: "none", html: "" };
 const interopCell = (state) =>
   state === "same" ? { cls: "all", html: "same" }
   : state === "differ" ? { cls: "differ", html: "differs" }
@@ -203,17 +202,21 @@ const interopCell = (state) =>
   : { cls: "none", html: "&ndash;" };
 
 /**
- * The results, in the shape wpt.fyi uses: a row per @font-face descriptor with passes over tests for each
- * engine, opening to the cells behind it, a group Z for the hand-written tests, then a total with a percentage.
- * The engine columns score WPT tests (a pass may be a loose one). The Interop column scores every cell and is
- * stricter: all three engines must render the same allowed thing, so a cell where the spec allows several
- * outcomes and the engines chose differently is not interoperable even though each engine passes.
+ * The results, in the shape wpt.fyi uses: a row per @font-face descriptor, opening to the cells behind it, a
+ * group Z for the hand-written tests, then a total with a percentage. Every column counts the same items (each
+ * cell, and each standalone test). An engine column counts the ones where that engine renders an allowed
+ * outcome, which a loose test can pass. The Interop column is stricter: all three engines must render the same
+ * allowed thing, so a cell where the spec allows several outcomes and the engines chose differently is not
+ * interoperable even though each engine passes.
  */
 function renderResults(manifest, results, survey) {
   const rowsC = compare(manifest, results, survey);
   const verdict = Object.fromEntries(rowsC.map((r) => [r.address, r.per]));
   const state = Object.fromEntries(rowsC.map((r) => [r.address, r.state]));
   const passed = (id, key) => reftestStatus(results, id, key) === "pass";
+  // an engine conforms in a cell when it renders an allowed outcome: a WPT pass, or, where no test can fail
+  // (the spec excludes nothing testable), any measured rendering
+  const conforms = (c, key) => (c.wpt ? passed(c.id, key) : verdict[c.address][key].ok !== false && verdict[c.address][key].label != null);
   const total = Object.fromEntries(ENGINES.map((e) => [e.key, { pass: 0, n: 0 }]));
   const interop = { same: 0, n: 0 };
   const out = [];
@@ -223,12 +226,11 @@ function renderResults(manifest, results, survey) {
 
   for (const col of manifest.columns) {
     const all = manifest.cells.filter((c) => c.column === col.slug);
-    const tested = all.filter((c) => c.wpt);
     const frac = ENGINES.map((e) => {
-      const pass = tested.filter((c) => passed(c.id, e.key)).length;
+      const pass = all.filter((c) => conforms(c, e.key)).length;
       total[e.key].pass += pass;
-      total[e.key].n += tested.length;
-      return { cls: cellClass(pass, tested.length), html: `${pass} / ${tested.length}`, pass };
+      total[e.key].n += all.length;
+      return { cls: cellClass(pass, all.length), html: `${pass} / ${all.length}`, pass };
     });
     const same = all.filter((c) => state[c.address] === "same").length;
     interop.same += same;
@@ -242,7 +244,7 @@ function renderResults(manifest, results, survey) {
         const cells = ENGINES.map((e) => {
           const v = verdict[c.address][e.key];
           const what = esc(v.label ?? "not run");
-          if (!c.wpt) return { cls: st === "differ" ? "differ" : "none", html: `<span class="did did-obs">${what}</span>` };
+          if (!c.wpt) return conforms(c, e.key) ? { cls: st === "differ" ? "differ" : "all", html: `allowed<span class="did did-obs">${what}</span>` } : { cls: "zero", html: `fail<span class="did">${what}</span>` };
           if (!passed(c.id, e.key)) return { cls: "zero", html: `fail<span class="did">${what}</span>` };
           return st === "differ" ? { cls: "differ", html: `pass<span class="did did-differ">${what}</span>` } : { cls: "all", html: "pass" };
         });
@@ -255,7 +257,8 @@ function renderResults(manifest, results, survey) {
       `<details class="rgroup"${anyBad ? " open" : ""}><summary>${gridRow(`<span class="addr">${esc(col.address)}</span> <span class="col-name">${esc(col.name)}</span> <code>${esc(col.code)}</code>`, sumCells, "rsum")}</summary>${lines}</details>`,
     );
   }
-  // group Z: the hand-written tests, which are not cells of the grid (no interop score: nothing is compared)
+  // group Z: the hand-written tests, which are not cells of the grid. Each is a single-outcome reftest, so a
+  // pass in all three engines is the same rendering in all three
   const z = manifest.standalone ?? [];
   if (z.length) {
     const frac = ENGINES.map((e) => {
@@ -264,17 +267,22 @@ function renderResults(manifest, results, survey) {
       total[e.key].n += z.length;
       return { cls: cellClass(pass, z.length), html: `${pass} / ${z.length}`, pass };
     });
+    const allPass = (t) => ENGINES.every((e) => passed(t.id, e.key));
+    const zSame = z.filter(allPass).length;
+    interop.same += zSame;
+    interop.n += z.length;
     const lines = z
       .map((t) => {
         const cells = ENGINES.map((e) => {
           const ok = passed(t.id, e.key);
           return { cls: ok ? "all" : "zero", html: ok ? "pass" : "fail" };
         });
-        return gridRow(`<a class="addr" href="${esc(TEST_URL_BASE + t.id + ".html")}">${esc(t.address)}</a> ${esc(t.name)}`, [...cells, BLANK], "rtest");
+        return gridRow(`<a class="addr" href="${esc(TEST_URL_BASE + t.id + ".html")}">${esc(t.address)}</a> ${esc(t.name)}`, [...cells, interopCell(allPass(t) ? "same" : "fail")], "rtest");
       })
       .join("");
+    const zSum = [...frac, { cls: cellClass(zSame, z.length), html: `${zSame} / ${z.length}` }];
     out.push(
-      `<details class="rgroup"${frac.some((f) => f.cls !== "all") ? " open" : ""}><summary>${gridRow(`<span class="addr">Z</span> <span class="col-name">Standalone tests</span> <code>hand-written, not cells of the grid</code>`, [...frac, BLANK], "rsum")}</summary>${lines}</details>`,
+      `<details class="rgroup"${zSum.some((f) => f.cls !== "all") ? " open" : ""}><summary>${gridRow(`<span class="addr">Z</span> <span class="col-name">Standalone tests</span> <code>hand-written, not cells of the grid</code>`, zSum, "rsum")}</summary>${lines}</details>`,
     );
   }
   out.push(

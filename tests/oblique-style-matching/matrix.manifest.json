@@ -98,17 +98,6 @@
     },
     {
       "address": "5",
-      "slug": "slnt",
-      "request": "normal",
-      "fvs": {
-        "slnt": -11
-      },
-      "lines": [
-        "font-variation-settings: 'slnt' -11;"
-      ]
-    },
-    {
-      "address": "6",
       "slug": "obl5",
       "request": "oblique 5deg",
       "lines": [
@@ -116,7 +105,7 @@
       ]
     },
     {
-      "address": "7",
+      "address": "6",
       "slug": "obl45",
       "request": "oblique 45deg",
       "lines": [
@@ -124,7 +113,7 @@
       ]
     },
     {
-      "address": "8",
+      "address": "7",
       "slug": "oblm5",
       "request": "oblique -5deg",
       "lines": [
@@ -132,7 +121,7 @@
       ]
     },
     {
-      "address": "9",
+      "address": "8",
       "slug": "italicnone",
       "request": "italic",
       "lines": [
@@ -145,7 +134,7 @@
       "extraCss": "font-synthesis-style: none;"
     },
     {
-      "address": "10",
+      "address": "9",
       "slug": "oblnone",
       "request": "oblique",
       "lines": [
@@ -1284,282 +1273,6 @@
     },
     {
       "address": "A5",
-      "id": "matrix-slnt-oblrange",
-      "row": "slnt",
-      "column": "oblrange",
-      "request": "normal",
-      "descriptor": "oblique -11deg 11deg",
-      "css": "font-variation-settings: 'slnt' -11;",
-      "status": "specified",
-      "spec": {
-        "decided": true,
-        "text": "slnt -11"
-      },
-      "allowed": [
-        {
-          "kind": "axis",
-          "axis": "slnt",
-          "value": -11
-        }
-      ],
-      "plan": {
-        "match": [
-          {
-            "kind": "axis",
-            "axis": "slnt",
-            "value": -11
-          }
-        ],
-        "mismatch": []
-      },
-      "selected": [
-        "face"
-      ],
-      "stage": "normal: oblique >= 0 ascending",
-      "assumptions": [],
-      "why": [
-        "selected face face (stage: normal: oblique >= 0 ascending)",
-        "oblique face [-11, 11]: closest matching value 0, clamped to the descriptor, then to the font",
-        "font-variation-settings is applied after the font-style variations (7.2), so it decides the axis"
-      ],
-      "wpt": true,
-      "files": [
-        "matrix-slnt-oblrange.html",
-        "matrix-slnt-oblrange-slnt-11-ref.html"
-      ]
-    },
-    {
-      "address": "B5",
-      "id": "matrix-slnt-oblwide",
-      "row": "slnt",
-      "column": "oblwide",
-      "request": "normal",
-      "descriptor": "oblique -20deg 20deg",
-      "css": "font-variation-settings: 'slnt' -11;",
-      "status": "specified",
-      "spec": {
-        "decided": true,
-        "text": "slnt -11"
-      },
-      "allowed": [
-        {
-          "kind": "axis",
-          "axis": "slnt",
-          "value": -11
-        }
-      ],
-      "plan": {
-        "match": [
-          {
-            "kind": "axis",
-            "axis": "slnt",
-            "value": -11
-          }
-        ],
-        "mismatch": []
-      },
-      "selected": [
-        "face"
-      ],
-      "stage": "normal: oblique >= 0 ascending",
-      "assumptions": [],
-      "why": [
-        "selected face face (stage: normal: oblique >= 0 ascending)",
-        "oblique face [-20, 20]: closest matching value 0, clamped to the descriptor, then to the font",
-        "font-variation-settings is applied after the font-style variations (7.2), so it decides the axis"
-      ],
-      "wpt": true,
-      "files": [
-        "matrix-slnt-oblwide.html",
-        "matrix-slnt-oblwide-slnt-11-ref.html"
-      ]
-    },
-    {
-      "address": "C5",
-      "id": "matrix-slnt-oblonesided",
-      "row": "slnt",
-      "column": "oblonesided",
-      "request": "normal",
-      "descriptor": "oblique 0deg 10deg",
-      "css": "font-variation-settings: 'slnt' -11;",
-      "status": "specified",
-      "spec": {
-        "decided": true,
-        "text": "slnt -11"
-      },
-      "allowed": [
-        {
-          "kind": "axis",
-          "axis": "slnt",
-          "value": -11
-        }
-      ],
-      "plan": {
-        "match": [
-          {
-            "kind": "axis",
-            "axis": "slnt",
-            "value": -11
-          }
-        ],
-        "mismatch": []
-      },
-      "selected": [
-        "face"
-      ],
-      "stage": "normal: oblique >= 0 ascending",
-      "assumptions": [],
-      "why": [
-        "selected face face (stage: normal: oblique >= 0 ascending)",
-        "oblique face [0, 10]: closest matching value 0, clamped to the descriptor, then to the font",
-        "font-variation-settings is applied after the font-style variations (7.2), so it decides the axis"
-      ],
-      "wpt": true,
-      "files": [
-        "matrix-slnt-oblonesided.html",
-        "matrix-slnt-oblonesided-slnt-11-ref.html"
-      ]
-    },
-    {
-      "address": "D5",
-      "id": "matrix-slnt-oblique",
-      "row": "slnt",
-      "column": "oblique",
-      "request": "normal",
-      "descriptor": "oblique",
-      "css": "font-variation-settings: 'slnt' -11;",
-      "status": "specified",
-      "spec": {
-        "decided": true,
-        "text": "slnt -11"
-      },
-      "allowed": [
-        {
-          "kind": "axis",
-          "axis": "slnt",
-          "value": -11
-        }
-      ],
-      "plan": {
-        "match": [
-          {
-            "kind": "axis",
-            "axis": "slnt",
-            "value": -11
-          }
-        ],
-        "mismatch": []
-      },
-      "selected": [
-        "face"
-      ],
-      "stage": "normal: oblique >= 0 ascending",
-      "assumptions": [],
-      "why": [
-        "selected face face (stage: normal: oblique >= 0 ascending)",
-        "oblique face [14, 14]: closest matching value 14, clamped to the descriptor, then to the font",
-        "font-variation-settings is applied after the font-style variations (7.2), so it decides the axis"
-      ],
-      "wpt": true,
-      "files": [
-        "matrix-slnt-oblique.html",
-        "matrix-slnt-oblique-slnt-11-ref.html"
-      ]
-    },
-    {
-      "address": "E5",
-      "id": "matrix-slnt-normal",
-      "row": "slnt",
-      "column": "normal",
-      "request": "normal",
-      "descriptor": "normal",
-      "css": "font-variation-settings: 'slnt' -11;",
-      "status": "specified",
-      "spec": {
-        "decided": true,
-        "text": "slnt -11"
-      },
-      "allowed": [
-        {
-          "kind": "axis",
-          "axis": "slnt",
-          "value": -11
-        }
-      ],
-      "plan": {
-        "match": [
-          {
-            "kind": "axis",
-            "axis": "slnt",
-            "value": -11
-          }
-        ],
-        "mismatch": []
-      },
-      "selected": [
-        "face"
-      ],
-      "stage": "normal: oblique >= 0 ascending",
-      "assumptions": [],
-      "why": [
-        "selected face face (stage: normal: oblique >= 0 ascending)",
-        "normal face: descriptor replaces the font data's style (4.4); applied value clamped to [0,0]",
-        "font-variation-settings is applied after the font-style variations (7.2), so it decides the axis"
-      ],
-      "wpt": true,
-      "files": [
-        "matrix-slnt-normal.html",
-        "matrix-slnt-normal-slnt-11-ref.html"
-      ]
-    },
-    {
-      "address": "F5",
-      "id": "matrix-slnt-auto",
-      "row": "slnt",
-      "column": "auto",
-      "request": "normal",
-      "descriptor": null,
-      "css": "font-variation-settings: 'slnt' -11;",
-      "status": "specified",
-      "spec": {
-        "decided": true,
-        "text": "slnt -11"
-      },
-      "allowed": [
-        {
-          "kind": "axis",
-          "axis": "slnt",
-          "value": -11
-        }
-      ],
-      "plan": {
-        "match": [
-          {
-            "kind": "axis",
-            "axis": "slnt",
-            "value": -11
-          }
-        ],
-        "mismatch": []
-      },
-      "selected": [
-        "face"
-      ],
-      "stage": "normal: oblique >= 0 ascending",
-      "assumptions": [],
-      "why": [
-        "selected face face (stage: normal: oblique >= 0 ascending)",
-        "auto face, normal request: selected as normal, applied value 0",
-        "font-variation-settings is applied after the font-style variations (7.2), so it decides the axis"
-      ],
-      "wpt": true,
-      "files": [
-        "matrix-slnt-auto.html",
-        "matrix-slnt-auto-slnt-11-ref.html"
-      ]
-    },
-    {
-      "address": "A6",
       "id": "matrix-obl5-oblrange",
       "row": "obl5",
       "column": "oblrange",
@@ -1605,7 +1318,7 @@
       ]
     },
     {
-      "address": "B6",
+      "address": "B5",
       "id": "matrix-obl5-oblwide",
       "row": "obl5",
       "column": "oblwide",
@@ -1651,7 +1364,7 @@
       ]
     },
     {
-      "address": "C6",
+      "address": "C5",
       "id": "matrix-obl5-oblonesided",
       "row": "obl5",
       "column": "oblonesided",
@@ -1697,7 +1410,7 @@
       ]
     },
     {
-      "address": "D6",
+      "address": "D5",
       "id": "matrix-obl5-oblique",
       "row": "obl5",
       "column": "oblique",
@@ -1743,7 +1456,7 @@
       ]
     },
     {
-      "address": "E6",
+      "address": "E5",
       "id": "matrix-obl5-normal",
       "row": "obl5",
       "column": "normal",
@@ -1799,7 +1512,7 @@
       ]
     },
     {
-      "address": "F6",
+      "address": "F5",
       "id": "matrix-obl5-auto",
       "row": "obl5",
       "column": "auto",
@@ -1845,7 +1558,7 @@
       ]
     },
     {
-      "address": "A7",
+      "address": "A6",
       "id": "matrix-obl45-oblrange",
       "row": "obl45",
       "column": "oblrange",
@@ -1891,7 +1604,7 @@
       ]
     },
     {
-      "address": "B7",
+      "address": "B6",
       "id": "matrix-obl45-oblwide",
       "row": "obl45",
       "column": "oblwide",
@@ -1937,7 +1650,7 @@
       ]
     },
     {
-      "address": "C7",
+      "address": "C6",
       "id": "matrix-obl45-oblonesided",
       "row": "obl45",
       "column": "oblonesided",
@@ -1983,7 +1696,7 @@
       ]
     },
     {
-      "address": "D7",
+      "address": "D6",
       "id": "matrix-obl45-oblique",
       "row": "obl45",
       "column": "oblique",
@@ -2029,7 +1742,7 @@
       ]
     },
     {
-      "address": "E7",
+      "address": "E6",
       "id": "matrix-obl45-normal",
       "row": "obl45",
       "column": "normal",
@@ -2079,7 +1792,7 @@
       ]
     },
     {
-      "address": "F7",
+      "address": "F6",
       "id": "matrix-obl45-auto",
       "row": "obl45",
       "column": "auto",
@@ -2125,7 +1838,7 @@
       ]
     },
     {
-      "address": "A8",
+      "address": "A7",
       "id": "matrix-oblm5-oblrange",
       "row": "oblm5",
       "column": "oblrange",
@@ -2173,7 +1886,7 @@
       ]
     },
     {
-      "address": "B8",
+      "address": "B7",
       "id": "matrix-oblm5-oblwide",
       "row": "oblm5",
       "column": "oblwide",
@@ -2221,7 +1934,7 @@
       ]
     },
     {
-      "address": "C8",
+      "address": "C7",
       "id": "matrix-oblm5-oblonesided",
       "row": "oblm5",
       "column": "oblonesided",
@@ -2269,7 +1982,7 @@
       ]
     },
     {
-      "address": "D8",
+      "address": "D7",
       "id": "matrix-oblm5-oblique",
       "row": "oblm5",
       "column": "oblique",
@@ -2317,7 +2030,7 @@
       ]
     },
     {
-      "address": "E8",
+      "address": "E7",
       "id": "matrix-oblm5-normal",
       "row": "oblm5",
       "column": "normal",
@@ -2375,7 +2088,7 @@
       ]
     },
     {
-      "address": "F8",
+      "address": "F7",
       "id": "matrix-oblm5-auto",
       "row": "oblm5",
       "column": "auto",
@@ -2423,7 +2136,7 @@
       ]
     },
     {
-      "address": "A9",
+      "address": "A8",
       "id": "matrix-italicnone-oblrange",
       "row": "italicnone",
       "column": "oblrange",
@@ -2469,7 +2182,7 @@
       ]
     },
     {
-      "address": "B9",
+      "address": "B8",
       "id": "matrix-italicnone-oblwide",
       "row": "italicnone",
       "column": "oblwide",
@@ -2515,7 +2228,7 @@
       ]
     },
     {
-      "address": "C9",
+      "address": "C8",
       "id": "matrix-italicnone-oblonesided",
       "row": "italicnone",
       "column": "oblonesided",
@@ -2561,7 +2274,7 @@
       ]
     },
     {
-      "address": "D9",
+      "address": "D8",
       "id": "matrix-italicnone-oblique",
       "row": "italicnone",
       "column": "oblique",
@@ -2607,7 +2320,7 @@
       ]
     },
     {
-      "address": "E9",
+      "address": "E8",
       "id": "matrix-italicnone-normal",
       "row": "italicnone",
       "column": "normal",
@@ -2653,7 +2366,7 @@
       ]
     },
     {
-      "address": "F9",
+      "address": "F8",
       "id": "matrix-italicnone-auto",
       "row": "italicnone",
       "column": "auto",
@@ -2696,7 +2409,7 @@
       "files": []
     },
     {
-      "address": "A10",
+      "address": "A9",
       "id": "matrix-oblnone-oblrange",
       "row": "oblnone",
       "column": "oblrange",
@@ -2742,7 +2455,7 @@
       ]
     },
     {
-      "address": "B10",
+      "address": "B9",
       "id": "matrix-oblnone-oblwide",
       "row": "oblnone",
       "column": "oblwide",
@@ -2788,7 +2501,7 @@
       ]
     },
     {
-      "address": "C10",
+      "address": "C9",
       "id": "matrix-oblnone-oblonesided",
       "row": "oblnone",
       "column": "oblonesided",
@@ -2834,7 +2547,7 @@
       ]
     },
     {
-      "address": "D10",
+      "address": "D9",
       "id": "matrix-oblnone-oblique",
       "row": "oblnone",
       "column": "oblique",
@@ -2880,7 +2593,7 @@
       ]
     },
     {
-      "address": "E10",
+      "address": "E9",
       "id": "matrix-oblnone-normal",
       "row": "oblnone",
       "column": "normal",
@@ -2926,7 +2639,7 @@
       ]
     },
     {
-      "address": "F10",
+      "address": "F9",
       "id": "matrix-oblnone-auto",
       "row": "oblnone",
       "column": "auto",

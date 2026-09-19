@@ -1,5 +1,5 @@
 {
-  "_readme": "Rows are use-site requests, columns are @font-face font-style descriptors. Addresses (A1, B2, ...) are labels fixed on 2026-09-20, in the order an author would write the @font-face rules (renumbered once more the same day, when italic fonts were dropped: column G and the <em> and oblique-only rows). File names use the slugs: matrix-{row}-{column}.html. `request` is the element's font-style as the reference sees it; the generator derives the test's inline CSS from it (or from `fvs` / `extraCss`).",
+  "_readme": "Rows are use-site requests, columns are @font-face font-style descriptors. Addresses (A1, B2, ...) are labels fixed on 2026-09-20, in the order an author would write the @font-face rules (renumbered twice the same day: italic fonts were dropped, then the font-variation-settings row, which tests precedence, not matching). File names use the slugs: matrix-{row}-{column}.html. `request` is the element's font-style as the reference sees it; the generator derives the test's inline CSS from it (or from `fvs` / `extraCss`).",
   "font": {
     "file": "resources/Cairo.var.subset.ttf",
     "note": "real Cairo subset (slnt -11..11, wght 200..1000, no ital); the test glyph is the capital I",
@@ -98,17 +98,6 @@
     },
     {
       "address": "5",
-      "slug": "slnt",
-      "request": "normal",
-      "fvs": {
-        "slnt": -11
-      },
-      "lines": [
-        "font-variation-settings: 'slnt' -11;"
-      ]
-    },
-    {
-      "address": "6",
       "slug": "obl5",
       "request": "oblique 5deg",
       "lines": [
@@ -116,7 +105,7 @@
       ]
     },
     {
-      "address": "7",
+      "address": "6",
       "slug": "obl45",
       "request": "oblique 45deg",
       "lines": [
@@ -124,7 +113,7 @@
       ]
     },
     {
-      "address": "8",
+      "address": "7",
       "slug": "oblm5",
       "request": "oblique -5deg",
       "lines": [
@@ -132,7 +121,7 @@
       ]
     },
     {
-      "address": "9",
+      "address": "8",
       "slug": "italicnone",
       "request": "italic",
       "lines": [
@@ -145,7 +134,7 @@
       "extraCss": "font-synthesis-style: none;"
     },
     {
-      "address": "10",
+      "address": "9",
       "slug": "oblnone",
       "request": "oblique",
       "lines": [
