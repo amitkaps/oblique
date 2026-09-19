@@ -117,7 +117,7 @@ Distinct from auto-range-default-angle (which tests whether the slnt axis is cla
 
 **Corroborating evidence (independently measured, in a separate real production codebase (vizchitra-fonts), not just cited as a historical bug report):** vizchitra-fonts' Cairo face currently ships font-style: oblique -11deg 11deg (an explicit range matching its true fvar slnt bounds exactly — a deployment change from the bare/no-descriptor shape auto-range-default-angle targets). Requesting bare font-style: oblique against it (implied 14deg default, outside the range) measures shear ~0.44 in Chromium instead of the correct ~0.194 — roughly double, because Chromium correctly clamps slnt to -11 AND separately stacks a ~14deg synthetic skew on top. WebKit fails the same case a different way (discards the axis, synthesizes instead). Firefox measures correct. This repo's own test, built independently using a different (synthetic, not real Cairo) font, reproduces the identical pass/fail pattern: FAIL on Chrome, PASS on Firefox. (source: vizchitra-fonts/docs/compat.md ("Decision — UPDATED" section) and vizchitra-fonts/src/lib/fonts/slant.browser.test.ts ("the BARE oblique keyword against a ranged face is mishandled, even at the font's own true bounds"))
 
-**Candidate test:** Done — see tests/oblique-style-matching/explicit-range-bare-keyword-synthesis-stacking.html. Not yet covered: the italic variant against the same face, which vizchitra-fonts measured as a THIRD distinct failure mode on WebKit (pure synthetic skew, no axis contribution at all — this test's own file requests bare italic too, but only Chrome/Firefox results are recorded here; Safari/WebKit's distinct failure mode is not independently confirmed by this repo). Also not covered: vizchitra-fonts' separate finding that Chromium/WebKit pick the WRONG FACE entirely (falls back to an upright normal sibling) for font-style: oblique 11deg against a family with both a normal and a bare-oblique face — this is a live, independently-measured real-world instance of the still-open normal-plus-bare-oblique-same-family gap below, not yet built as a test in this repo.
+**Candidate test:** Done — see tests/oblique-style-matching/explicit-range-bare-keyword-synthesis-stacking.html, and now also matrix-face-oblique-range-use-italic.html, -oblique.html and -em.html (all Chrome FAIL / Firefox PASS at default font-synthesis; the <em> case is new). Not yet covered: the italic variant against the same face, which vizchitra-fonts measured as a THIRD distinct failure mode on WebKit (pure synthetic skew, no axis contribution at all — this test's own file requests bare italic too, but only Chrome/Firefox results are recorded here; Safari/WebKit's distinct failure mode is not independently confirmed by this repo). Also not covered: vizchitra-fonts' separate finding that Chromium/WebKit pick the WRONG FACE entirely (falls back to an upright normal sibling) for font-style: oblique 11deg against a family with both a normal and a bare-oblique face — this is a live, independently-measured real-world instance of the still-open normal-plus-bare-oblique-same-family gap below, not yet built as a test in this repo.
 
 ### 1. normal-plus-bare-oblique-same-family
 
@@ -135,19 +135,33 @@ No test constructs a same-family pairing of a font-style:normal face and a bare/
 
 ### 2. italic-descriptor-exact-match-still-shears
 
-**Status:** test written and run — tests/oblique-style-matching/matrix-italic-r5-italic.html + -ref.html, part of a 25-test batch systematically enumerating 5 @font-face font-style descriptor values x 7 use-site CSS patterns against resources/oblique-symmetric.ttf, added 2026-09-19
+**Status:** tests written and run — tests/oblique-style-matching/matrix-face-italic-use-italic.html and matrix-face-italic-use-em.html (+ refs), part of a 30-test grid: 5 @font-face font-style descriptor values x 6 use-site CSS patterns, all against resources/Cairo.var.subset.ttf, default font-synthesis, added 2026-09-19
 
 **Priority tier:** 1
 
 **Evidence tier:** written test, dated cross-engine result — a genuine, isolated FAIL on Chrome, PASS on Firefox
 
-A face declared font-style: italic (bare, binary descriptor — no numeric angle), on a font whose ONLY working axis is slnt (no ital axis), requested via <em> (implicit italic) with font-synthesis:none: Chrome renders sheared (activates the real slnt axis), Firefox renders genuinely upright. Verified against a reference forced to genuinely-upright via explicit font-variation-settings: 'slnt' 0 — NOT via implicit/default styling, which was independently confirmed unreliable here (this same face renders sheared even for a plain font-style: normal request, per matrix-italic-r7-italic.html, part of the same 25-test batch).
+A face declared font-style: italic (bare, binary descriptor — no numeric angle), on a font whose ONLY working axis is slnt (no ital axis), requested via font-style: italic or via <em> (implicit italic), at default font-synthesis: Chrome renders sheared (activates the real slnt axis), Firefox renders genuinely upright. Verified against a reference forced to genuinely-upright via explicit font-variation-settings: 'slnt' 0 — NOT via implicit/default styling, which was independently confirmed unreliable here (this same face renders sheared even for a plain font-style: normal request on BOTH engines, per matrix-face-italic-use-normal.html, part of the same grid).
 
 **Why it matters:** CSS Fonts 4's italic-matching branch (section 5.2) explicitly licenses axis-setting only 'for variable fonts with an ital axis' at its first stage — this face has no ital axis, only slnt, and the descriptor gives no explicit angle for slnt to map to. Chrome activating the axis anyway is not obviously licensed by that text. This is a narrow, specific gap in how 'binary' style descriptors (italic, with no numeric range) interact with fonts that only expose a numeric (slnt) axis, distinct from every other test in this suite which either declares an explicit range or omits the descriptor entirely.
 
 **Corroborating evidence (same underlying phenomenon already documented for a different font shape in this repo's own suite):** italic-no-extra-synthesis.html established that Chrome over-applies styling for a font-style:italic request against an italic-declared face on an ital-axis font. This new test reproduces the identical polarity on a completely different font shape (slnt-axis only, no ital axis) — Chrome activates the real slnt axis for a face declared font-style:italic even for a request whose exact style already matches the descriptor, while Firefox renders genuinely upright. (source: tests/oblique-style-matching/italic-no-extra-synthesis.html (this repo, 2026-09-18) — same Chrome-FAIL/Firefox-PASS polarity, but on an ital-axis-only font, not a slnt-only one)
 
-**Candidate test:** Done — see tests/oblique-style-matching/matrix-italic-r5-italic.html. The full 25-test batch (tests/oblique-style-matching/matrix-*.html, generated by resources/gen25.py) also confirms this is the ONLY divergent cell among all 25 systematically-enumerated (descriptor x use-site) combinations tested — every other cell agrees between Chrome and Firefox.
+**Candidate test:** Done — see tests/oblique-style-matching/matrix-face-italic-use-italic.html and matrix-face-italic-use-em.html. Both fail on Chrome only; the italic-declared column's other 4 cells agree between engines.
+
+### 2. normal-face-explicit-angle-synthesis
+
+**Status:** test written and run — tests/oblique-style-matching/matrix-face-normal-use-oblique-11deg.html + -ref.html, added 2026-09-19
+
+**Priority tier:** 1
+
+**Evidence tier:** written test, dated cross-engine result — FAIL on Chrome, PASS on Firefox
+
+A face declared font-style: normal has no oblique face (CSS Fonts 4 section 4.4: the descriptor replaces the style implied by the font data, so the font's own slnt axis is not consulted for matching). A request for font-style: oblique 11deg against it should therefore be synthesized (section 2.8.2). Measured at 8em: Firefox leans 16px, consistent with a synthesized 11deg; Chrome renders upright (0px) — it synthesizes for bare oblique/italic/<em> (21px, its fixed skew) but NOT for an explicit angle. The reftest asserts the rendering must not be upright.
+
+**Why it matters:** Unlike the bare keywords, both of which synthesize on both engines, the explicit-angle form drops the requested slant entirely on Chrome. This is the same request vizchitra-fonts uses as its recommended pattern (font-style: oblique 11deg), and it is a real hazard whenever a stylesheet's family carries only a normal face. Whether upright is a Chrome bug or a deliberate choice is not established here; only that the two engines disagree and the spec text points to synthesis.
+
+**Candidate test:** Done — see tests/oblique-style-matching/matrix-face-normal-use-oblique-11deg.html. Not established: whether Firefox's 16px is a synthetic skew or the real axis (the two are the same size at the same angle); the mismatch reftest only requires not-upright.
 
 ### 2. font-style-plus-explicit-axis-pairing
 

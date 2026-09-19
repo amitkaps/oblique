@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" class="reftest-wait">
+<meta charset="utf-8" />
+<title>CSS Test: @font-face { font-style: italic } + font-style: normal</title>
+<!--
+  Coverage-matrix cell: column = "@font-face { font-style: italic }", row = "font-style: normal".
+  One of 30 cells (5 @font-face descriptors x 6 use-site patterns) built
+  for this folder's coverage matrix; see resources/gen-matrix.py for how
+  each expected value was derived and docs/investigation-log.md section 10.
+  font-synthesis is deliberately left at its default: the spec synthesizes
+  only when the family lacks a suitable face, so a matched request must
+  never synthesize, and forcing it off would hide a browser that does.
+  Measured on both engines: with an italic-declared face as the only candidate, even a normal request renders slanted. The face's declared style is applied via the real axis. Locked in as expected.
+-->
+<link rel="help" href="https://drafts.csswg.org/css-fonts-4/#font-style-matching" />
+<link rel="help" href="https://drafts.csswg.org/css-fonts-4/#descdef-font-face-font-style" />
+<link rel="help" href="https://drafts.csswg.org/css-fonts-4/#font-synthesis-style" />
+<link rel="match" href="matrix-face-italic-use-normal-ref.html">
+<meta name="assert"
+  content="A face declared '@font-face { font-style: italic }', requested with 'font-style: normal',
+  must render the same as the reference, which sets 'slnt' -11 directly." />
+<link rel="stylesheet" href="oblique-matching.css">
+<!-- Font: resources/Cairo.var.subset.ttf: real Cairo subset (slnt -11..11, wght 200..1000, no ital); the test glyph is the capital I, a plain stem. -->
+<style>
+  @font-face {
+    font-family: "matrix test font";
+    src: url('resources/Cairo.var.subset.ttf');
+    font-style: italic;
+  }
+  .test {
+    font-family: "matrix test font";
+    font-size: 8em;
+  }
+</style>
+<script>
+  document.fonts.ready.then(() => {
+    document.documentElement.classList.remove('reftest-wait');
+  });
+</script>
+
+<p class="test" style="font-style: normal;">I</p>

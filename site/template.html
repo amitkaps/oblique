@@ -28,12 +28,13 @@
       One font, one glyph under test: real Cairo (<code>slnt</code> &minus;11..11), subset to
       the letters of OBLIQUE, tested on the capital <code>I</code>. Columns are what the
       <code>@font-face</code> declares; rows are the CSS at the use site
-      (<code>font-synthesis</code> is at its default unless the row says otherwise). Each
+      (<code>font-synthesis</code> is never set: it is only meant to apply when a face is
+      missing, so a matched request must not trigger it). Each
       specimen is live in <em>your</em> browser: <b class="ov-pink">pink</b> is the
       test's own reference rendering, <b class="ov-cyan">cyan</b> is the CSS under test;
       aligned they blend pale, and <strong>visible pink is a failure</strong>. The circles
       are this project's recorded <code>wpt run</code> results.
-      <strong>A dash means no test yet</strong> &mdash; not passing, not failing.
+      A dash would mean no test yet, not passing and not failing.
       Candidate for upstreaming; no WPT PR has been opened.
     </p>
     <!--MATRIX-->

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en" class="reftest-wait">
+<meta charset="utf-8" />
+<title>CSS Test: @font-face { font-style: oblique -11deg 11deg } + font-style: normal (reference)</title>
+<!--
+  Reference: the same face, default rendering: upright.
+-->
+<link rel="stylesheet" href="oblique-matching.css">
+<style>
+  @font-face {
+    font-family: "matrix test font";
+    src: url('resources/Cairo.var.subset.ttf');
+    font-style: oblique -11deg 11deg;
+  }
+  .test {
+    font-family: "matrix test font";
+    font-size: 8em;
+  }
+</style>
+<script>
+  document.fonts.ready.then(() => {
+    document.documentElement.classList.remove('reftest-wait');
+  });
+</script>
+
+<p class="test">I</p>

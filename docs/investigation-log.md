@@ -737,3 +737,64 @@ the old font and are left as the record of what was measured then. One
 consequence: the auto-derived-range case (`auto-derived-range-clamp-cairo-symmetric`)
 still passes on real Cairo's own axes and metadata, not just on a font with
 its range shape.
+
+## 10. The grid rebuilt at default `font-synthesis` (2026-09-19)
+
+Section 8's 25 tests forced `font-synthesis: none` in most cells. That was the
+wrong default. CSS Fonts 4 section 2.8.2 says the UA synthesizes an oblique
+face when a family *lacks* one; a request that a declared face satisfies has
+nothing to synthesize, so a correct engine never does, and forcing synthesis off
+hides exactly the engine that does anyway (section 7's stacking bug was
+invisible to every test that set `none`). All 30 cells now run at the default,
+with rows reordered to `normal`, `italic`, `oblique`, `oblique 11deg`, `<em>`,
+`font-variation-settings: 'slnt' -11` (the `<em>`/synthesis-off and
+`oblique`/synthesis-off rows are gone). The 25 superseded `matrix-*-r*` tests,
+`resources/gen25.py`, and their rows in `results/browser-matrix.md` were removed;
+`resources/gen-matrix.py` writes the 30 replacements
+(`matrix-face-<descriptor>-use-<row>.html`), with no shared or borrowed tests.
+
+**A face declared `normal` has no oblique face, whatever its `fvar` says.**
+CSS Fonts 4 section 4.4: "The value for these font face style attributes is used
+in place of the style implied by the underlying font data", and `auto` is
+"selected as if the appropriate normal value is chosen ... clamping does not
+occur". Checked against our own results: a normal-declared face rendered upright
+for oblique/`<em>` requests with synthesis off on both engines, so the font's
+`slnt` axis was not consulted. Note the flip side for the `auto` column: read
+literally the spec also treats it as normal, yet both engines apply the real axis
+to it (auto x oblique measures 16px, no synthesis); and because "clamping does not
+occur", the observed "clamps to -11" may be the font's own axis limit rather than
+browser logic. The outcome is identical either way, so the tests are unchanged,
+but "auto-derived clamp" describes the result, not necessarily the mechanism.
+
+**Measured first (WebDriver screenshots, both engines, 8em, lean of the stem top
+vs bottom).** Upright 0px, real slnt -11 = 16px, synthetic default skew = 21px,
+Chrome stacked = 36px. Chrome / Firefox:
+
+| use-site \ `@font-face` | auto | normal | italic | oblique | oblique range |
+|---|---|---|---|---|---|
+| `normal` | 0 / 0 | 0 / 0 | 16 / 16 | 16 / 16 | 0 / 0 |
+| `italic` | 16 / 16 | 21 / 21 | **16 / 0** | 16 / 16 | **36** / 16 |
+| `oblique` | 16 / 16 | 21 / 21 | 16 / 16 | 16 / 16 | **36** / 16 |
+| `oblique 11deg` | 16 / 16 | **0 / 16** | 16 / 16 | 16 / 16 | 16 / 16 |
+| `<em>` | 16 / 16 | 21 / 21 | **16 / 0** | 16 / 16 | **36** / 16 |
+| `slnt -11` | 16 / 16 | 16 / 16 | 16 / 16 | 16 / 16 | 16 / 16 |
+
+Expectations were then fixed from the spec's rules, not from the numbers:
+face-satisfied requests reach the real axis at -11 (clamped where the request is
+out of range) and are never synthesized; a normal face's italic/oblique/`<em>`
+cells must be synthesized (two `rel="mismatch"` references: not upright, not the
+real axis; the 21px vs 16px gap makes the second one meaningful); `oblique 11deg`
+on a normal face gets only the not-upright reference because a synthesized 11deg
+skew is indistinguishable from the real axis at 11deg. Two expectations are
+locked in as observed rather than derived, as before: a normal request against an
+italic- or bare-oblique-declared only-face renders slanted on both engines.
+
+**Result: Firefox passes all 30. Chrome fails exactly 6, the ones the table
+marks in bold**: the explicit-range face with `italic`, `oblique` and `<em>` (the
+stacking bug; `<em>` is new), the italic-declared face with `italic` and `<em>`
+(drives `slnt` though only an `ital` axis is licensed; `italic` is new), and the
+normal face with `oblique 11deg` (a new finding: Chrome synthesizes for the bare
+keywords but drops an explicit angle entirely; whether that is a bug or a choice
+is not established). Recorded in `results/browser-matrix.md` for Chrome
+153.0.8010.48 and Firefox 156.0 (wpt run). Every other test in the folder kept
+its earlier result.
