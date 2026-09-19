@@ -159,11 +159,12 @@ function renderMatrix(manifest, results, survey, versions) {
       const cell = byAddr[`${col.address}${row.address}`];
       const res = perCell[cell.address];
       const url = MATRIX_URL + (cell.wpt ? cell.files[0] : "matrix.manifest.json");
-      let tags = "";
-      if (cell.status !== "specified") {
-        const allowed = cell.allowed.map(outcomeText).join(" / ");
-        tags = `<span class="tag" title="${esc(cell.why.join("; "))}">spec allows: ${esc(allowed)}</span>`;
-      }
+      // every cell says what the reference expects: one outcome when the spec decides, else what it allows
+      const allowed = cell.allowed.map(outcomeText).join(" / ");
+      const tags =
+        cell.status === "specified"
+          ? `<span class="tag tag-spec" title="${esc(cell.why.join("; "))}">spec: ${esc(allowed)}</span>`
+          : `<span class="tag" title="${esc(cell.why.join("; "))}">spec allows: ${esc(allowed)}</span>`;
       out.push(
         `<td class="status-${cellStatus(cell, res)}"><span class="cell-addr">${esc(cell.address)}</span>` +
           `<a class="specimen-link" href="${esc(url)}" title="${esc(cell.id)}">${specimen(manifest, cell)}</a>` +
