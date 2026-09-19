@@ -1,0 +1,228 @@
+CSS Fonts Module Level 4 - Editor's Draft excerpts used by reference/src.
+Source: https://drafts.csswg.org/css-fonts-4/
+Fetched: 2026-09-19   sha256 of the full HTML: 98604e6ac682cf04da8f53d21774b7fdbadac008772b15fc92986bcd971162f5
+Plain-text extraction (tags stripped, blank lines collapsed). Refresh with: curl -sL <url> and re-extract; if the hash changes, re-read the excerpts below and re-run `node --test`.
+
+==============================================================================
+2.3 font-style property: value meanings (excerpt)
+==============================================================================
+meanings:
+ normal
+ Matches against a face that is classified as a normal face,
+ one that is neither italic or obliqued.
+ This represents an oblique value of "0".
+ italic
+ Matches against a font that is labeled as an italic face,
+ or an oblique face if one does not exist.
+ The angle and direction of slant is unspecified.
+ left
+ Matches against a font that is labeled as an italic face,
+ with a positive (clockwise) slant;
+ or an oblique face with positive slant, if one does not exist.
+ right
+ Matches against a font that is labeled as an italic face,
+ with a negative (counter-clockwise) slant;
+ or an oblique face with negative slant, if one does not exist.
+ oblique <angle [-90deg,90deg]>?
+ Controls matching against an oblique face.
+ Positive angles represent a clockwise slant;
+ negative angles represent a counter-clockwise slant.
+ The lack of an <angle> represents 14deg.
+ (Note that a font might internally provide its own mapping for "oblique",
+ but the mapping within the font is disregarded.)
+ Fractional and negative values are accepted; however,
+ values less than -90deg or values greater than 90deg are invalid.
+ If no oblique faces exist,
+ and font-synthesis-style has the value auto,
+ a synthetic oblique face will be generated.
+ An italic face with negative slant. 
+ The font is Mf Autumn Breeze,
+ by Misti Hammers.
+ A font family might contain no italic or oblique faces,
+ only an italic face and no oblique,
+ only an oblique face and no italic,
+ both an oblique and an italic,
+ multiple oblique faces at various angles,
+ or various combinations thereof.
+ The font matching routine will select a font to use
+ which is of the correct sign as the requested angle,
+ and (if there are multiple such faces) closest to the requested angle.
+ In general, for a requested angle greater or equal to 11deg,
+ larger angles are preferred;
+ otherwise, smaller angles are preferred.
+ (See § 5 Font Matching Algorithm.)
+ For TrueType / OpenType fonts that use variations,
+ the slnt variation is used to implement oblique values,
+ and the ital variation with a value of 1 is used to implement the italic values.
+ Note: the OpenType slnt axis is defined
+ with a positive angle meaning a counter-clockwise slant,
+ the opposite direction to CSS.
+ The CSS implementation will take this into account
+ when using variations
+ to produce oblique faces.
+
+==============================================================================
+4.4 @font-face style descriptors: auto, descriptor-replaces-font-data, clamping (excerpt)
+==============================================================================
+The auto values for these three descriptors have the following effects:
+ For font selection purposes, the font is selected as if
+the appropriate normal value
+(normal, normal or normal)
+is chosen
+ For variation axis clamping, clamping does not occur
+ The value for these font face style attributes
+ is used in place of the style implied by the underlying font data.
+ This allows authors to combine faces in flexible combinations,
+ even in situations where the original font data was arranged differently.
+ User agents that implement synthetic bolding and obliquing
+ must only apply synthetic styling in cases
+ where the font descriptors imply this is needed,
+ rather than based on the style attributes implied by the font data.
+ However, variation values applied to fonts defined with '@font-face'
+ will be clamped to both the values specified in these descriptors,
+ or implied by the application of variation parameters
+ (such as manipulation of the wght axis
+ to satisfy the requested font-weight),
+ as well as the values supported by the font file itself.
+ Tests
+ synthetic-bold-out-of-capabilities-range.html (live test) (source)
+
+==============================================================================
+2.8.2 font-synthesis-style
+==============================================================================
+Controlling synthesized oblique: The font-synthesis-style property
+ Name:
+ font-synthesis-style
+ Value:
+ auto | none | oblique-only
+ Initial:
+ auto
+ Applies to:
+ all elements and text
+ Inherited:
+ yes
+ Percentages:
+ N/A
+ Computed value:
+ specified keyword
+ Canonical order:
+ per grammar
+ Animation type:
+ discrete
+ Media:
+ visual
+ Tests
+ font-synthesis-style-binary.html (live test) (source)
+ font-synthesis-style-first-letter.html (live test) (source)
+ font-synthesis-style-first-line.html (live test) (source)
+ font-synthesis-style.html (live test) (source)
+ font-synthesis-style-invalid.html (live test) (source)
+ font-synthesis-style-valid.html (live test) (source)
+ This property controls whether user agents are allowed
+ to synthesize oblique font faces
+ when a font family lacks oblique faces.
+ auto
+ Synthesis of oblique faces is allowed
+ none
+ Synthesis of oblique faces is not allowed
+ oblique-only
+ Synthesis of oblique faces is allowed,
+ but they must not be used as fallback
+ if italic is specified
+
+==============================================================================
+5.2 Matching font styles: the font-style steps (verbatim)
+==============================================================================
+If the value of font-style is italic:
+ If the matching set includes faces with italic values containing the mapped value of italic,
+then faces with italic values which do not include the desired italic mapped value are removed from the matching set.
+ Otherwise, italic values above the desired italic value are checked in ascending order followed by
+italic values below the desired italic value, until 0 is hit. Only positive values of italic values are checked
+in this stage.
+ For variable fonts with an ital axis,
+a match is created by setting the ital value to 1.
+ If no match is found, oblique values greater than or equal to 11deg are checked in ascending order
+followed by oblique values below 11deg in descending order, until 0 is hit. Only positive values of oblique values
+are checked in this stage.
+ The threshold for preferring oblique over normal should be lower than the average angle.
+ If no match is found, italic values less than or equal to 0 are checked in descending order until a match is found.
+ If no match is found, oblique values less than or equal to 0deg are checked in descending order until a match is found.
+ Similar to the previous example, here is the conceptual distance graph for an element styled with "font-style: italic":
+ As you can see, because font D contains the minimum italic value across the entire family, font D would be selected by this algorithm. However, if font D were somehow eliminated from the family, font E would then contain the lowest distance in the family, so it would be selected. If E were eliminated, C would be selected. If C were eliminated, font B would not be chosen immediately; instead, oblique values would be consulted and an oblique value might be chosen. However, if no oblique value is chosen, font B would then be selected, followed by font A.
+ If the value of font-style is oblique and the requested angle is greater than or equal to 11deg,
+ If the matching set includes faces with oblique values containing the value of oblique,
+faces with oblique values which do not include the desired oblique value are removed from the matching set.
+ Otherwise, oblique values above the desired oblique value are checked in ascending order followed by
+oblique values below the desired oblique value, until 0 is hit. Only positive values of oblique values are checked in this stage.
+ For variable fonts with a slnt axis,
+a match is created by setting the slnt value
+with the specified oblique value.
+Otherwise, if font-synthesis-style has the value
+auto,
+then a fallback match is produced
+by geometric shearing to the specified oblique value.
+The ital axis is not used to satisfy an oblique request.
+ If no match is found, italic values greater than or equal to 1 are checked in ascending order
+followed by italic values below 1 in descending order, until 0 is hit. Only positive values of italic values are checked in this stage.
+ If no match is found, oblique values less than or equal to 0deg are checked in descending order until a match is found.
+ If no match is found, italic values less than or equal to 0 are checked in descending order until a match is found.
+ Similar to the previous example, here is the conceptual distance graph for an element styled with "font-style: oblique 40deg":
+ As you can see, because font D contains the minimum oblique value across the entire family, font D would be selected by this algorithm. However, if font D were somehow eliminated from the family, font E would then contain the lowest distance in the family, so it would be selected. If E were eliminated, C would be selected. If C were eliminated, font B would not be chosen immediately; instead, italic values would be consulted and an italic value might be chosen. However, if no italic value is chosen, font B would then be selected, followed by font A.
+ If the value of font-style is oblique and the requested angle is greater than or equal to 0deg and less than 11deg,
+ If the matching set includes faces with oblique values containing the value of oblique,
+faces with oblique values which do not include the desired oblique value are removed from the matching
+set.
+ Otherwise, oblique values below the desired oblique value are checked in descending order until 0 is hit, followed by
+oblique values above the desired oblique value. Only positive values of oblique values are checked
+in this stage.
+ For variable fonts with a slnt axis,
+a match is created by setting the slnt value
+with the specified oblique value.
+Otherwise, if font-synthesis-style has the value auto,
+then a fallback match is produced
+by geometric shearing to the specified oblique value.
+The ital axis is not used to satisfy an oblique request.
+ If no match is found, italic values less than 1 are checked in descending order until 0 is hit,
+followed by italic values above 1 in ascending order. Only positive values of italic values
+are checked in this stage.
+ If no match is found, oblique values less than or equal to 0deg are checked in descending order until a match is found.
+ If no match is found, italic values less than or equal to 0 are checked in descending order until a match is found.
+ Similar to the previous example, here is the conceptual distance graph for an element styled with "font-style: oblique 13deg":
+ As you can see, because font D contains the minimum oblique value across the entire family, font D would be selected by this algorithm. However, if font D were somehow eliminated from the family, font C would then contain the lowest distance in the family, so it would be selected. If C were eliminated, E would be selected. If E were eliminated, font B would not be chosen immediately; instead, italic values would be consulted and an italic value might be chosen. However, if no italic value is chosen, font B would then be selected, followed by font A.
+ If the value of font-style is oblique and the requested angle is less than 0deg and greater than -11deg, follow the steps above, except with the negated values and opposite directions. If the value of font-style is oblique and the requested angle is less than or equal to -11deg, follow the steps above, except with the negated values and opposite directions.
+ If the value of font-style is normal,
+ Oblique values greater than or equal to 0 are checked in ascending order.
+ If no match is found, italic values greater than or equal to 0 are checked in ascending
+ If no match is found, oblique values less than 0deg are checked in descending order until a match is found.
+ If no match is found, italic values less than 0 are checked in descending order until a match is found.
+ Similar to the previous example, here is the conceptual distance graph for an element styled with "font-style: normal":
+ As you can see, because font C contains the minimum oblique value across the entire family, font C would be selected by this algorithm. However, if font C were somehow eliminated from the family, font B would not be chosen immediately; instead, italic values would be consulted and an italic value might be chosen. However, if no italic value is chosen, font B would then be selected, followed by font A.
+ If an oblique angle was found in the above search, all faces which don’t include that oblique angle are excluded from the matching set. Otherwise, if an italic value was found in the above search, all faces which don’t include that italic value are excluded from the matching set.
+ Tests
+ oblique-last-resort-weight-selection.html (live test) (source)
+ oblique-request-italic-only-family-no-crash.html (live test) (source)
+ User agents are not required to distinguish between italic and oblique fonts. In such user agents, the font-style matching steps above are performed by mapping both italic values and oblique angles onto a common scale. The exact nature of this mapping is undefined, however, an italic value of 1 must map to the same value that an oblique angle of 11deg maps to. Within font
+families defined via @font-face rules, italic and oblique
+faces must be distinguished using the value of the
+font-style descriptor.
+ For families that lack any italic or oblique faces, user agents
+may create artificial oblique faces, if this is permitted by the
+value of the font-synthesis property.
+
+==============================================================================
+7.2 Feature and variation precedence: the font-style step (excerpt)
+==============================================================================
+Font variations as enabled by the font-weight,
+ font-width, and font-style properties are applied.
+ The application of the value enabled by
+font-style is affected by font selection, because this property might select an
+italic or an oblique font. The value applied is the closest matching value as determined
+by the font matching algorithm. User agents must apply
+at most one value due to the font-style property; both "ital" and "slnt" values must
+not be set together.
+ If the selected font is defined in an @font-face rule, then the values applied at this step
+should be clamped to the value of the font-weight, font-width,
+and font-style
+descriptors in that @font-face rule.
+ Then, the values applied in this step should be clamped (possibly again) to the values
+that are supported by the font.

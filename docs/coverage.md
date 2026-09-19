@@ -135,11 +135,11 @@ No test constructs a same-family pairing of a font-style:normal face and a bare/
 
 ### 2. italic-descriptor-exact-match-still-shears
 
-**Status:** tests written and run — tests/oblique-style-matching/matrix-face-italic-use-italic.html and matrix-face-italic-use-em.html (+ refs), part of a 30-test grid: 5 @font-face font-style descriptor values x 6 use-site CSS patterns, all against resources/Cairo.var.subset.ttf, default font-synthesis, added 2026-09-19
+**Status:** withdrawn 2026-09-19: reclassified by the reference algorithm (reference/), see docs/investigation-log.md section 12
 
 **Priority tier:** 1
 
-**Evidence tier:** written test, dated cross-engine result — a genuine, isolated FAIL on Chrome, PASS on Firefox
+**Evidence tier:** withdrawn: the reference algorithm allows every observed rendering
 
 A face declared font-style: italic (bare, binary descriptor — no numeric angle), on a font whose ONLY working axis is slnt (no ital axis), requested via font-style: italic or via <em> (implicit italic), at default font-synthesis: Chrome renders sheared (activates the real slnt axis), Firefox renders genuinely upright. Verified against a reference forced to genuinely-upright via explicit font-variation-settings: 'slnt' 0 — NOT via implicit/default styling, which was independently confirmed unreliable here (this same face renders sheared even for a plain font-style: normal request on BOTH engines, per matrix-face-italic-use-normal.html, part of the same grid).
 
@@ -151,11 +151,11 @@ A face declared font-style: italic (bare, binary descriptor — no numeric angle
 
 ### 2. normal-face-explicit-angle-synthesis
 
-**Status:** test written and run — tests/oblique-style-matching/matrix-face-normal-use-oblique-11deg.html + -ref.html, added 2026-09-19
+**Status:** withdrawn 2026-09-19: reclassified by the reference algorithm (reference/), see docs/investigation-log.md section 12
 
 **Priority tier:** 1
 
-**Evidence tier:** written test, dated cross-engine result — FAIL on Chrome, PASS on Firefox
+**Evidence tier:** withdrawn: the reference algorithm allows every observed rendering
 
 A face declared font-style: normal has no oblique face (CSS Fonts 4 section 4.4: the descriptor replaces the style implied by the font data, so the font's own slnt axis is not consulted for matching). A request for font-style: oblique 11deg against it should therefore be synthesized (section 2.8.2). Measured at 8em: Firefox leans 16px, consistent with a synthesized 11deg; Chrome renders upright (0px) — it synthesizes for bare oblique/italic/<em> (21px, its fixed skew) but NOT for an explicit angle. The reftest asserts the rendering must not be upright.
 

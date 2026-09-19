@@ -112,9 +112,10 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--reps", type=int, default=3)
     ap.add_argument("--record", action="store_true", help="append stable results to results/browser-matrix.md")
+    ap.add_argument("--prefix", default="", help="only replay tests whose id starts with this (e.g. matrix-)")
     args = ap.parse_args()
 
-    pages = test_pages()
+    pages = [p for p in test_pages() if p[0].startswith(args.prefix)]
     http = subprocess.Popen([sys.executable, "-m", "http.server", str(HTTP_PORT), "--directory", str(TESTS_DIR)],
                             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     driver = subprocess.Popen(["/usr/bin/safaridriver", "-p", str(DRIVER_PORT)],

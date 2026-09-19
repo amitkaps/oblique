@@ -420,9 +420,9 @@
         "id": "italic-descriptor-exact-match-still-shears",
         "priority": 2,
         "priority_tier": 1,
-        "status": "tests written and run — tests/oblique-style-matching/matrix-face-italic-use-italic.html and matrix-face-italic-use-em.html (+ refs), part of a 30-test grid: 5 @font-face font-style descriptor values x 6 use-site CSS patterns, all against resources/Cairo.var.subset.ttf, default font-synthesis, added 2026-09-19",
-        "evidence_tier": "written test, dated cross-engine result — a genuine, isolated FAIL on Chrome, PASS on Firefox",
-        "test_result": {
+        "status": "withdrawn 2026-09-19: reclassified by the reference algorithm (reference/), see docs/investigation-log.md section 12",
+        "evidence_tier": "withdrawn: the reference algorithm allows every observed rendering",
+        "test_result_withdrawn_observations": {
           "chrome": {"version": "153.0.8010.48", "result": "fail"},
           "firefox": {"version": "156.0", "result": "pass"},
           "safari": {"version": "27.0 (safaridriver direct replay, see investigation-log section 11)", "result": "pass", "note": "Safari, like Firefox, leaves the italic-declared face upright for italic and <em>"}
@@ -440,9 +440,9 @@
         "id": "normal-face-explicit-angle-synthesis",
         "priority": 2,
         "priority_tier": 1,
-        "status": "test written and run — tests/oblique-style-matching/matrix-face-normal-use-oblique-11deg.html + -ref.html, added 2026-09-19",
-        "evidence_tier": "written test, dated cross-engine result — FAIL on Chrome, PASS on Firefox",
-        "test_result": {
+        "status": "withdrawn 2026-09-19: reclassified by the reference algorithm (reference/), see docs/investigation-log.md section 12",
+        "evidence_tier": "withdrawn: the reference algorithm allows every observed rendering",
+        "test_result_withdrawn_observations": {
           "chrome": {"version": "153.0.8010.48", "result": "fail"},
           "firefox": {"version": "156.0", "result": "pass"},
           "safari": {"version": "27.0 (safaridriver direct replay, see investigation-log section 11)", "result": "fail", "note": "Safari, like Chrome, does not synthesize an explicit angle against a normal face"}

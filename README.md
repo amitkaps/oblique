@@ -251,9 +251,13 @@ oblique/
 ├── .mise.toml                # pins python/uv AND node/pnpm versions
 ├── .github/workflows/
 │   └── sync-wpt-results.yml # daily wpt.fyi sync, rebuilds + commits the site
+├── reference/                # JS reference implementation of CSS Fonts 4 font-style matching;
+│   │                         # generates tests/oblique-style-matching/matrix-*.html (see reference/README.md)
 ├── scripts/
 │   ├── setup-wpt.sh          # vendors a scoped, gitignored .wpt/ checkout
 │   ├── sync-tests-to-wpt.sh  # mirrors tests/ into .wpt/ (rsync --delete, no stale copies)
+│   ├── safari-replay.py      # Safari results: direct safaridriver replay (wpt run is unreliable there)
+│   ├── survey.py             # measures the lean of every generated cell in Chrome, Firefox and Safari
 │   ├── record-results.py     # parses wptreport JSON into browser-matrix.md
 │   ├── sync-wpt-results.py   # pulls live upstream results from wpt.fyi
 │   ├── render-coverage-docs.py  # renders coverage.md/upstream-matrix.md

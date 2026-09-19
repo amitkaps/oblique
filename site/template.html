@@ -26,17 +26,19 @@
     <h2>Test coverage: <code>@font-face</code> descriptor &times; use-site CSS</h2>
     <p class="matrix-intro">
       One font, one glyph under test: real Cairo (<code>slnt</code> &minus;11..11), subset to
-      the letters of OBLIQUE, tested on the capital <code>I</code>. Columns are what the
-      <code>@font-face</code> declares; rows are the CSS at the use site
-      (<code>font-synthesis</code> is never set: it is only meant to apply when a face is
-      missing, so a matched request must not trigger it). Each
-      specimen is live in <em>your</em> browser: <b class="ov-pink">pink</b> is the
-      test's own reference rendering, <b class="ov-cyan">cyan</b> is the CSS under test;
-      aligned they blend pale, and <strong>visible pink is a failure</strong>. The circles
-      are this project's recorded results: Chromium and Firefox from <code>wpt run</code>,
-      Safari from a direct <code>safaridriver</code> replay of the same reftests (<code>wpt run</code>
-      proved unreliable on Safari).
-      A dash would mean no test yet, not passing and not failing.
+      the letters of OBLIQUE, tested on the capital <code>I</code>. Columns (A, B, C&hellip;) are what the
+      <code>@font-face</code> declares; rows (1, 2, 3&hellip;) are the CSS at the use site, and a cell
+      is its column letter plus its row number. What each cell should do is not decided by hand: an
+      independent JavaScript implementation of CSS Fonts 4 font-style matching
+      (<code>reference/</code>) computes it, and never uses a browser to do so.
+      Where the spec pins the outcome down, the cell is a WPT test; where it leaves latitude
+      (&ldquo;spec allows&hellip;&rdquo;) the test only forbids what the spec forbids; where it is silent,
+      the cell is only observed. <code>font-synthesis</code> is never set, since it should apply only
+      when a face is missing. Each specimen is live in <em>your</em> browser:
+      <b class="ov-pink">pink</b> is a rendering the spec accepts, <b class="ov-cyan">cyan</b> is the CSS
+      under test; aligned they blend pale, and <strong>visible pink is a failure</strong>. The circles
+      are recorded results: Chromium and Firefox from <code>wpt run</code>, Safari from a direct
+      <code>safaridriver</code> replay (<code>wpt run</code> proved unreliable on Safari).
       Candidate for upstreaming; no WPT PR has been opened.
     </p>
     <!--MATRIX-->

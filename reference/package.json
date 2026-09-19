@@ -1,0 +1,13 @@
+{
+  "name": "oblique-reference",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Reference implementation of CSS Fonts 4 font-style matching, used as the control for the generated WPT matrix. The browser is the system under test; nothing here touches a browser API.",
+  "scripts": {
+    "test": "node --test",
+    "generate": "node src/cli.mjs generate",
+    "check": "node src/cli.mjs generate --check",
+    "compare": "node src/cli.mjs compare"
+  }
+}

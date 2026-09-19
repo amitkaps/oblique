@@ -1,0 +1,75 @@
+// The reference's verdict for the single-face Cairo grid, cell by cell, with the
+// clause that decides each. These pin down the reasoning, not the browsers.
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import { expected } from "../src/expected.mjs";
+
+const font = { slnt: [-11, 11], ital: null };
+const run = (descriptor, request, extra = {}) =>
+  expected({ faces: [{ id: "f", descriptor }], font, request, ...extra });
+const keys = (e) => e.allowed.map((o) => (o.kind === "axis" ? `slnt=${o.value}` : o.kind)).sort();
+
+test("normal request: a normal, auto or in-range face is upright; a face declared oblique 14deg is not", () => {
+  assert.deepEqual(keys(run("normal", "normal")), ["upright"]);
+  assert.deepEqual(keys(run(undefined, "normal")), ["upright"]);
+  assert.deepEqual(keys(run("oblique -11deg 11deg", "normal")), ["upright"]);
+  // bare oblique = a one-point range at 14deg: the closest value to 0 is 14, then the font limits it to -11
+  assert.deepEqual(keys(run("oblique", "normal")), ["slnt=-11"]);
+  assert.equal(run("oblique", "normal").status, "specified");
+});
+
+test("a normal-declared face never reaches the real axis, whatever the font can do", () => {
+  for (const request of ["italic", "oblique", "oblique 11deg"]) {
+    const e = run("normal", request);
+    assert.ok(!keys(e).includes("slnt=-11"), request);
+    assert.deepEqual(keys(e), ["synth", "upright"], request); // synthesis permitted, not required
+    assert.equal(e.status, "constrained");
+    assert.deepEqual(e.plan.mismatch.map((o) => o.kind + (o.value ?? "")), ["axis-11"]);
+  }
+});
+
+test("font-synthesis-style: none removes the synthesized outcome, leaving upright only", () => {
+  const e = run("normal", "oblique 11deg", { synthesis: { fontSynthesisStyle: "none" } });
+  assert.deepEqual(keys(e), ["upright"]);
+  const s = run("normal", "italic", { synthesis: { fontSynthesis: "weight" } }); // no `style` token
+  assert.deepEqual(keys(s), ["upright"]);
+});
+
+test("oblique-only forbids synthesizing for italic but allows it for oblique", () => {
+  assert.deepEqual(keys(run("normal", "italic", { synthesis: { fontSynthesisStyle: "oblique-only" } })), ["upright"]);
+  assert.deepEqual(keys(run("normal", "oblique", { synthesis: { fontSynthesisStyle: "oblique-only" } })), ["synth", "upright"]);
+});
+
+test("a range face reaches the axis at the clamped value and is never synthesized on top", () => {
+  for (const request of ["italic", "oblique", "oblique 11deg", "oblique 14deg", "oblique 45deg"]) {
+    const e = run("oblique -11deg 11deg", request);
+    assert.deepEqual(keys(e), ["slnt=-11"], request);
+    assert.equal(e.status, "specified");
+  }
+  assert.deepEqual(keys(run("oblique -11deg 11deg", "oblique -8deg")), ["slnt=8"]); // the sign flips
+  assert.deepEqual(keys(run("oblique -11deg 11deg", "oblique 5deg")), ["slnt=-5"]);
+});
+
+test("an italic-declared face on a slnt-only font permits upright or the axis (5.2: italic 1 = oblique 11deg)", () => {
+  const e = run("italic", "italic");
+  assert.deepEqual(keys(e), ["slnt=-11", "upright"]);
+  assert.equal(e.status, "unspecified");
+});
+
+test("an auto face leaves the value open, so nothing is asserted", () => {
+  for (const request of ["italic", "oblique", "oblique 11deg"]) assert.equal(run(undefined, request).status, "unspecified", request);
+  assert.equal(run(undefined, "normal").status, "specified");
+});
+
+test("font-variation-settings wins over the font-style variations (7.2)", () => {
+  for (const d of [undefined, "normal", "italic", "oblique", "oblique -11deg 11deg"]) {
+    assert.deepEqual(keys(run(d, "normal", { fvs: { slnt: -11 } })), ["slnt=-11"], String(d));
+  }
+  assert.deepEqual(keys(run("normal", "normal", { fvs: { slnt: -40 } })), ["slnt=-11"]); // the font still limits it
+});
+
+test("an ital-axis font: an italic face sets ital 1, and an oblique request never uses ital", () => {
+  const f = { slnt: null, ital: [0, 1] };
+  const e = expected({ faces: [{ id: "f", descriptor: "italic" }], font: f, request: "italic" });
+  assert.deepEqual(e.allowed, [{ kind: "axis", axis: "ital", value: 1 }]);
+});

@@ -282,3 +282,27 @@ body {
 
 .ov-pink { color: #ff3d9a; }
 .ov-cyan { color: #22d3ee; }
+
+/* generated-matrix additions: spreadsheet addresses and "observed" cells */
+.matrix td { position: relative; }
+.cell-addr {
+  position: absolute;
+  top: 0.15rem;
+  right: 0.3rem;
+  font-size: 0.62rem;
+  color: var(--muted);
+  font-weight: 600;
+  z-index: 1;
+}
+.addr {
+  display: inline-block;
+  margin-bottom: 0.15rem;
+  padding: 0 0.35rem;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+.row-num { display: inline-block; padding: 0 0.35rem; border: 1px solid var(--border); border-radius: 3px; }
+.matrix td.status-observed { border-left-color: var(--accent-upstream); }
+.b-badge.observed { border-color: var(--accent-upstream); border-style: dotted; }

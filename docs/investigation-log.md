@@ -862,3 +862,72 @@ Chrome (0px), and the italic-declared face stays upright like Firefox. This
 matches vizchitra-fonts' independent Safari 27 findings: WebKit's "pure synthetic
 skew, no axis contribution" for italic on a ranged face, the stacked skew for
 bare oblique, and `oblique 11deg` against a range being fine.
+
+## 12. A reference implementation of the matching algorithm, and what it overturned (2026-09-19)
+
+Sections 8, 10 and 11 derived each cell's expected value by hand, partly from what browsers
+did. That is circular. `reference/` is now an independent JavaScript implementation of the
+CSS Fonts 4 font-style rules (spec text saved in `reference/spec/`, fetched 2026-09-19); it
+computes what the spec allows for each cell, and the WPT tests are generated from that. It uses
+no browser API, and its own tests check it against the spec's step ordering and against what
+upstream WPT tests intend. See `reference/README.md`.
+
+**The output is a set of allowed outcomes, in three statuses.** `specified` (one outcome),
+`constrained` (several, or synthesis, but something is forbidden) and `unspecified` (nothing
+testable is excluded, so the cell is measured, not tested). Of the 30 cells of the 5 x 6 grid:
+17 specified, 4 constrained, 9 unspecified, so 21 generated tests and 9 observed-only cells.
+
+**Spec findings that changed my earlier verdicts** (each is a clause the earlier hand-derived
+tables did not apply):
+
+1. **Bare `oblique` is a one-point range at 14deg** (2.3: "The lack of an angle represents
+   14deg"). A face declared `oblique` therefore has closest value 14 for a `normal` request,
+   which the font limits to slnt -11: slanted. This is the only correct reason the bare-oblique
+   column leans for `normal` (I had lumped it with the italic column).
+2. **An italic-declared face on a slnt-only font permits both renderings.** 2.3 says the `ital`
+   variation implements italic values (no `ital` axis: nothing applied, upright); 5.2 says a UA
+   need not distinguish italic from oblique and then italic 1 = oblique 11deg (slnt -11: slanted).
+   Chrome slants, Firefox and Safari stay upright, and all three are conformant. **The earlier
+   claim that Chrome fails the italic-declared cells (and that all three engines fail italic x
+   `normal`) is withdrawn**; the coverage entry is kept, marked withdrawn.
+3. **Synthesis is permitted, not required, for a normal-declared face.** 2.3 says a synthetic
+   oblique "will be generated", 5.2 says UAs "may create" one, and 2.8.2 only says whether it is
+   "allowed". Chrome and Safari render upright for `oblique 11deg` against a normal face, which
+   is conformant. **The earlier claim that this is a Chrome (and Safari) bug is withdrawn.** What
+   the spec does forbid is reaching the real axis on a normal-declared face (4.4: the descriptor
+   replaces the style implied by the font data), and no engine does.
+4. **The `auto` column is undecided.** 4.4 says `auto` is "selected as if normal" and
+   "clamping does not occur", which supports either a real-axis rendering or an upright one.
+   All of column A's italic/oblique cells are `unspecified`.
+5. **`italic` has no defined angle** (2.3: "The angle and direction of slant is unspecified"),
+   so italic on an oblique face allows the closest-11deg or the 14deg-default value.
+
+**What survives.** The three genuine, spec-decided failures on the explicit-range face
+(cells E2, E3, E5: `italic`, bare `oblique`, `<em>` against `oblique -11deg 11deg`): the axis
+must clamp to -11 and nothing may be synthesized on top, because a real oblique face exists
+(2.3 "if no oblique faces exist" is not satisfied). Firefox passes; Chrome stacks a synthetic
+skew on the clamped axis (36px lean vs 16px); Safari gives a pure synthetic skew with no axis for
+`italic` and `<em>` (21px) and stacks for bare `oblique` (36px). Chrome 153, Firefox 156,
+Safari 27.0.
+
+**Two independent signals agree in every cell.** The generated reftests (Chrome and Firefox
+via `wpt run`, Safari via `scripts/safari-replay.py`) and a separate measurement of the lean of
+the glyph in all three engines (`scripts/survey.py` to `results/survey.json`, judged against the
+lean each allowed outcome predicts by `reference/src/compare.mjs`). `node reference/src/cli.mjs
+compare`: 27 cells agree, 3 diverge (E2, E3, E5), none is flagged `reference-suspect` (a cell
+that fails in every engine, which would point at the reference or a spec gap instead).
+
+**Validation against upstream WPT tests, by intent.** Not against engine results: several
+upstream tests fail on some engine (`italic-oblique-fallback` on Chrome,
+`font-synthesis-style-oblique-only` on Chrome and Safari, `oblique-last-resort-weight-selection`
+on Firefox). The reference matches `font-synthesis-style-oblique-only` and (with the recorded
+resolution csswg-drafts#9389, which the published Editor's Draft text has not caught up with)
+`italic-oblique-fallback`. It **disagrees** with `oblique-last-resort-weight-selection`: that
+test treats an italic request as a 14deg slope, the text says an 11deg threshold, so the text
+selects a different face. Recorded as a known disagreement in `reference/test/upstream.test.mjs`,
+not fitted.
+
+**Housekeeping.** `resources/gen-matrix.py` and the 30 `matrix-face-*` tests are replaced by the
+generated `matrix-{row}-{column}.html` (addresses `A1`.., append-only so addresses stay stable),
+their recorded rows removed and the new ones recorded; the site matrix now reads
+`matrix.manifest.json`.
