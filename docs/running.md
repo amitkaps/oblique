@@ -7,8 +7,8 @@ in `.mise.toml`.
 mise run install                     # once: pnpm install (vite)
 
 # the reference implementation and the generated tests
-mise run test                        # unit tests (50)
-mise run generate                    # regenerate tests/oblique-style-matching/matrix/ from reference/cases/matrix.json
+mise run test                        # unit tests (53)
+mise run generate                    # regenerate the matrix-* tests from reference/cases/matrix.json
 mise run compare                     # expected vs recorded browser results
 
 # WPT (a sparse checkout in .wpt/, gitignored)
@@ -25,14 +25,15 @@ mise run site                        # build into dist/
 ```
 
 After any change under `tests/`, `wpt-sync` (or any `wpt-*` task, which sync first) refreshes `.wpt/`.
-`generate` rewrites `matrix/` completely; never edit those files by hand.
+`generate` rewrites every `matrix-*` file and the manifest; never edit those by hand. The `standalone-*` tests are hand-written.
 
 ## Results files
 
-`results/browser-matrix.md` is this repo's own runs: rows are appended by `scripts/record-results.py`
-(wpt) and `scripts/safari-replay.py --record` (Safari), never by hand, and the last row for a test and
-engine wins. `results/survey.json` holds the measured lean per cell per engine. The site reads both at build
-time and fails the build if the manifest, the files on disk and the recorded results disagree.
+`results/browser-matrix.md` is this repo's own runs, one row per test and engine. `scripts/record-results.py`
+(wpt) and `scripts/safari-replay.py --record` (Safari) write it through `scripts/results_file.py`, never by hand:
+recording a test again replaces its row, and rows for tests that no longer exist are dropped (git keeps the
+history). `results/survey.json` holds the measured lean per cell per engine. The site reads both at build time and
+fails the build if the manifest, the files on disk and the recorded results disagree.
 
 ## Chrome and Firefox
 

@@ -6,15 +6,15 @@ import assert from "node:assert/strict";
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { generate } from "../src/wpt.mjs";
-import { loadMatrix, MATRIX_DIR, cells } from "../src/cases.mjs";
+import { loadMatrix, TESTS_DIR, cells } from "../src/cases.mjs";
 
 test("committed files equal the generator's output", () => {
   const { files } = generate(loadMatrix());
   for (const [name, content] of files) {
-    assert.ok(existsSync(join(MATRIX_DIR, name)), `missing ${name}: run \`node src/cli.mjs generate\``);
-    assert.equal(readFileSync(join(MATRIX_DIR, name), "utf8"), content, `${name} is stale`);
+    assert.ok(existsSync(join(TESTS_DIR, name)), `missing ${name}: run \`node src/cli.mjs generate\``);
+    assert.equal(readFileSync(join(TESTS_DIR, name), "utf8"), content, `${name} is stale`);
   }
-  const stale = readdirSync(MATRIX_DIR).filter((n) => /^matrix-/.test(n) && !files.has(n));
+  const stale = readdirSync(TESTS_DIR).filter((n) => /^matrix-/.test(n) && !files.has(n));
   assert.deepEqual(stale, []);
 });
 

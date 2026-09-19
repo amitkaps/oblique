@@ -21,7 +21,7 @@
 //   obliqueOnlyDemotesRealObliqueFaces - csswg-drafts#9390: under `font-synthesis-style:
 //     oblique-only` an italic request treats REAL oblique faces as a last resort too. The ED
 //     text is about synthesized faces ("they must not be used as fallback"); WPT's
-//     font-synthesis-style-oblique-only.html asserts the broader reading. See docs/review.md.
+//     font-synthesis-style-oblique-only.html asserts the broader reading. csswg-drafts#9390 is still open and proposes to change `none` in the same way.
 
 import { ITALIC_VALUE } from "./style.mjs";
 

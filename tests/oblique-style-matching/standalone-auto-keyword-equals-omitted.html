@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" class="reftest-wait">
+<meta charset="utf-8" />
+<title>CSS Test: font-style: auto in @font-face is the same as omitting the descriptor</title>
+<!--
+  CSS Fonts 4 §4.4: the initial value of the font-style descriptor is `auto` ("If these
+  descriptors are omitted, initial values are assumed"). So a face declared with
+  `font-style: auto` and a face with no font-style descriptor must render identically
+  for every request, whatever that rendering is: this test does not say which
+  rendering is right (for italic on an auto face the spec leaves it open), only that
+  the two spellings agree. It uses several requests because the two could differ in
+  how a UA feeds them into matching and variation clamping.
+  Font: resources/Cairo.var.subset.ttf (real Cairo subset, slnt -11..11); glyph: capital I.
+-->
+<link rel="help" href="https://drafts.csswg.org/css-fonts-4/#font-prop-desc" />
+<link rel="match" href="standalone-auto-keyword-equals-omitted-ref.html">
+<meta name="assert" content="A face declared with 'font-style: auto' renders exactly like a face with the font-style descriptor omitted, for normal, italic, oblique, oblique with angles inside and outside the font's range, a negative angle, and through an em element." />
+<link rel="stylesheet" href="oblique-matching.css">
+<style>
+  @font-face {
+    font-family: "auto keyword face";
+    src: url('resources/Cairo.var.subset.ttf');
+    font-style: auto;
+  }
+  .test {
+    font-family: "auto keyword face";
+    font-size: 4em;
+    display: inline-block;
+    margin: 0 0.3em;
+  }
+</style>
+<script>
+  document.fonts.ready.then(() => {
+    document.documentElement.classList.remove('reftest-wait');
+  });
+</script>
+
+<p class="test" style="font-style: normal">I</p>
+<p class="test" style="font-style: italic">I</p>
+<p class="test" style="font-style: oblique">I</p>
+<p class="test" style="font-style: oblique 5deg">I</p>
+<p class="test" style="font-style: oblique 45deg">I</p>
+<p class="test" style="font-style: oblique -5deg">I</p>
+<p class="test"><em>I</em></p>

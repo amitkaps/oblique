@@ -7,8 +7,6 @@ import { expected } from "./expected.mjs";
 
 export const ROOT = join(fileURLToPath(new URL(".", import.meta.url)), "..", "..");
 export const TESTS_DIR = join(ROOT, "tests", "oblique-style-matching");
-export const MATRIX_DIR = join(TESTS_DIR, "matrix");
-export const STANDALONE_DIR = join(TESTS_DIR, "standalone");
 export const MATRIX_JSON = join(ROOT, "reference", "cases", "matrix.json");
 
 export function loadMatrix(path = MATRIX_JSON) {
@@ -18,7 +16,6 @@ export function loadMatrix(path = MATRIX_JSON) {
 /** The inline CSS the generated test puts on its paragraph. */
 export function useSiteCss(row) {
   if (row.fvs) return Object.entries(row.fvs).map(([axis, v]) => `font-variation-settings: '${axis}' ${v};`).join(" ");
-  if (row.em) return row.extraCss ?? "";
   return `font-style: ${row.request};${row.extraCss ? " " + row.extraCss : ""}`;
 }
 
