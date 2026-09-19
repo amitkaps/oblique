@@ -75,13 +75,15 @@ def differs(a, b):
 
 
 def test_pages():
+    """(test id, page path relative to TESTS_DIR, [(rel, ref path relative to TESTS_DIR)])"""
     pages = []
-    for path in sorted(TESTS_DIR.glob("*.html")):
-        if "-ref" in path.stem or "notupright" in path.stem or "notaxis" in path.stem:
-            continue
-        links = re.findall(r'<link rel="(match|mismatch)" href="([^"]+)"', path.read_text())
-        if links:
-            pages.append((path.stem, path.name, links))
+    for folder in ("matrix", "standalone"):
+        for path in sorted((TESTS_DIR / folder).glob("*.html")):
+            if "-ref" in path.stem or "notupright" in path.stem or "notaxis" in path.stem:
+                continue
+            links = re.findall(r'<link rel="(match|mismatch)" href="([^"]+)"', path.read_text())
+            if links:
+                pages.append((path.stem, f"{folder}/{path.name}", [(rel, f"{folder}/{href}") for rel, href in links]))
     return pages
 
 

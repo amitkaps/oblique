@@ -5,7 +5,7 @@
 //   node src/cli.mjs compare             expected vs recorded browser results
 import { readdirSync, readFileSync, writeFileSync, rmSync, existsSync } from "node:fs";
 import { join } from "node:path";
-import { loadMatrix, TESTS_DIR, cells } from "./cases.mjs";
+import { loadMatrix, MATRIX_DIR, cells } from "./cases.mjs";
 import { generate } from "./wpt.mjs";
 import { compare, loadManifest, loadSurvey, readBrowserMatrix, report } from "./compare.mjs";
 
@@ -15,17 +15,17 @@ function runGenerate(check) {
   const { files } = generate(loadMatrix());
   const problems = [];
   for (const [name, content] of files) {
-    const path = join(TESTS_DIR, name);
+    const path = join(MATRIX_DIR, name);
     const current = existsSync(path) ? readFileSync(path, "utf8") : null;
     if (current !== content) {
       problems.push(current === null ? `missing ${name}` : `differs ${name}`);
       if (!check) writeFileSync(path, content);
     }
   }
-  for (const name of readdirSync(TESTS_DIR).filter(isGenerated)) {
+  for (const name of readdirSync(MATRIX_DIR).filter(isGenerated)) {
     if (!files.has(name)) {
       problems.push(`stale ${name}`);
-      if (!check) rmSync(join(TESTS_DIR, name));
+      if (!check) rmSync(join(MATRIX_DIR, name));
     }
   }
   const html = [...files.keys()].filter((n) => n.endsWith(".html") && !n.includes("-ref") && !n.includes("-notref")).length;

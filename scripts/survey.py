@@ -1,6 +1,6 @@
 """Measure how each browser actually renders every cell of the generated matrix.
 
-For each cell in tests/oblique-style-matching/matrix.manifest.json this builds a probe
+For each cell in tests/oblique-style-matching/matrix/matrix.manifest.json this builds a probe
 page (the same @font-face descriptor and use-site CSS as the generated test), loads it
 in a real browser through WebDriver, screenshots it, and measures the LEAN of the
 capital I: how far the top of the stem is displaced from its bottom, in pixels.
@@ -33,7 +33,7 @@ from PIL import Image
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 TESTS_DIR = REPO_ROOT / "tests" / "oblique-style-matching"
-MANIFEST = TESTS_DIR / "matrix.manifest.json"
+MANIFEST = TESTS_DIR / "matrix" / "matrix.manifest.json"
 OUT = REPO_ROOT / "results" / "survey.json"
 DRIVERS = REPO_ROOT / ".wpt" / "_venv3" / "bin"
 HTTP_PORT = 18932
@@ -73,7 +73,7 @@ def probe_html(manifest, cell):
     style = f' style="{cell["css"]}"' if cell["css"] else ""
     inner = f"<em>{font['glyph']}</em>" if row.get("em") else font["glyph"]
     return f"""<!DOCTYPE html><html class="reftest-wait"><meta charset="utf-8">
-<link rel="stylesheet" href="oblique-matching.css">
+<link rel="stylesheet" href="../oblique-matching.css">
 <style>@font-face {{ font-family: "probe"; src: url('{font['file']}');{desc} }}
 .test {{ font-family: "probe"; font-size: {font['fontSize']}; }}</style>
 <script>document.fonts.ready.then(() => document.documentElement.classList.remove('reftest-wait'));</script>
@@ -109,7 +109,7 @@ def survey_engine(engine, manifest, base_url, reps):
         for cell in manifest["cells"]:
             leans = []
             for _ in range(reps):
-                wd(port, "POST", f"/session/{sid}/url", {"url": f"{base_url}/probe-{cell['id']}.html"})
+                wd(port, "POST", f"/session/{sid}/url", {"url": f"{base_url}/matrix/probe-{cell['id']}.html"})
                 deadline = time.time() + 10
                 while time.time() < deadline:
                     waiting = wd(port, "POST", f"/session/{sid}/execute/sync", {
@@ -136,11 +136,13 @@ def main():
 
     manifest = json.loads(MANIFEST.read_text())
     tmp = Path(tempfile.mkdtemp(prefix="survey-"))
+    # same layout as tests/oblique-style-matching/: probes in matrix/, font in resources/
+    (tmp / "matrix").mkdir()
     (tmp / "resources").mkdir()
-    shutil.copy(TESTS_DIR / manifest["font"]["file"], tmp / manifest["font"]["file"])
+    shutil.copy(TESTS_DIR / "resources" / Path(manifest["font"]["file"]).name, tmp / "resources")
     shutil.copy(TESTS_DIR / "oblique-matching.css", tmp / "oblique-matching.css")
     for cell in manifest["cells"]:
-        (tmp / f"probe-{cell['id']}.html").write_text(probe_html(manifest, cell))
+        (tmp / "matrix" / f"probe-{cell['id']}.html").write_text(probe_html(manifest, cell))
 
     http = subprocess.Popen([sys.executable, "-m", "http.server", str(HTTP_PORT), "--directory", str(tmp)],
                             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)

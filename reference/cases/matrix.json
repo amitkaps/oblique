@@ -1,7 +1,7 @@
 {
   "_readme": "Rows are use-site requests, columns are @font-face font-style descriptors. Addresses (A1, B2, ...) are PERMANENT labels: append new rows/columns, never renumber. File names use the slugs: matrix-{row}-{column}.html. `request` is the element's font-style as the reference sees it; the generator derives the test's inline CSS from it (or from `em` / `fvs` / `extraCss`).",
   "font": {
-    "file": "resources/Cairo.var.subset.ttf",
+    "file": "../resources/Cairo.var.subset.ttf",
     "note": "real Cairo subset (slnt -11..11, wght 200..1000, no ital); the test glyph is the capital I",
     "slnt": [-11, 11],
     "ital": null,

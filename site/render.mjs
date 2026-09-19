@@ -3,7 +3,7 @@
 // @font-face `font-style` descriptor (columns A, B, C...) x use-site request (rows 1, 2, 3...),
 // one cell per pair, all against one font (Cairo subset, capital I).
 //
-// Everything about the grid comes from tests/oblique-style-matching/matrix.manifest.json,
+// Everything about the grid comes from tests/oblique-style-matching/matrix/matrix.manifest.json,
 // which reference/ generates from reference/cases/matrix.json: addresses, labels, what the
 // reference algorithm expects in each cell, which cells have a WPT test. This file only reads
 // that manifest and the recorded browser results; it never decides an expectation.
@@ -18,7 +18,7 @@
 // verifyMatrix() fails the build if the manifest, the tests on disk and the results disagree.
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { ROOT, TESTS_DIR } from "../reference/src/cases.mjs";
+import { TESTS_DIR, MATRIX_DIR, STANDALONE_DIR } from "../reference/src/cases.mjs";
 import {
   leanLabel,
   loadManifest,
@@ -29,6 +29,8 @@ import {
 
 const FONT_FILE = join(TESTS_DIR, "resources", "Cairo.var.subset.ttf");
 const TEST_URL_BASE = "https://github.com/amitkaps/oblique/blob/main/tests/oblique-style-matching/";
+const MATRIX_URL = TEST_URL_BASE + "matrix/";
+const STANDALONE_URL = TEST_URL_BASE + "standalone/";
 const SPECIMEN_WORD = "OBLIQUE";
 const ENGINES = [
   { id: "chromium", key: "chrome", label: "Chromium" },
@@ -51,13 +53,13 @@ function verifyMatrix(manifest, results) {
   if (cells.length !== columns.length * rows.length) throw new Error("site: the manifest is not exactly columns x rows");
   for (const cell of cells) {
     for (const name of cell.files) {
-      if (!existsSync(join(TESTS_DIR, name)))
+      if (!existsSync(join(MATRIX_DIR, name)))
         throw new Error(`site: ${name} (cell ${cell.address}) is missing: run \`pnpm generate\``);
     }
     if (cell.wpt && !results[cell.id])
       throw new Error(`site: ${cell.id} (cell ${cell.address}) has no row in results/browser-matrix.md: run and record it first`);
   }
-  const onDisk = new Set(readdirSync(TESTS_DIR).filter((n) => n.startsWith("matrix-") && isTestFile(n)).map((n) => n.slice(0, -5)));
+  const onDisk = new Set(readdirSync(MATRIX_DIR).filter((n) => n.startsWith("matrix-") && isTestFile(n)).map((n) => n.slice(0, -5)));
   const expected = new Set(cells.filter((c) => c.wpt).map((c) => c.id));
   const extra = [...onDisk].filter((n) => !expected.has(n));
   const missing = [...expected].filter((n) => !onDisk.has(n));
@@ -156,7 +158,7 @@ function renderMatrix(manifest, results, survey, versions) {
     for (const col of columns) {
       const cell = byAddr[`${col.address}${row.address}`];
       const res = perCell[cell.address];
-      const url = TEST_URL_BASE + (cell.wpt ? cell.files[0] : "matrix.manifest.json");
+      const url = MATRIX_URL + (cell.wpt ? cell.files[0] : "matrix.manifest.json");
       let tags = "";
       if (cell.status !== "specified") {
         const allowed = cell.allowed.map(outcomeText).join(" / ");
@@ -190,8 +192,8 @@ function renderMatrix(manifest, results, survey, versions) {
 
 /** The hand-written tests: every recorded id that is not a generated matrix cell and still exists on disk. */
 function renderStandalone(results) {
-  const ids = readdirSync(TESTS_DIR)
-    .filter((n) => !n.startsWith("matrix-") && isTestFile(n))
+  const ids = readdirSync(STANDALONE_DIR)
+    .filter(isTestFile)
     .map((n) => n.slice(0, -5))
     .sort();
   const rows = ids.map((id) => {
@@ -200,7 +202,7 @@ function renderStandalone(results) {
       const cls = s === "pass" || s === "fail" ? s : "unknown";
       return `<li class="b-badge ${cls}" title="${esc(`${e.label}: ${s}`)}"><img class="logo" src="/browsers/${e.id}.svg" alt="${esc(e.label)}"></li>`;
     });
-    return `<tr><td><a href="${esc(TEST_URL_BASE + id + ".html")}">${esc(id)}</a></td><td><ul class="verdicts">${lis.join("")}</ul></td></tr>`;
+    return `<tr><td><a href="${esc(STANDALONE_URL + id + ".html")}">${esc(id)}</a></td><td><ul class="verdicts">${lis.join("")}</ul></td></tr>`;
   });
   return `<table class="standalone"><thead><tr><th>Test</th><th>Result</th></tr></thead><tbody>${rows.join("")}</tbody></table>`;
 }

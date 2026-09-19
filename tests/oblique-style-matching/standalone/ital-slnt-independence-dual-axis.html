@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en" class="reftest-wait">
+<meta charset="utf-8" />
+<title>CSS Test: `italic` and `oblique` each activate only their own axis on a font exposing both `slnt` and `ital`</title>
+<!--
+  Algorithm step: CSS Fonts 4 §5.2 "Matching font styles", per the
+  resolution of csswg-drafts#12836 (merged into the published spec, see
+  docs/investigation-log.md): "For variable fonts with an ital axis, a
+  match is created by setting the ital value to 1" (the italic branch) and
+  "For variable fonts with a slnt axis, a match is created by setting the
+  slnt value with the specified oblique value ... The ital axis is not
+  used to satisfy an oblique request" (the oblique branch).
+  Closes docs/coverage.json's confirmed_gaps entry 'combined-slnt-ital-font':
+  independence.html and italic-no-extra-synthesis.html (moved into this
+  folder) both use fonts with only ONE of the two axes, so they can only
+  show "the axis that isn't present wasn't touched" trivially. This is the
+  first test in this project with a font exposing BOTH axes for real,
+  proving the stronger claim: activating one axis leaves the OTHER at its
+  real, present default — not merely absent.
+  Pass means: the "italic" paragraph renders identically to a reference
+  that sets 'ital' 1 AND 'slnt' 0 explicitly (ital active, slnt at its
+  default), and the "oblique 11deg" paragraph renders identically to a
+  reference that sets 'slnt' -11 AND 'ital' 0 explicitly (slnt active,
+  ital at its default).
+  Live finding (2026-09-18): FAILS on Chrome 153.0.8010.48, PASSES on
+  Firefox 156.0 (see results/browser-matrix.md). Investigated before
+  concluding this was a real finding, not a test-construction mistake —
+  forcing 'font-variation-settings: slnt 0' on top of Chrome's automatic
+  'font-style: italic' collapses the rendering to a plain unsheared
+  rectangle (the confirmed-working font-variation-settings-overrides-
+  font-style precedence, see style-plus-explicit-variation-settings.html,
+  makes this an isolating test in its own right); forcing 'ital 1' on top
+  instead restores full shear matching the explicit-ital reference. Only
+  the "italic" paragraph is affected — "oblique 11deg" renders correctly.
+  This means Chrome's automatic 'italic' resolution is driving the slnt
+  axis (reserved for oblique requests) on a font that has both axes, not
+  purely the ital axis — a fresh, reverse-direction instance of the same
+  class of axis-independence violation WebKit #209565 documents.
+-->
+<link rel="help" href="https://drafts.csswg.org/css-fonts-4/#font-style-matching" />
+<link rel="help" href="https://github.com/w3c/csswg-drafts/issues/12836" />
+<link rel="match" href="ital-slnt-independence-dual-axis-ref.html">
+<meta name="assert"
+  content="On a font exposing both a real slnt axis and a real ital axis,
+  'font-style: italic' sets ital=1 and leaves slnt at its default (0), and
+  'font-style: oblique 11deg' sets slnt=-11 and leaves ital at its default
+  (0) — each request activates only its own axis, even when the other is
+  genuinely present on the same font." />
+<link rel="stylesheet" href="../oblique-matching.css">
+<!--
+  Font: resources/oblique-dual-axis.ttf — this suite's purpose-built font
+  with both a real slnt axis (-11..11) and a real ital axis (0..1); see
+  README.md and resources/build-fonts.py for why slnt and ital shear
+  different, pixel-distinguishable edges of the glyph specifically so a
+  wrong-axis-activation bug would produce a visible mismatch rather than
+  an accidental pass.
+-->
+<style>
+  @font-face {
+    font-family: "dual axis test";
+    src: url('../resources/oblique-dual-axis.ttf');
+  }
+  .test {
+    font-synthesis: none;
+    font-family: "dual axis test";
+  }
+</style>
+<script>
+  document.fonts.ready.then(() => {
+    document.documentElement.classList.remove('reftest-wait');
+  });
+</script>
+
+<p class="test" style="font-style: italic">A</p>
+<p class="test" style="font-style: oblique 11deg">A</p>

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en" class="reftest-wait">
+<meta charset="utf-8" />
+<title>CSS Test: bare `oblique`/`italic` against a face whose EXPLICIT range matches its own true slnt bounds must not ALSO synthesize a skew</title>
+<!--
+  This is a DIFFERENT bug shape from auto-derived-range-clamp.html and
+  auto-derived-range-clamp-cairo-symmetric.html (both in this folder). Those
+  test whether the UA correctly CLAMPS the axis to the range boundary — and
+  found both Chrome and Firefox do, on two independent range shapes. This
+  test targets a separate question raised by reviewing
+  vizchitra-fonts/docs/compat.md and its src/lib/fonts/slant.browser.test.ts
+  directly (a real production codebase's own measured browser matrix, not
+  this project's synthetic fonts): once the axis IS correctly clamped, does
+  the UA ALSO, separately, synthesize an additional skew on top of it?
+  Per CSS Fonts 4 section 2.8.2 (font-synthesis-style): "This property
+  controls whether user agents are allowed to synthesize oblique font faces
+  WHEN A FONT FAMILY LACKS OBLIQUE FACES." (emphasis added; fetched from the
+  raw spec HTML, https://drafts.csswg.org/css-fonts-4/, 2026-09-19). The
+  family under test here does NOT lack an oblique face — it has one, with a
+  real slnt axis, correctly matched and clamped to its own boundary. Any
+  additional synthetic skew stacked on top would not be "filling a gap the
+  family lacks" — it would be double-slanting a face that already has a
+  correctly-matched real axis.
+  Real-world corroboration: vizchitra-fonts' Cairo face now ships EXACTLY
+  this shape — font-style: oblique -11deg 11deg, matching its true fvar
+  bounds exactly (a deliberate deployment choice, documented in
+  vizchitra-fonts/docs/compat.md's "Decision — UPDATED" section). Its own
+  measured browser matrix (slant.browser.test.ts, "the BARE oblique keyword
+  against a ranged face is mishandled, even at the font's own true bounds")
+  found Chromium stacks a ~14deg synthetic skew on top of the
+  correctly-matched -11 axis value (measured shear ~0.44, vs. the correct
+  ~0.194 — roughly double), and WebKit discards the axis and synthesizes
+  instead (also landing near ~0.44). Only Firefox was measured correct.
+  Why THIS project's earlier tests didn't already catch this: every prior
+  range-clamp test in this folder (auto-derived-range-clamp.html,
+  auto-derived-range-clamp-cairo-symmetric.html,
+  explicit-descriptor-range-clamp.html) sets `font-synthesis: none`
+  deliberately, to isolate "did automatic slnt-matching alone pick the
+  right value?" from synthesis entirely. That isolation is exactly what
+  makes Chromium's stacking mechanism impossible to trigger — this test
+  is the first in this folder to leave font-synthesis at its default
+  (auto, synthesis allowed), specifically so it can observe the interaction
+  those other tests intentionally exclude.
+  Pass means: bare `oblique` and bare `italic` render identically to the
+  reference, which sets 'slnt' -11 directly via font-variation-settings and
+  never requests a font-style at all — i.e. no additional synthetic skew
+  was stacked on top of the correctly-matched real axis value.
+-->
+<link rel="help" href="https://drafts.csswg.org/css-fonts-4/#font-style-matching" />
+<link rel="help" href="https://drafts.csswg.org/css-fonts-4/#font-synthesis-style" />
+<link rel="match" href="explicit-range-bare-keyword-synthesis-stacking-ref.html">
+<meta name="assert"
+  content="A variable-font face whose font-style descriptor declares an
+  oblique range matching its own true slnt axis bounds, requested with a
+  bare 'oblique' or 'italic' keyword whose implied default angle falls
+  outside that range, must clamp the slnt axis to the range boundary and
+  must NOT additionally synthesize a skew on top of it — font-synthesis-style
+  only applies 'when a font family lacks oblique faces' (CSS Fonts 4 2.8.2),
+  and this family does not lack one." />
+<!--
+  Font: resources/Cairo.var.subset.ttf (same font as
+  auto-derived-range-clamp-cairo-symmetric.html — real Cairo, subset to
+  "OBLIQUE"; fvar slnt -11..11, Cairo's real bounds).
+  Unlike that test, THIS test's @font-face declares an EXPLICIT font-style
+  descriptor matching the font's own true bounds exactly
+  (oblique -11deg 11deg) — reproducing vizchitra-fonts' current CairoObliqueRange
+  shape — rather than leaving font-style undeclared (auto-derived).
+  Test glyph: the capital I — same convention as
+  auto-derived-range-clamp-cairo-symmetric.html, and for the same reason
+  (this font's cmap only holds the letters of OBLIQUE).
+-->
+<style>
+  @font-face {
+    font-family: "range true bounds synthesis test font";
+    src: url('../resources/Cairo.var.subset.ttf');
+    font-style: oblique -11deg 11deg;
+  }
+
+  .test {
+    font-family: "range true bounds synthesis test font";
+    font-size: 8em;
+    /* Deliberately NOT setting font-synthesis: none here — see the header
+       comment. This is the one test in this folder that leaves synthesis
+       at its default (auto), on purpose. */
+  }
+</style>
+<script>
+  document.fonts.ready.then(() => {
+    document.documentElement.classList.remove('reftest-wait');
+  });
+</script>
+
+<p class="test" style="font-style: oblique">I</p>
+<p class="test" style="font-style: italic">I</p>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en" class="reftest-wait">
+<meta charset="utf-8" />
+<title>CSS Test: bare `font-style: oblique` activates a variable font's `slnt` axis</title>
+<!--
+  Algorithm step: CSS Fonts 4 §5.2 "Matching font styles" — for variable
+  fonts, when a bare `oblique` value is requested and the matched face
+  declares a `font-style: oblique <min> <max>` descriptor with a real `slnt`
+  axis, the UA sets the `slnt` axis to satisfy the request rather than
+  synthesizing a skew.
+  Prior art: WebKit #209565 (STILL OPEN as of 2026-09-18, see
+  docs/findings.md) documents exactly this class of failure — a `slnt` axis
+  present but not consulted by automatic font-style matching.
+  Pass means: the rendered "varfont" text in the oblique paragraph has the
+  same slant as the reference, which sets 'slnt' directly and never goes
+  through automatic font-style matching — i.e. the automatic mapping this
+  test exercises produced the same result as the explicit axis value would.
+-->
+<link rel="help" href="https://drafts.csswg.org/css-fonts-4/#font-style-matching" />
+<link rel="help" href="https://bugs.webkit.org/show_bug.cgi?id=209565" />
+<link rel="match" href="slnt-axis-activation-ref.html">
+<meta name="assert"
+  content="A bare 'oblique' request against a face whose font-style descriptor
+  declares an oblique range with a real slnt axis activates that axis,
+  rather than falling back to synthetic skew." />
+<!--
+  Font: resources/FontStyleTest-slnt-VF.woff2, from WPT's own
+  css/css-fonts/variations/resources/ (authored by Stephen Nixon for
+  https://arrowtype.github.io/vf-slnt-test/ — spec.md's cited community test
+  suite). Reused rather than building a second slnt test font, since a
+  suitable one already exists in WPT's corpus (checked per docs/plan.md's
+  Step 2, font corpus check). Its declared slnt axis range is -15..0.
+-->
+<style>
+  @font-face {
+    font-family: "slnt test font";
+    src: url('../resources/FontStyleTest-slnt-VF.woff2');
+    font-style: oblique 0deg 15deg;
+  }
+
+  .test {
+    font-family: "slnt test font";
+    font-size: 3em;
+  }
+
+  .oblique {
+    font-style: oblique;
+  }
+</style>
+<script>
+  document.fonts.ready.then(() => {
+    document.documentElement.classList.remove('reftest-wait');
+  });
+</script>
+
+<p class="test oblique">varfont</p>

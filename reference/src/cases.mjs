@@ -7,6 +7,8 @@ import { expected } from "./expected.mjs";
 
 export const ROOT = join(fileURLToPath(new URL(".", import.meta.url)), "..", "..");
 export const TESTS_DIR = join(ROOT, "tests", "oblique-style-matching");
+export const MATRIX_DIR = join(TESTS_DIR, "matrix");
+export const STANDALONE_DIR = join(TESTS_DIR, "standalone");
 export const MATRIX_JSON = join(ROOT, "reference", "cases", "matrix.json");
 
 export function loadMatrix(path = MATRIX_JSON) {

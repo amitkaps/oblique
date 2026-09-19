@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en" class="reftest-wait">
+<meta charset="utf-8" />
+<title>CSS Test: `font-style: normal` against an all-oblique-negative family falls back through the "oblique &lt;0 descending" branch</title>
+<!--
+  Algorithm step: CSS Fonts 4 §5.2 "Matching font styles" — "If the value of
+  font-style is normal, Oblique values greater than or equal to 0 are
+  checked in ascending order. If no match is found, italic values greater
+  than or equal to 0 are checked in ascending [order]. If no match is
+  found, oblique values less than 0deg are checked in descending order
+  until a match is found."
+  This family has exactly one face, declaring
+  `font-style: oblique -20deg -5deg` (all-negative CSS angles — see
+  resources/oblique-nozero.ttf and README.md) and no italic-declared face
+  at all, so a `normal` request must pass through all three stages: no
+  oblique >=0 candidate exists, no italic >=0 candidate exists, and the
+  third stage (oblique <0, descending from 0) is what actually resolves it
+  — landing on this face's -5deg boundary, the closest available value to
+  0deg.
+  Pass means: the "normal" paragraph renders identically to the reference,
+  which sets 'slnt' to 5 directly (this font's slnt value for the
+  CSS -5deg boundary, per the sign convention in resources/build-fonts.py)
+  — not upright/unstyled (which would mean the fallback silently didn't
+  run) and not some other value.
+-->
+<link rel="help" href="https://drafts.csswg.org/css-fonts-4/#font-style-matching" />
+<link rel="match" href="boundary-0deg-normal-fallback-ref.html">
+<meta name="assert"
+  content="'font-style: normal' against a family whose only face declares
+  font-style: oblique -20deg -5deg (no italic face, no oblique value >=0)
+  falls back to the closest available oblique value below 0deg (-5deg),
+  setting 'slnt' to 5." />
+<link rel="stylesheet" href="../oblique-matching.css">
+<!--
+  Font: resources/oblique-nozero.ttf (slnt range 5..20, default 12 —
+  chosen deliberately off the boundary so a correct clamp to 5 is visually
+  distinct from doing nothing; see resources/build-fonts.py). Declared
+  descriptor range -20deg -5deg maps onto the font's slnt 20..5 by
+  negation, the same declared-descriptor-to-slnt convention already
+  confirmed passing upstream and in slnt-axis-activation.html.
+-->
+<style>
+  @font-face {
+    font-family: "nozero fallback test";
+    src: url('../resources/oblique-nozero.ttf');
+    font-style: oblique -20deg -5deg;
+  }
+  .test {
+    font-synthesis: none;
+    font-family: "nozero fallback test";
+  }
+</style>
+<script>
+  document.fonts.ready.then(() => {
+    document.documentElement.classList.remove('reftest-wait');
+  });
+</script>
+
+<p class="test" style="font-style: normal">A</p>

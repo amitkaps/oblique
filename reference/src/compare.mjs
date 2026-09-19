@@ -16,7 +16,7 @@
 
 import { readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
-import { ROOT, TESTS_DIR } from "./cases.mjs";
+import { ROOT, MATRIX_DIR } from "./cases.mjs";
 
 export const ENGINES = ["chrome", "firefox", "safari"];
 const TOL = 1.5;
@@ -98,7 +98,7 @@ export function loadSurvey() {
 }
 
 export function loadManifest() {
-  return JSON.parse(readFileSync(join(TESTS_DIR, "matrix.manifest.json"), "utf8"));
+  return JSON.parse(readFileSync(join(MATRIX_DIR, "matrix.manifest.json"), "utf8"));
 }
 
 export function report(rows, manifest) {

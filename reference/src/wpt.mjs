@@ -54,7 +54,7 @@ function refHtml(cell, matrix, outcome, kind) {
   variation, CSS Fonts 4 7.2), so this reference does not depend on the descriptor or on the
   matching under test.
 -->
-<link rel="stylesheet" href="oblique-matching.css">
+<link rel="stylesheet" href="../oblique-matching.css">
 <style>
 ${faceRule(matrix, null)}
   .test {
@@ -96,7 +96,7 @@ function testHtml(cell, matrix, refs) {
 ${links}
 <meta name="assert"
   content="A face declared '${esc(desc)}', requested with '${esc(cell.row.lines.join(" "))}', ${esc(rule)}." />
-<link rel="stylesheet" href="oblique-matching.css">
+<link rel="stylesheet" href="../oblique-matching.css">
 <!-- Font: ${matrix.font.file}: ${matrix.font.note} -->
 <style>
 ${faceRule(matrix, cell.col.descriptor)}
