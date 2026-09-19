@@ -45,7 +45,7 @@
   <section class="findings">
     <h2>Findings</h2>
     <p>
-      Cells E2, E3, E5 and E8 (<code>italic</code>, bare <code>oblique</code>, <code>&lt;em&gt;</code> and
+      Cells A2, A3, A5 and A8 (<code>italic</code>, bare <code>oblique</code>, <code>&lt;em&gt;</code> and
       <code>oblique 45deg</code> against a face declared <code>oblique -11deg 11deg</code>, default synthesis):
       the axis must clamp to &minus;11 and nothing may be synthesized on top. Firefox does that. Chrome stacks a
       synthetic skew on the axis (36px lean, expected 16px). Safari stacks for bare <code>oblique</code> and
@@ -54,7 +54,7 @@
       failure is the extra skew and nothing else.
     </p>
     <p>
-      Cell B12: <code>italic</code> with <code>font-synthesis-style: oblique-only</code> against a face declared
+      Cell C12: <code>italic</code> with <code>font-synthesis-style: oblique-only</code> against a face declared
       <code>normal</code> must stay upright (a synthesized oblique must not stand in for italic). Firefox does;
       Chrome and Safari synthesize.
     </p>

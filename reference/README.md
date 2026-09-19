@@ -28,7 +28,7 @@ Node 24 (pinned in `.mise.toml`), no dependencies. From the repo root (`mise run
 | File | Role |
 |---|---|
 | `spec/css-fonts-4-excerpts.txt` | the spec text everything quotes, with URL, date and hash of the full page |
-| `src/style.mjs` | parse descriptors and requests (`normal` = `oblique 0deg`; bare `oblique` = 14deg; `auto` = "as if normal") |
+| `src/style.mjs` | parse descriptors and requests (`normal` = `oblique 0deg`; bare `oblique` = 14deg; `auto` = selected as if normal, but not clamped: 4.4) |
 | `src/match.mjs` | the 5.2 face-selection stages, including the 11deg thresholds. Selects a face; does not synthesize |
 | `src/variation.mjs` | 7.2: the applied `slnt`/`ital` value, clamped to the descriptor then the font; CSS angle to `slnt` flips the sign |
 | `src/synthesis.mjs` | 2.8.2 `font-synthesis-style`: when a synthesized oblique is permitted |

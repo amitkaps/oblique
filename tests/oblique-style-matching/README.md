@@ -5,7 +5,7 @@ This README is not copied into `.wpt/`.
 
 ```
 matrix/       46 generated reftests + matrix.manifest.json (never edited by hand)
-standalone/   14 hand-written tests, kept while they are re-based on the Cairo subset
+standalone/   15 hand-written tests: 14 older ones kept while they are re-based on the Cairo subset, and the `auto` equivalence test
 resources/    fonts (each with a .headers sidecar for WPT) and the scripts that build them
 oblique-matching.css   shared fixed-size layout, so pixel diffs do not depend on font metrics
 ```
@@ -16,7 +16,7 @@ Columns are the `@font-face` `font-style` descriptor (A omitted, B `normal`, C `
 E `oblique -11deg 11deg`); rows are the use-site request (1 `normal`, 2 `italic`, 3 `oblique`,
 4 `oblique 11deg`, 5 `<em>`, 6 `font-variation-settings: 'slnt' -11`, 7 `oblique 5deg`, 8 `oblique 45deg`,
 9 `oblique -5deg`, 10 `italic` with `font-synthesis-style: none`, 11 `oblique` with `font-synthesis: none`,
-12 `italic` with `font-synthesis-style: oblique-only`). A cell is `E2`; its file is
+12 `italic` with `font-synthesis-style: oblique-only`). A cell is `A2`; its file is
 `matrix-{row slug}-{column slug}.html` (`matrix-italic-oblrange.html`). Every cell uses
 `resources/Cairo.var.subset.ttf` and the capital `I`.
 
@@ -48,7 +48,8 @@ meant to remove; their expectations were not re-derived with the reference.
 | `style-plus-explicit-variation-settings` | Cairo | `font-variation-settings` after `font-style` (7.2) |
 | `ital-slnt-independence-dual-axis` | oblique-dual-axis | `ital` and `slnt` are independent |
 | `independence`, `italic-no-extra-synthesis` | IdentTestItal | `italic` sets `ital`, no extra synthesis |
-| `explicit-range-bare-keyword-synthesis-stacking` | Cairo | no synthesis on top of a clamped axis (same claim as cells E2/E3) |
+| `auto-keyword-equals-omitted` | Cairo | `font-style: auto` in `@font-face` renders exactly like an omitted descriptor (4.4: `auto` is the initial value), for seven requests. Says nothing about which rendering is right, so it holds even where the spec is open (italic on `auto`). Not a matrix column: it would repeat column D |
+| `explicit-range-bare-keyword-synthesis-stacking` | Cairo | no synthesis on top of a clamped axis (same claim as cells A2/A3) |
 
 ## resources/
 

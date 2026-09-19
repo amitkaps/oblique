@@ -91,3 +91,21 @@ test("an ital-axis font: an italic face sets ital 1, and an oblique request neve
   const e = expected({ faces: [{ id: "f", descriptor: "italic" }], font: f, request: "italic" });
   assert.deepEqual(e.allowed, [{ kind: "axis", axis: "ital", value: 1 }]);
 });
+
+test("font-synthesis never disables a real axis: variable fonts do not count as synthesis (2.8, csswg-drafts 6f7c48d)", () => {
+  for (const [descriptor, request] of [[undefined, "oblique"], ["oblique", "oblique"], ["oblique -11deg 11deg", "oblique"], ["oblique -11deg 11deg", "italic"]]) {
+    for (const synthesis of [{ fontSynthesis: "none" }, { fontSynthesisStyle: "none" }]) {
+      const e = run(descriptor, request, { synthesis });
+      assert.deepEqual(keys(e), ["slnt=-11"], `${descriptor} ${request} ${JSON.stringify(synthesis)}`);
+    }
+  }
+});
+
+test("B (normal-declared) oblique requests are a recorded hedge: the axis is forbidden, upright or synthesized is allowed", () => {
+  // The literal 5.2 text (slnt match first, shearing only "Otherwise") would make these upright only;
+  // csswg-drafts#7999's author scopes the no-synthesis intent to declarations that do not restrict the
+  // range to 0. Text and intent disagree, so neither is asserted (docs/findings.md, "Open").
+  for (const request of ["oblique", "oblique 5deg", "oblique 45deg", "oblique -5deg"]) {
+    assert.deepEqual(keys(run("normal", request)), ["synth", "upright"], request);
+  }
+});

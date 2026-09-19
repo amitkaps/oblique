@@ -5,7 +5,11 @@
 //   5.2  "For families that lack any italic or oblique faces, user agents may create
 //        artificial oblique faces, if this is permitted by the value of the
 //        font-synthesis property."
-//   5.2  a variable font with a slnt axis matches an oblique request by setting the axis;
+//   2.8  "Variable fonts ... do not count as font synthesis and their use is not affected by the
+//        font-synthesis property" (csswg-drafts 6f7c48d, #9391): font-synthesis: none never
+//        disables a real axis, it only removes the synthesized outcome.
+//   5.2  a variable font with a slnt axis matches an oblique request by setting the axis (this
+//        ordering: csswg-drafts ac67b72, #9391; before it the axis match needed synthesis auto);
 //        "otherwise" a fallback match is made by geometric shearing. So an auto face on a
 //        font with slnt is never sheared for an oblique request (4.4: auto does not clamp).
 //   2.8.2 none: not allowed. oblique-only: allowed, "but they must not be used as

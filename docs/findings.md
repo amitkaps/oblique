@@ -2,13 +2,14 @@
 
 What the tests show and what is still open. Chrome 153.0.8010.48, Firefox 156.0, Safari 27.0
 (macOS 15.8). The grid is the 5 `@font-face` descriptors (A to E) by 12 use-site requests (1 to 12)
-on the Cairo `OBLIQUE` subset; a cell is written `E2` (column E, row 2).
+on the Cairo `OBLIQUE` subset; a cell is written `A2` (column A, row 2). Columns run in the order an author would write the
+`@font-face` rules: A `oblique -11deg 11deg`, B bare `oblique`, C `normal`, D `auto` (descriptor omitted), E `italic`.
 
 ## Confirmed failures
 
 Five cells have a spec-decided outcome that Chrome and Safari get wrong; Firefox passes all of them.
 
-### Cells E2, E3, E5 and E8: synthesis stacked on the axis
+### Cells A2, A3, A5 and A8: synthesis stacked on the axis
 
 `italic`, bare `oblique` and `<em>` against a face declared `font-style: oblique -11deg 11deg`, with
 `font-synthesis` left at its default. A real oblique face exists, so the spec (2.3 "if no oblique faces
@@ -23,16 +24,16 @@ exist" is not satisfied) says the axis must clamp to `slnt -11` and nothing may 
 Lean is measured at 8em on the capital `I`: upright 0px, real `slnt -11` 16px, synthetic 14deg 21px,
 stacked 36px. The same behaviour was measured independently in the sibling `vizchitra-fonts` project.
 Row 8 (`oblique 45deg`, past the font's range) fails the same way on the same face: Chrome and Safari stack
-(36px), Firefox clamps to the axis (16px). Rows 10 and 11 (`E10`, `E11`) repeat rows 2 and 3 with
+(36px), Firefox clamps to the axis (16px). Rows 10 and 11 (`A10`, `A11`) repeat rows 2 and 3 with
 `font-synthesis-style: none` / `font-synthesis: none` and pass everywhere, so the failures are the synthetic skew
 on top of the axis and nothing else.
 
-### Cell B12: `oblique-only` synthesizes for an italic request
+### Cell C12: `oblique-only` synthesizes for an italic request
 
 `font-style: italic` with `font-synthesis-style: oblique-only` against a face declared `normal`: 2.8.2 says a
 synthesized oblique "must not be used as fallback if italic is specified", so the glyph must be upright. Firefox
 is upright; Chrome and Safari synthesize (21px). Upstream `font-synthesis-style-oblique-only` fails on the same two
-engines. Cell E12 (the same request on the explicit-range face) shows the stacking again in Chrome and Safari but
+engines. Cell A12 (the same request on the explicit-range face) shows the stacking again in Chrome and Safari but
 is only measured, because the reference is not sure what `oblique-only` does to a real oblique face.
 
 ## How a cell is decided
@@ -48,7 +49,7 @@ for a cell: `upright`, `axis slnt=n`, or `synth`. A stacked axis plus synthesis 
 
 Two signals agree in every cell: the reftests (Chrome and Firefox via `wpt run`, Safari via
 `scripts/safari-replay.py`) and a separate measurement of the glyph's lean (`scripts/survey.py`).
-`mise run compare`: 54 of 60 cells agree, 6 diverge (E2, E3, E5, E8, B12, and E12 which has no test), none is `reference-suspect` (a cell every
+`mise run compare`: 54 of 60 cells agree, 6 diverge (A2, A3, A5, A8, C12, and A12 which has no test), none is `reference-suspect` (a cell every
 engine fails, which would point at the reference or a spec gap rather than at three browsers).
 
 Spec rules that decide cells (quoted in `reference/spec/css-fonts-4-excerpts.txt`):
@@ -60,17 +61,36 @@ Spec rules that decide cells (quoted in `reference/spec/css-fonts-4-excerpts.txt
   normal; for *variation clamping* "clamping does not occur". So an oblique request on an `auto` face of a font
   with a `slnt` axis sets the axis to the requested angle, limited only by the font (§5.2: a variable font with
   `slnt` matches by the axis, shearing is only the fallback). Upstream `font-face-style-auto-variable` and
-  `-default-variable` assert this and pass on all three engines, and cells A3 and A4 agree. Italic and `<em>` on
-  an `auto` face stay open (§5.2's italic steps never set `slnt`), so A2 and A5 are only observed: Chrome and
+  `-default-variable` assert this and pass on all three engines, and cells D3 and D4 agree. Italic and `<em>` on
+  an `auto` face stay open (§5.2's italic steps never set `slnt`), so D2 and D5 are only observed: Chrome and
   Firefox slant, Safari stays upright.
 - `italic` has no defined angle: "the angle and direction of slant is unspecified" (2.3).
 - Synthesis "will be generated" in 2.3 but a UA "may create" it in 5.2, so it is permitted, not required.
+- A variable font's axis is not synthesis: §2.8 says such fonts "do not count as font synthesis and their use is
+  not affected by the font-synthesis property", and §5.2's oblique steps set `slnt` first and shear only as the
+  "Otherwise" fallback (csswg-drafts commits `6f7c48d` and `ac67b72`, #9391, from #7999). So `font-synthesis: none`
+  never disables the axis (A10, A11 and D11 stay on it in all three engines), and an out-of-range angle on an `auto`
+  face stops at the font's limit (upstream `synthetic-oblique-out-of-capabilities-range`, passing 3 of 3).
 - CSS angle and OpenType `slnt` have opposite signs: `oblique 11deg` is `slnt -11`.
 - Rows 1 to 9 never set `font-synthesis`: the spec synthesizes only for a missing face, so forcing it off
   would hide an engine that synthesizes on top of a matched face. Rows 10 to 12 exist to set it.
 - The size of a synthesized skew is not tested (a reftest cannot build one). Observed: for `oblique 5deg` on a
   `normal` face Firefox skews about 5deg, Chrome and Safari leave it upright; for `oblique 45deg` Chrome and
   Safari skew 14deg while Firefox skews far more. 5.2 says "geometric shearing to the specified oblique value".
+
+## A recorded hedge: oblique requests on a `normal`-declared variable font
+
+Cells C3, C4, C7, C8 and C9 allow upright or a synthesized skew and forbid the real axis. The reading that gives
+this is 4.4 (the descriptor replaces the font data's style, so the applied value is clamped to 0) plus "synthetic
+styling ... where the font descriptors imply this is needed". Two other readings disagree:
+
+- **Literal §5.2:** the slnt step has no exception for a range restricted to 0, so the axis match is made, clamped
+  to 0, and shearing is never reached. That makes C3 to C9 upright only, and all three engines fail them.
+- **The author's scope in #7999:** the no-synthesis intent covers declarations "that would not restrict the range
+  to 0", which excludes `normal`. That supports the hedge.
+
+Text and stated intent disagree, so neither is asserted. `auto` differs from `normal` here: it is the font's own
+range ("implicit `auto` ranges" in #7999), so it takes the axis and is never sheared.
 
 ## Claims withdrawn
 
@@ -93,8 +113,11 @@ resolution csswg-drafts#9389, which the Editor's Draft text has not caught up wi
 
 ## The hand-written tests
 
-The 14 tests in `tests/oblique-style-matching/standalone/` predate the matrix and use several fonts.
-Their pass/fail is recorded but their expectations were not re-derived with the reference, so treat their
+The tests in `tests/oblique-style-matching/standalone/` are hand-written. Fourteen predate the matrix and use several
+fonts; the fifteenth, `auto-keyword-equals-omitted`, checks that `font-style: auto` and an omitted descriptor render
+identically (passes on all three engines).
+
+For the fourteen older ones, pass/fail is recorded but the expectations were not re-derived with the reference, so treat their
 "Chrome fails" verdicts (`italic-no-extra-synthesis`, `ital-slnt-independence-dual-axis`,
 `italic-oblique-equivalence`) as unchecked: two earlier claims of the same kind were withdrawn above.
 
@@ -117,6 +140,7 @@ Their pass/fail is recorded but their expectations were not re-derived with the 
 5. **Real-device Safari** (iPhone, older versions) has never been run; vizchitra-fonts saw
    version-dependent behaviour (18.7 vs 27.0).
 6. **File the spec questions** with CSSWG: synthesis "will" versus "may", italic on a `slnt`-only font,
-   `auto` semantics, the 14deg-versus-11deg italic slope.
+   `auto` semantics (does italic on an `auto` face use the font's own range?), the 14deg-versus-11deg italic slope,
+   and whether the slnt step of §5.2 applies to a face declared `normal` (the hedge above).
 7. **Upstreaming.** No WPT PR is open. `tests/oblique-style-matching/` is the single folder that would be
    proposed.

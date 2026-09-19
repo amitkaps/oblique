@@ -1,5 +1,5 @@
 {
-  "_readme": "Rows are use-site requests, columns are @font-face font-style descriptors. Addresses (A1, B2, ...) are PERMANENT labels: append new rows/columns, never renumber. File names use the slugs: matrix-{row}-{column}.html. `request` is the element's font-style as the reference sees it; the generator derives the test's inline CSS from it (or from `em` / `fvs` / `extraCss`).",
+  "_readme": "Rows are use-site requests, columns are @font-face font-style descriptors. Addresses (A1, B2, ...) are PERMANENT labels (fixed once, on 2026-09-20, in the order an author would write the @font-face rules): append new rows/columns, never renumber. File names use the slugs: matrix-{row}-{column}.html. `request` is the element's font-style as the reference sees it; the generator derives the test's inline CSS from it (or from `em` / `fvs` / `extraCss`).",
   "font": {
     "file": "../resources/Cairo.var.subset.ttf",
     "note": "real Cairo subset (slnt -11..11, wght 200..1000, no ital); the test glyph is the capital I",
@@ -16,38 +16,38 @@
   "columns": [
     {
       "address": "A",
-      "slug": "auto",
-      "descriptor": null,
-      "code": "@font-face { /* font-style omitted */ }",
-      "note": "Descriptor omitted, which is defined as auto: matched as if normal"
+      "slug": "oblrange",
+      "descriptor": "oblique -11deg 11deg",
+      "code": "@font-face { font-style: oblique -11deg 11deg; }",
+      "note": "Declared oblique with the font's true slnt range"
     },
     {
       "address": "B",
-      "slug": "normal",
-      "descriptor": "normal",
-      "code": "@font-face { font-style: normal; }",
-      "note": "Declared upright"
-    },
-    {
-      "address": "C",
-      "slug": "italic",
-      "descriptor": "italic",
-      "code": "@font-face { font-style: italic; }",
-      "note": "Declared italic (binary, no angle)"
-    },
-    {
-      "address": "D",
       "slug": "oblique",
       "descriptor": "oblique",
       "code": "@font-face { font-style: oblique; }",
       "note": "Declared oblique, no range (14deg)"
     },
     {
+      "address": "C",
+      "slug": "normal",
+      "descriptor": "normal",
+      "code": "@font-face { font-style: normal; }",
+      "note": "Declared upright"
+    },
+    {
+      "address": "D",
+      "slug": "auto",
+      "descriptor": null,
+      "code": "@font-face { font-style: auto /* or omitted */ }",
+      "note": "Descriptor omitted = auto, the initial value. Selected as if normal, but not clamped, so the font's own slnt range applies"
+    },
+    {
       "address": "E",
-      "slug": "oblrange",
-      "descriptor": "oblique -11deg 11deg",
-      "code": "@font-face { font-style: oblique -11deg 11deg; }",
-      "note": "Declared oblique with the font's true slnt range"
+      "slug": "italic",
+      "descriptor": "italic",
+      "code": "@font-face { font-style: italic; }",
+      "note": "Declared italic (binary, no angle)"
     }
   ],
   "rows": [

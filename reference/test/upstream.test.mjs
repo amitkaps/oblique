@@ -75,3 +75,15 @@ test("font-face-style-auto-variable.html / -default-variable.html: auto applies 
     assert.deepEqual(expected({ faces: [{ id: "Inter", descriptor }], font: inter, request: "oblique 0deg" }).allowed, [{ kind: "upright" }]);
   }
 });
+
+// css/css-fonts/synthetic-oblique-out-of-capabilities-range.html (csswg-drafts#7999)
+// "font-style with angle outside of the 'slnt' range supported by the font does not synthesize oblique
+// faces": oblique 60deg on an auto Inter face renders exactly like oblique 10deg (the font's limit).
+// Passes on Chrome, Firefox and Safari (wpt.fyi, 2026-09-18).
+test("synthetic-oblique-out-of-capabilities-range.html: an out-of-range angle on an auto face stops at the font's limit", () => {
+  const inter = { slnt: [-10, 0], ital: null };
+  const at = (request) => expected({ faces: [{ id: "Inter", descriptor: undefined }], font: inter, request });
+  assert.deepEqual(at("oblique 60deg").allowed, at("oblique 10deg").allowed);
+  assert.deepEqual(at("oblique 60deg").allowed, [{ kind: "axis", axis: "slnt", value: -10 }]);
+  assert.equal(at("oblique 60deg").allowed.some((o) => o.kind === "synth"), false);
+});

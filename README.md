@@ -25,7 +25,7 @@ site/                         the grid, live in your browser, with pass/fail per
 
 The browser is the system under test; the reference never asks one. All 60 cells use one real font, the
 [Cairo](https://fonts.google.com/specimen/Cairo) variable font (SIL OFL, `slnt` -11..11) subset to the letters
-of `OBLIQUE`, and test the capital `I`, which shears cleanly. A cell is written `E2`: column E, row 2.
+of `OBLIQUE`, and test the capital `I`, which shears cleanly. A cell is written `A2`: column A, row 2.
 
 ## Current result
 
@@ -52,7 +52,7 @@ Setup, the Safari method, and gotchas: [docs/running.md](docs/running.md). All t
 |---|---|
 | `reference/` | the reference implementation, its tests, the saved spec text ([README](reference/README.md)) |
 | `tests/oblique-style-matching/matrix/` | generated reftests and manifest; never edited by hand |
-| `tests/oblique-style-matching/standalone/` | 14 older hand-written tests, kept while they are re-based on Cairo |
+| `tests/oblique-style-matching/standalone/` | 15 hand-written tests (14 older ones on several fonts, kept while they are re-based on Cairo, plus the `auto` equivalence test) |
 | `tests/oblique-style-matching/resources/` | fonts and the scripts that build them |
 | `results/` | `browser-matrix.md` (recorded runs), `survey.json` (measured lean per cell) |
 | `site/` | the page: `index.html`, `style.css`, `render.mjs` (a Vite plugin that renders the grid) |
