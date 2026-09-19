@@ -19,7 +19,9 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { TESTS_DIR, MATRIX_DIR, STANDALONE_DIR } from "../reference/src/cases.mjs";
+import { pinCss } from "../reference/src/outcome.mjs";
 import {
+  compare,
   leanLabel,
   loadManifest,
   loadSurvey,
@@ -72,8 +74,6 @@ const reftestStatus = (results, id, key) => {
   return r === "pass" ? "pass" : r === "fail" ? "fail" : r === "not-run" ? "not-run" : "unknown";
 };
 
-const outcomeText = (o) => (o.kind === "upright" ? "upright" : o.kind === "synth" ? "synthesized skew" : `${o.axis} ${o.value}`);
-const pinned = (o) => `font-variation-settings: 'slnt' ${o.kind === "upright" ? 0 : o.value};`;
 
 function fontFaceCss(manifest) {
   return manifest.columns
@@ -90,7 +90,7 @@ function specimen(manifest, cell) {
   const matches = cell.plan.match;
   if (!matches.length) return `<div class="overlap overlap-single">${test}</div>`; // the test can only say what it must not be
   // pink = the first reference the test would accept
-  const ref = `<span class="ov-control" style="${esc(`${family} ${pinned(matches[0])}`)}">${SPECIMEN_WORD}</span>`;
+  const ref = `<span class="ov-control" style="${esc(`${family} ${pinCss(matches[0])}`)}">${SPECIMEN_WORD}</span>`;
   return `<div class="overlap">${ref}${test}</div>`;
 }
 
@@ -123,6 +123,7 @@ function cellStatus(cell, perEngine) {
 function renderMatrix(manifest, results, survey, versions) {
   const { columns, rows, cells } = manifest;
   const byAddr = Object.fromEntries(cells.map((c) => [c.address, c]));
+  const verdict = Object.fromEntries(compare(manifest, results, survey).map((r) => [r.address, r.per]));
   const perCell = {};
   for (const cell of cells) {
     perCell[cell.address] = Object.fromEntries(
@@ -159,16 +160,17 @@ function renderMatrix(manifest, results, survey, versions) {
       const cell = byAddr[`${col.address}${row.address}`];
       const res = perCell[cell.address];
       const url = MATRIX_URL + (cell.wpt ? cell.files[0] : "matrix.manifest.json");
-      // every cell says what the reference expects: one outcome when the spec decides, else what it allows
-      const allowed = cell.allowed.map(outcomeText).join(" / ");
-      const tags =
-        cell.status === "specified"
-          ? `<span class="tag tag-spec" title="${esc(cell.why.join("; "))}">spec: ${esc(allowed)}</span>`
-          : `<span class="tag" title="${esc(cell.why.join("; "))}">spec allows: ${esc(allowed)}</span>`;
+      // every cell says what the reference expects, on one line, in the same words as the badges
+      const line = cell.spec;
+      const tags = `<span class="spec ${line.decided ? "spec-decided" : "spec-open"}" title="${esc(cell.why.join("; "))}">${line.decided ? "spec:" : "spec*:"} ${esc(line.text)}</span>`;
+      // what an engine did where it is outside what the spec allows
+      const fails = ENGINES.filter((e) => verdict[cell.address][e.key].ok === false)
+        .map((e) => `<span class="cell-fail">${esc(e.label)}: ${esc(verdict[cell.address][e.key].label)}</span>`)
+        .join("");
       out.push(
         `<td class="status-${cellStatus(cell, res)}"><span class="cell-addr">${esc(cell.address)}</span>` +
           `<a class="specimen-link" href="${esc(url)}" title="${esc(cell.id)}">${specimen(manifest, cell)}</a>` +
-          `${badges(manifest, survey, cell, res)}<div class="cell-tags">${tags}</div></td>`,
+          `${badges(manifest, survey, cell, res)}<div class="cell-tags">${tags}${fails}</div></td>`,
       );
     }
     out.push("</tr>");
@@ -180,6 +182,9 @@ function renderMatrix(manifest, results, survey, versions) {
       '<li><span class="b-badge fail"></span> fail</li>' +
       '<li><span class="b-badge observed"></span> observed (the spec allows it, nothing to pass or fail)</li>' +
       '<li><span class="b-badge unknown"></span> not run</li>' +
+      '<li class="legend-note"><strong>spec:</strong> the spec decides, one rendering. <strong>spec*:</strong> it allows any of these. ' +
+      '<code>slnt -11</code> is an 11&deg; forward slant (CSS angle and <code>slnt</code> have opposite signs), <code>slnt 0</code> is upright, ' +
+      '<code>synth</code> is a synthesized skew. A red line is what an engine did outside that.</li>' +
       '<li class="legend-note">Hover a circle for the engine and what it was measured to do. Click a specimen for its test file.</li>' +
       "</ul>",
   );

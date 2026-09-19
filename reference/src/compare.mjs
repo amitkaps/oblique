@@ -17,13 +17,13 @@
 import { readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { ROOT, MATRIX_DIR } from "./cases.mjs";
+import { label, synth } from "./outcome.mjs";
 
 export const ENGINES = ["chrome", "firefox", "safari"];
 const TOL = 1.5;
 
 /** lean (px, positive = forward slant) an allowed outcome predicts, from the font's calibration */
 export function predictedLean(o, font) {
-  if (o.kind === "upright") return 0;
   if (o.kind === "axis") return -o.value * font.pxPerSlntUnit; // slnt and CSS angle have opposite signs
   return Math.sign(o.angle) * Math.tan((Math.abs(o.angle) * Math.PI) / 180) * font.glyphHeightPx;
 }
@@ -31,19 +31,19 @@ export function predictedLean(o, font) {
 const SYNTH_MIN = 3;
 const SYNTH_MAX = 90;
 
-/** What a measured lean looks like, for reporting. */
+/** What a measured lean looks like, in the same words as an expectation: slnt 0, slnt -11, synth. */
 export function leanLabel(lean, font) {
   const px = font.pxPerSlntUnit;
   const near = (v, t) => Math.abs(lean - v) <= t;
-  const synth14 = predictedLean({ kind: "synth", angle: 14 }, font);
+  const synth14 = predictedLean(synth(14), font);
   const axisMax = Math.abs(font.slnt[0]) * px;
-  if (near(0, TOL)) return "upright";
+  if (near(0, TOL)) return "slnt 0";
   const v = -lean / px;
   if (Math.abs(v) <= Math.max(Math.abs(font.slnt[0]), Math.abs(font.slnt[1])) + 0.5 && near(-Math.round(v) * px, TOL)) {
-    return `axis ${Math.round(v)}`;
+    return `slnt ${Math.round(v)}`;
   }
-  if (near(synth14, TOL)) return "synthetic 14deg";
-  if (near(axisMax + synth14, 3)) return "stacked (axis + synthetic)";
+  if (near(synth14, TOL)) return "synth";
+  if (near(axisMax + synth14, 3)) return `slnt ${font.slnt[0]} + synth`; // stacked: never allowed
   return `lean ${lean}px`;
 }
 

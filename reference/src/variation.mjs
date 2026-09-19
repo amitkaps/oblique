@@ -17,15 +17,13 @@ import { ITALIC_AS_OBLIQUE_ANGLE, DEFAULT_OBLIQUE_ANGLE } from "./style.mjs";
 
 export const clamp = (v, lo, hi) => Math.min(Math.max(v, lo), hi);
 
-export const UPRIGHT = { kind: "upright" };
-export const key = (o) =>
-  o.kind === "upright" ? "upright" : o.kind === "synth" ? "synth" : `${o.axis}=${o.value}`;
+import { axis, UPRIGHT, key } from "./outcome.mjs";
+export { UPRIGHT, key };
 
 /** CSS oblique angle -> outcome, through the font's own slnt range (sign flips). */
 function slntOutcome(cssAngle, font) {
   if (!font.slnt) return UPRIGHT;
-  const v = clamp(-cssAngle, font.slnt[0], font.slnt[1]);
-  return v === 0 ? UPRIGHT : { kind: "axis", axis: "slnt", value: v };
+  return axis(clamp(-cssAngle, font.slnt[0], font.slnt[1]));
 }
 
 function unique(outcomes) {

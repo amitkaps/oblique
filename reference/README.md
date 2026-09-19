@@ -32,6 +32,7 @@ Node 24 (pinned in `.mise.toml`), no dependencies. From the repo root (`mise run
 | `src/match.mjs` | the 5.2 face-selection stages, including the 11deg thresholds. Selects a face; does not synthesize |
 | `src/variation.mjs` | 7.2: the applied `slnt`/`ital` value, clamped to the descriptor then the font; CSS angle to `slnt` flips the sign |
 | `src/synthesis.mjs` | 2.8.2 `font-synthesis-style`: when a synthesized oblique is permitted |
+| `src/outcome.mjs` | the vocabulary: outcomes (`slnt 0`, `slnt -11`, `synth`), their labels, file tokens, pinning CSS, and the one-line `spec: ...` / `spec*: ...` text each cell shows |
 | `src/expected.mjs` | composes the three into an **allowed set of outcomes** and a status |
 | `src/cases.mjs`, `src/wpt.mjs` | rows x columns to concrete cases; render the reftests and manifest |
 | `src/compare.mjs` | judge recorded results and measured lean against the allowed set |
@@ -39,7 +40,8 @@ Node 24 (pinned in `.mise.toml`), no dependencies. From the repo root (`mise run
 ## The three statuses
 
 The spec leaves latitude in places, so an expectation is a **set of allowed outcomes**
-(`upright`, `axis slnt=n`, `synth`), never a single guess:
+(`slnt 0` which is upright, `slnt -11`, `synth`), never a single guess. Every outcome is either an axis value or a
+synthesized skew, and its words, file tokens and pinning CSS all come from `src/outcome.mjs`:
 
 | Status | Meaning | Becomes |
 |---|---|---|

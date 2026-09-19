@@ -10,9 +10,9 @@ const run = (descriptor, request, extra = {}) =>
 const keys = (e) => e.allowed.map((o) => (o.kind === "axis" ? `slnt=${o.value}` : o.kind)).sort();
 
 test("normal request: a normal, auto or in-range face is upright; a face declared oblique 14deg is not", () => {
-  assert.deepEqual(keys(run("normal", "normal")), ["upright"]);
-  assert.deepEqual(keys(run(undefined, "normal")), ["upright"]);
-  assert.deepEqual(keys(run("oblique -11deg 11deg", "normal")), ["upright"]);
+  assert.deepEqual(keys(run("normal", "normal")), ["slnt=0"]);
+  assert.deepEqual(keys(run(undefined, "normal")), ["slnt=0"]);
+  assert.deepEqual(keys(run("oblique -11deg 11deg", "normal")), ["slnt=0"]);
   // bare oblique = a one-point range at 14deg: the closest value to 0 is 14, then the font limits it to -11
   assert.deepEqual(keys(run("oblique", "normal")), ["slnt=-11"]);
   assert.equal(run("oblique", "normal").status, "specified");
@@ -22,7 +22,7 @@ test("a normal-declared face never reaches the real axis, whatever the font can 
   for (const request of ["italic", "oblique", "oblique 11deg"]) {
     const e = run("normal", request);
     assert.ok(!keys(e).includes("slnt=-11"), request);
-    assert.deepEqual(keys(e), ["synth", "upright"], request); // synthesis permitted, not required
+    assert.deepEqual(keys(e), ["slnt=0", "synth"], request); // synthesis permitted, not required
     assert.equal(e.status, "constrained");
     assert.deepEqual(e.plan.mismatch.map((o) => o.kind + (o.value ?? "")), ["axis-11"]);
   }
@@ -30,14 +30,14 @@ test("a normal-declared face never reaches the real axis, whatever the font can 
 
 test("font-synthesis-style: none removes the synthesized outcome, leaving upright only", () => {
   const e = run("normal", "oblique 11deg", { synthesis: { fontSynthesisStyle: "none" } });
-  assert.deepEqual(keys(e), ["upright"]);
+  assert.deepEqual(keys(e), ["slnt=0"]);
   const s = run("normal", "italic", { synthesis: { fontSynthesis: "weight" } }); // no `style` token
-  assert.deepEqual(keys(s), ["upright"]);
+  assert.deepEqual(keys(s), ["slnt=0"]);
 });
 
 test("oblique-only forbids synthesizing for italic but allows it for oblique", () => {
-  assert.deepEqual(keys(run("normal", "italic", { synthesis: { fontSynthesisStyle: "oblique-only" } })), ["upright"]);
-  assert.deepEqual(keys(run("normal", "oblique", { synthesis: { fontSynthesisStyle: "oblique-only" } })), ["synth", "upright"]);
+  assert.deepEqual(keys(run("normal", "italic", { synthesis: { fontSynthesisStyle: "oblique-only" } })), ["slnt=0"]);
+  assert.deepEqual(keys(run("normal", "oblique", { synthesis: { fontSynthesisStyle: "oblique-only" } })), ["slnt=0", "synth"]);
 });
 
 test("a range face reaches the axis at the clamped value and is never synthesized on top", () => {
@@ -52,7 +52,7 @@ test("a range face reaches the axis at the clamped value and is never synthesize
 
 test("an italic-declared face on a slnt-only font permits upright or the axis (5.2: italic 1 = oblique 11deg)", () => {
   const e = run("italic", "italic");
-  assert.deepEqual(keys(e), ["slnt=-11", "upright"]);
+  assert.deepEqual(keys(e), ["slnt=-11", "slnt=0"]);
   assert.equal(e.status, "unspecified");
 });
 
@@ -64,19 +64,19 @@ test("an auto face on a slnt font: an oblique request sets the axis to the reque
     assert.equal(e.status, "specified", request);
     assert.equal(e.allowed.some((o) => o.kind === "synth"), false, request);
   }
-  assert.deepEqual(keys(run(undefined, "oblique 0deg")), ["upright"]);
+  assert.deepEqual(keys(run(undefined, "oblique 0deg")), ["slnt=0"]);
   assert.equal(run(undefined, "normal").status, "specified");
 });
 
 test("an auto face and an italic request stays open: upright, the axis, or a synthesized skew", () => {
   const e = run(undefined, "italic");
-  assert.deepEqual(keys(e), ["slnt=-11", "synth", "upright"]);
+  assert.deepEqual(keys(e), ["slnt=-11", "slnt=0", "synth"]);
   assert.equal(e.status, "unspecified");
 });
 
 test("an auto face on a font WITHOUT a slnt axis is a normal face: shearing is the only oblique", () => {
   const e = expected({ faces: [{ id: "f", descriptor: undefined }], font: { slnt: null, ital: null }, request: "oblique 10deg" });
-  assert.deepEqual(keys(e), ["synth", "upright"]);
+  assert.deepEqual(keys(e), ["slnt=0", "synth"]);
 });
 
 test("font-variation-settings wins over the font-style variations (7.2)", () => {
@@ -101,11 +101,11 @@ test("font-synthesis never disables a real axis: variable fonts do not count as 
   }
 });
 
-test("B (normal-declared) oblique requests are a recorded hedge: the axis is forbidden, upright or synthesized is allowed", () => {
+test("C (normal-declared) oblique requests are a recorded hedge: the axis is forbidden, upright or synthesized is allowed", () => {
   // The literal 5.2 text (slnt match first, shearing only "Otherwise") would make these upright only;
   // csswg-drafts#7999's author scopes the no-synthesis intent to declarations that do not restrict the
   // range to 0. Text and intent disagree, so neither is asserted (docs/findings.md, "Open").
   for (const request of ["oblique", "oblique 5deg", "oblique 45deg", "oblique -5deg"]) {
-    assert.deepEqual(keys(run("normal", request)), ["synth", "upright"], request);
+    assert.deepEqual(keys(run("normal", request)), ["slnt=0", "synth"], request);
   }
 });

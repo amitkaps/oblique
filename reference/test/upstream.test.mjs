@@ -72,7 +72,7 @@ test("font-face-style-auto-variable.html / -default-variable.html: auto applies 
       assert.deepEqual(e.allowed, [{ kind: "axis", axis: "slnt", value: slnt }], `${descriptor} ${request}`);
       assert.equal(e.status, "specified");
     }
-    assert.deepEqual(expected({ faces: [{ id: "Inter", descriptor }], font: inter, request: "oblique 0deg" }).allowed, [{ kind: "upright" }]);
+    assert.deepEqual(expected({ faces: [{ id: "Inter", descriptor }], font: inter, request: "oblique 0deg" }).allowed, [{ kind: "axis", axis: "slnt", value: 0 }]);
   }
 });
 

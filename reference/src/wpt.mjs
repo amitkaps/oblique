@@ -10,14 +10,11 @@
 // plain face with the axis PINNED through font-variation-settings, which 7.2 says wins.
 
 import { cells } from "./cases.mjs";
+import { describe, pinCss, token } from "./outcome.mjs";
 
 const FONT_FAMILY = "matrix test font";
 
 const esc = (s) => s.replaceAll("&", "&amp;").replaceAll("<", "&lt;");
-const token = (o) => (o.kind === "upright" ? "upright" : `slnt${o.value}`);
-const pinned = (o) => `font-variation-settings: 'slnt' ${o.kind === "upright" ? 0 : o.value};`;
-const describe = (o) =>
-  o.kind === "upright" ? "upright" : o.kind === "synth" ? `a synthesized ${o.angle}deg skew` : `${o.axis} ${o.value}`;
 
 function faceRule(matrix, descriptor) {
   const line = descriptor ? `\n    font-style: ${descriptor};` : "";
@@ -60,7 +57,7 @@ ${faceRule(matrix, null)}
   .test {
     font-family: "${FONT_FAMILY}";
     font-size: ${matrix.font.fontSize};
-    ${pinned(outcome)}
+    ${pinCss(outcome)}
   }
 </style>
 ${SCRIPT}
@@ -135,6 +132,7 @@ export function generate(matrix) {
       descriptor: cell.col.descriptor,
       css: cell.css,
       status: e.status,
+      spec: e.spec,
       allowed: e.allowed,
       plan: e.plan,
       selected: e.selected,
