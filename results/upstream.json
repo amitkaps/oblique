@@ -1,20 +1,20 @@
 {
-  "synced_at": "2026-09-18T08:16:34.759289+00:00",
+  "synced_at": "2026-09-19T06:07:11.223295+00:00",
   "run_metadata": {
     "chrome": {
-      "id": 5204236987269120,
-      "browser_version": "153.0.8010.47",
-      "created_at": "2026-09-17T10:45:37.574586Z"
+      "id": 5166441543499776,
+      "browser_version": "153.0.8010.52",
+      "created_at": "2026-09-18T11:14:31.16422Z"
     },
     "firefox": {
-      "id": 5096862033117184,
+      "id": 5091516342337536,
       "browser_version": "156.0",
-      "created_at": "2026-09-17T10:21:18.768848Z"
+      "created_at": "2026-09-18T11:43:10.543077Z"
     },
     "safari": {
-      "id": 6240852912635904,
+      "id": 5144351754944512,
       "browser_version": "27.0 (22625.1.29.11.27)",
-      "created_at": "2026-09-17T11:11:40.777977Z"
+      "created_at": "2026-09-18T10:51:43.28389Z"
     }
   },
   "tests": [
@@ -23,7 +23,7 @@
       "results": {
         "chrome": {
           "status": "PASS",
-          "browser_version": "153.0.8010.47"
+          "browser_version": "153.0.8010.52"
         },
         "firefox": {
           "status": "PASS",
@@ -40,7 +40,7 @@
       "results": {
         "chrome": {
           "status": "PASS",
-          "browser_version": "153.0.8010.47"
+          "browser_version": "153.0.8010.52"
         },
         "firefox": {
           "status": "PASS",
@@ -57,7 +57,7 @@
       "results": {
         "chrome": {
           "status": "PASS",
-          "browser_version": "153.0.8010.47"
+          "browser_version": "153.0.8010.52"
         },
         "firefox": {
           "status": "PASS",
@@ -74,7 +74,7 @@
       "results": {
         "chrome": {
           "status": "PASS",
-          "browser_version": "153.0.8010.47"
+          "browser_version": "153.0.8010.52"
         },
         "firefox": {
           "status": "PASS",
@@ -91,7 +91,7 @@
       "results": {
         "chrome": {
           "status": "PASS",
-          "browser_version": "153.0.8010.47"
+          "browser_version": "153.0.8010.52"
         },
         "firefox": {
           "status": "PASS",
@@ -108,7 +108,7 @@
       "results": {
         "chrome": {
           "status": "PASS",
-          "browser_version": "153.0.8010.47"
+          "browser_version": "153.0.8010.52"
         },
         "firefox": {
           "status": "PASS",
@@ -125,7 +125,7 @@
       "results": {
         "chrome": {
           "status": "PASS",
-          "browser_version": "153.0.8010.47"
+          "browser_version": "153.0.8010.52"
         },
         "firefox": {
           "status": "PASS",
@@ -142,7 +142,7 @@
       "results": {
         "chrome": {
           "status": "OK",
-          "browser_version": "153.0.8010.47"
+          "browser_version": "153.0.8010.52"
         },
         "firefox": {
           "status": "OK",
@@ -159,7 +159,7 @@
       "results": {
         "chrome": {
           "status": "OK",
-          "browser_version": "153.0.8010.47"
+          "browser_version": "153.0.8010.52"
         },
         "firefox": {
           "status": "OK",
@@ -176,7 +176,7 @@
       "results": {
         "chrome": {
           "status": "OK",
-          "browser_version": "153.0.8010.47"
+          "browser_version": "153.0.8010.52"
         },
         "firefox": {
           "status": "OK",
@@ -193,7 +193,7 @@
       "results": {
         "chrome": {
           "status": "OK",
-          "browser_version": "153.0.8010.47"
+          "browser_version": "153.0.8010.52"
         },
         "firefox": {
           "status": "OK",
@@ -210,7 +210,7 @@
       "results": {
         "chrome": {
           "status": "PASS",
-          "browser_version": "153.0.8010.47"
+          "browser_version": "153.0.8010.52"
         },
         "firefox": {
           "status": "PASS",
@@ -227,7 +227,7 @@
       "results": {
         "chrome": {
           "status": "PASS",
-          "browser_version": "153.0.8010.47"
+          "browser_version": "153.0.8010.52"
         },
         "firefox": {
           "status": "PASS",
@@ -244,7 +244,7 @@
       "results": {
         "chrome": {
           "status": "PASS",
-          "browser_version": "153.0.8010.47"
+          "browser_version": "153.0.8010.52"
         },
         "firefox": {
           "status": "PASS",
@@ -261,7 +261,7 @@
       "results": {
         "chrome": {
           "status": "OK",
-          "browser_version": "153.0.8010.47"
+          "browser_version": "153.0.8010.52"
         },
         "firefox": {
           "status": "OK",
@@ -278,7 +278,7 @@
       "results": {
         "chrome": {
           "status": "PASS",
-          "browser_version": "153.0.8010.47"
+          "browser_version": "153.0.8010.52"
         },
         "firefox": {
           "status": "PASS",
@@ -295,7 +295,7 @@
       "results": {
         "chrome": {
           "status": "OK",
-          "browser_version": "153.0.8010.47"
+          "browser_version": "153.0.8010.52"
         },
         "firefox": {
           "status": "OK",
@@ -312,7 +312,7 @@
       "results": {
         "chrome": {
           "status": "OK",
-          "browser_version": "153.0.8010.47"
+          "browser_version": "153.0.8010.52"
         },
         "firefox": {
           "status": "OK",
@@ -329,7 +329,7 @@
       "results": {
         "chrome": {
           "status": "PASS",
-          "browser_version": "153.0.8010.47"
+          "browser_version": "153.0.8010.52"
         },
         "firefox": {
           "status": "PASS",
@@ -346,7 +346,7 @@
       "results": {
         "chrome": {
           "status": "FAIL",
-          "browser_version": "153.0.8010.47"
+          "browser_version": "153.0.8010.52"
         },
         "firefox": {
           "status": "PASS",
@@ -363,7 +363,7 @@
       "results": {
         "chrome": {
           "status": "FAIL",
-          "browser_version": "153.0.8010.47"
+          "browser_version": "153.0.8010.52"
         },
         "firefox": {
           "status": "FAIL",
@@ -380,7 +380,7 @@
       "results": {
         "chrome": {
           "status": "PASS",
-          "browser_version": "153.0.8010.47"
+          "browser_version": "153.0.8010.52"
         },
         "firefox": {
           "status": "PASS",
@@ -397,7 +397,7 @@
       "results": {
         "chrome": {
           "status": "FAIL",
-          "browser_version": "153.0.8010.47"
+          "browser_version": "153.0.8010.52"
         },
         "firefox": {
           "status": "PASS",
@@ -414,7 +414,7 @@
       "results": {
         "chrome": {
           "status": "PASS",
-          "browser_version": "153.0.8010.47"
+          "browser_version": "153.0.8010.52"
         },
         "firefox": {
           "status": "PASS",
@@ -431,7 +431,7 @@
       "results": {
         "chrome": {
           "status": "FAIL",
-          "browser_version": "153.0.8010.47"
+          "browser_version": "153.0.8010.52"
         },
         "firefox": {
           "status": "PASS",
@@ -448,7 +448,7 @@
       "results": {
         "chrome": {
           "status": "PASS",
-          "browser_version": "153.0.8010.47"
+          "browser_version": "153.0.8010.52"
         },
         "firefox": {
           "status": "FAIL",
@@ -465,7 +465,7 @@
       "results": {
         "chrome": {
           "status": "PASS",
-          "browser_version": "153.0.8010.47"
+          "browser_version": "153.0.8010.52"
         },
         "firefox": {
           "status": "PASS",
@@ -482,7 +482,7 @@
       "results": {
         "chrome": {
           "status": "PASS",
-          "browser_version": "153.0.8010.47"
+          "browser_version": "153.0.8010.52"
         },
         "firefox": {
           "status": "PASS",
@@ -499,7 +499,7 @@
       "results": {
         "chrome": {
           "status": "PASS",
-          "browser_version": "153.0.8010.47"
+          "browser_version": "153.0.8010.52"
         },
         "firefox": {
           "status": "PASS",
@@ -516,7 +516,7 @@
       "results": {
         "chrome": {
           "status": "OK",
-          "browser_version": "153.0.8010.47"
+          "browser_version": "153.0.8010.52"
         },
         "firefox": {
           "status": "OK",
@@ -533,7 +533,7 @@
       "results": {
         "chrome": {
           "status": "PASS",
-          "browser_version": "153.0.8010.47"
+          "browser_version": "153.0.8010.52"
         },
         "firefox": {
           "status": "PASS",
@@ -550,7 +550,7 @@
       "results": {
         "chrome": {
           "status": "PASS",
-          "browser_version": "153.0.8010.47"
+          "browser_version": "153.0.8010.52"
         },
         "firefox": {
           "status": "PASS",
@@ -567,7 +567,7 @@
       "results": {
         "chrome": {
           "status": "OK",
-          "browser_version": "153.0.8010.47"
+          "browser_version": "153.0.8010.52"
         },
         "firefox": {
           "status": "OK",
@@ -584,7 +584,7 @@
       "results": {
         "chrome": {
           "status": "OK",
-          "browser_version": "153.0.8010.47"
+          "browser_version": "153.0.8010.52"
         },
         "firefox": {
           "status": "OK",
@@ -601,7 +601,7 @@
       "results": {
         "chrome": {
           "status": "PASS",
-          "browser_version": "153.0.8010.47"
+          "browser_version": "153.0.8010.52"
         },
         "firefox": {
           "status": "PASS",
@@ -618,7 +618,7 @@
       "results": {
         "chrome": {
           "status": "PASS",
-          "browser_version": "153.0.8010.47"
+          "browser_version": "153.0.8010.52"
         },
         "firefox": {
           "status": "PASS",
@@ -635,7 +635,7 @@
       "results": {
         "chrome": {
           "status": "OK",
-          "browser_version": "153.0.8010.47"
+          "browser_version": "153.0.8010.52"
         },
         "firefox": {
           "status": "OK",
