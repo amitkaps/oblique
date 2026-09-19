@@ -7,7 +7,7 @@ in `.mise.toml`.
 mise run install                     # once: pnpm install (vite)
 
 # the reference implementation and the generated tests
-mise run test                        # unit tests (33)
+mise run test                        # unit tests (50)
 mise run generate                    # regenerate tests/oblique-style-matching/matrix/ from reference/cases/matrix.json
 mise run compare                     # expected vs recorded browser results
 
@@ -42,6 +42,8 @@ time and fails the build if the manifest, the files on disk and the recorded res
 machine without a Rust/OpenSSL toolchain. Firefox is run with `--yes` because otherwise the first run waits
 forever on an interactive OpenH264 prompt. Never pass `--install-fonts`; on macOS it can stall waiting on a
 permission prompt, and these tests use embedded web fonts.
+`wpt run` exits nonzero whenever a test fails, so the script records the report regardless and fails only when
+no report was written.
 
 ## Safari
 
