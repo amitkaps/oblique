@@ -30,9 +30,10 @@
       independent JavaScript implementation of CSS Fonts 4 font-style matching
       (<code>reference/</code>) computes it, and never uses a browser to do so.
       Every cell states what the reference expects. Where the spec pins the outcome down
-      (&ldquo;spec: slnt &minus;11&rdquo;) the cell is a WPT test for that one rendering; where it leaves latitude
-      (&ldquo;spec*: slnt 0 / synth&rdquo;) the test only forbids what the spec forbids; where it is silent,
-      the cell is only observed. <code>font-synthesis</code> is left at its default in rows 1 to 8, since synthesis should apply only
+      (&ldquo;spec: slnt &minus;11&rdquo;) the cell is a WPT test for that one rendering. Where it allows several
+      outcomes (&ldquo;spec*: slnt 0 / synth&rdquo;) a test can only forbid some of them, so an engine can pass and
+      still render something different from the others: that is an <em>interop</em> problem, and the cell is amber.
+      Where nothing testable is excluded, the cell is only measured. <code>font-synthesis</code> is left at its default in rows 1 to 8, since synthesis should apply only
       when a face is missing; rows 9 and 10 set it on purpose. Each specimen is live in <em>your</em> browser:
       <b class="ov-pink">pink</b> is a rendering the spec accepts, <b class="ov-cyan">cyan</b> is the CSS
       under test; aligned they merge into dark blue, and <strong>visible pink is a failure</strong>. The circles
@@ -46,8 +47,11 @@
   <section class="results">
     <h2>Results</h2>
     <p class="matrix-intro">
-      Passes over WPT tests, per <code>@font-face</code> descriptor; open a row for the tests behind it. Only cells
-      with a test are scored. Group Z holds the two hand-written tests that are not cells of the grid.
+      Passes over WPT tests, per <code>@font-face</code> descriptor; open a row for the cells behind it. The
+      engine columns count tests passed, which a loose test can pass. <strong>Interop</strong> is stricter: it counts a
+      cell only when all three engines render the same allowed thing, so where the spec allows several outcomes and the
+      engines chose differently, it does not count. Group Z holds the two hand-written tests that are not cells of the
+      grid.
     </p>
     <!--RESULTS-->
     <div class="findings">

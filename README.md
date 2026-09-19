@@ -29,10 +29,11 @@ of `OBLIQUE`, and test the capital `I`, which shears cleanly. A cell is written 
 
 ## Current result
 
-Chrome, Firefox and Safari agree with the spec in 54 of 60 cells. Where a face is declared with a range (the font's own,
+Chrome, Firefox and Safari all stay within what the spec allows in 54 of 60 cells. Where a face is declared with a range (the font's own,
 or a narrower one), `italic`, bare `oblique` and `oblique 45deg` make Chrome stack a synthetic skew on top of the real axis,
 and Safari do the same or drop the axis; Firefox is correct. A range wider than the font's own passes in all three. Where the
-spec is open, the engines mostly differ (2 of 8 cells agree). Details, the claims that were withdrawn, and what is open:
+spec allows several outcomes, the engines mostly differ (2 of 8 cells agree), so interop, which counts a cell only when
+all three engines render the same allowed thing, is 48 of 60 (80%) against 90% or 100% pass rates. Details, the claims that were withdrawn, and what is open:
 [docs/findings.md](docs/findings.md). Scope is oblique and `slnt`: italic fonts are out of scope.
 
 ## Run it

@@ -13,6 +13,13 @@
 //   reference-suspect    EVERY measured engine is outside it: more likely a wrong or
 //                        incomplete reference (or a spec gap) than three browser bugs
 //   inconclusive         no results recorded for the cell
+//
+// Independently of that, `cellState` says whether the engines are INTEROPERABLE in a cell:
+//   fail     some engine renders something the spec forbids
+//   differ   every engine is allowed, but they do not all render the same (only possible where the
+//            spec allows several outcomes): each conforms, the web does not interoperate
+//   same     every engine renders the same allowed thing
+//   unknown  not every engine was measured
 
 import { readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
@@ -29,6 +36,7 @@ export function predictedLean(o, font) {
 }
 
 const SYNTH_MIN = 3;
+const SYNTH_SAME_PX = 3; // two synthesized skews within this many px of lean count as the same rendering
 const SYNTH_MAX = 90;
 
 /**
@@ -82,6 +90,21 @@ export function withinAllowed(cell, lean, font) {
   );
 }
 
+/** two engines rendered the same thing: the same words, or both a synthesized skew within a few px */
+export function sameRendering(a, b) {
+  if (a.label === b.label) return true;
+  const synthLike = (x) => typeof x.label === "string" && x.label.startsWith("synth") && !x.label.includes("+") && typeof x.lean === "number";
+  return synthLike(a) && synthLike(b) && Math.abs(a.lean - b.lean) <= SYNTH_SAME_PX;
+}
+
+/** @param {Object<string,{ok:boolean|null,label:string|null,lean:number|null}>} per  the per-engine verdicts of compare() */
+export function cellState(per) {
+  const p = ENGINES.map((e) => per[e]);
+  if (p.some((x) => x.ok === false)) return "fail";
+  if (p.some((x) => x.ok === null || x.label == null)) return "unknown";
+  return p.every((x) => sameRendering(x, p[0])) ? "same" : "differ";
+}
+
 export function readBrowserMatrix(path = join(ROOT, "results", "browser-matrix.md")) {
   const out = {};
   for (const line of readFileSync(path, "utf8").split("\n")) {
@@ -126,7 +149,7 @@ export function compare(manifest, matrixResults, survey) {
       else if (bad.length === measured.length && measured.length > 1) classification = "reference-suspect";
       else classification = "diverges-from-spec";
     }
-    return { address: cell.address, id: cell.id, status: cell.status, per, classification };
+    return { address: cell.address, id: cell.id, status: cell.status, per, classification, state: cellState(per) };
   });
 }
 

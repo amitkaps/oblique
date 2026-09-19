@@ -12,7 +12,10 @@ Scope: oblique and `slnt`. Italic fonts (an `ital` axis, an italic-declared face
 [Dropped with italic fonts](#dropped-with-italic-fonts); `italic` is still a request (rows 2 and 9), because on a
 `slnt` font it is resolved through the oblique branch.
 
-Results: Chrome 54 of 60 tests pass, Firefox 60 of 60, Safari 54 of 60 (58 matrix tests and 2 standalone).
+Results: Chrome 54 of 60 tests pass, Firefox 60 of 60, Safari 54 of 60 (58 matrix tests and 2 standalone). A pass can be
+loose, so the site also scores **interop**: a cell counts only when all three engines render the same allowed thing.
+That is 48 of 60 cells (80%). Six fail (A2, A3, A7, C2, C3, C7) and six are amber: each engine is allowed, but they
+chose differently (E4, E6, E7, E8, F2, F9).
 
 ## Confirmed failures
 
@@ -107,10 +110,11 @@ styling ... where the font descriptors imply this is needed". Two other readings
 Text and stated intent disagree, so neither is asserted. `auto` differs from `normal` here: it is the font's own
 range ("implicit `auto` ranges" in #7999), so it takes the axis and is never sheared.
 
-## Where the spec is open, do the engines agree?
+## Where the spec allows several outcomes, do the engines agree?
 
-Mostly not. Eight cells leave the outcome open (E2, E3, E4, E6, E7, E8, F2, F9), and all three engines render the
-same in only two of them: a `normal` face given `italic` or bare `oblique` is synthesized at the default 14deg by all
+Mostly not. Eight cells are `spec*` (E2, E3, E4, E6, E7, E8, F2, F9). A loose test passes them, but that does not
+make them interoperable, so the site marks a cell amber when every engine is allowed and they still differ. All three
+engines render the same in only two of the eight: a `normal` face given `italic` or bare `oblique` is synthesized at the default 14deg by all
 three (E2, E3). In the other six they differ: an explicit angle on a `normal` face (E4, E6, E7, E8) is skewed by
 Firefox at about the requested angle, while Chrome and Safari stay upright (or use 14deg for 45deg); italic on an
 `auto` face (F2, F9) is slanted by Chrome and Firefox and upright in Safari. So where the spec is silent there is little

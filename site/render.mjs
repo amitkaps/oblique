@@ -95,64 +95,52 @@ function specimen(manifest, cell) {
   return `<div class="overlap">${ref}${test}</div>`;
 }
 
-/** what one engine did in one cell: the ring (pass, fail, observed) and the words for what it rendered */
-function engineView(cell, results, verdict) {
+/**
+ * What one engine did in one cell: the ring and the words for what it rendered.
+ *   pass    an allowed rendering, and (where the spec allows several) the same one every engine chose
+ *   fail    a rendering the spec forbids
+ *   differ  allowed, but the engines did not all choose the same: conformant, not interoperable
+ *   unknown not measured
+ * `untested` marks a cell with no WPT test (measured only); it changes the ring's line, not its colour.
+ */
+function engineView(cell, verdict, state) {
   return ENGINES.map((e) => {
     const v = verdict[cell.address][e.key];
-    let ring;
-    if (cell.wpt) ring = reftestStatus(results, cell.id, e.key);
-    else ring = v.label == null ? "not-run" : v.ok === false ? "fail" : "observed"; // untested, but outside what the spec allows
-    return { engine: e, ring: ring === "pass" || ring === "fail" || ring === "observed" ? ring : "unknown", label: v.label ?? "not run" };
+    const ring = v.ok === null || v.label == null ? "unknown" : v.ok === false ? "fail" : state === "differ" ? "differ" : "pass";
+    return { engine: e, ring, label: v.label ?? "not run", untested: !cell.wpt };
   });
 }
 
 const badge = (view) =>
-  `<span class="b-badge ${view.ring}" title="${esc(`${view.engine.label}: ${view.label}`)}"><img class="logo" src="/browsers/${view.engine.id}.svg" alt="${esc(view.engine.label)}"></span>`;
+  `<span class="b-badge ${view.ring}${view.untested ? " untested" : ""}" title="${esc(`${view.engine.label}: ${view.label}`)}"><img class="logo" src="/browsers/${view.engine.id}.svg" alt="${esc(view.engine.label)}"></span>`;
 
 /**
- * What the engines did. When all three did the same, one line; when they differ, a line each, so
+ * What the engines did. When all three rendered the same, one line; otherwise a line each, so
  * disagreement is what stands out.
  */
-function engineLines(views) {
-  const same = views.every((v) => v.label === views[0].label && v.ring === views[0].ring && v.label !== "not run");
-  if (same) {
+function engineLines(views, state) {
+  if (state === "same") {
     return `<div class="eng-line ${views[0].ring}"><span class="rings" title="Chromium, Firefox and Safari, all the same">${views.map(badge).join("")}</span><span class="eng-val">${esc(views[0].label)}</span></div>`;
   }
   return views.map((v) => `<div class="eng-line ${v.ring}">${badge(v)}<span class="eng-val">${esc(v.label)}</span></div>`).join("");
 }
 
-function cellStatus(cell, perEngine) {
-  if (!cell.wpt) return "observed";
-  const vals = new Set(Object.values(perEngine).filter((v) => v === "pass" || v === "fail"));
-  if (vals.has("fail")) return "fail";
-  return vals.size === 1 && vals.has("pass") ? "pass" : "unknown";
-}
-
 function renderMatrix(manifest, results, survey, versions) {
   const { columns, rows, cells } = manifest;
   const byAddr = Object.fromEntries(cells.map((c) => [c.address, c]));
-  const verdict = Object.fromEntries(compare(manifest, results, survey).map((r) => [r.address, r.per]));
-  const perCell = {};
-  for (const cell of cells) {
-    perCell[cell.address] = Object.fromEntries(
-      ENGINES.map((e) => [
-        e.key,
-        cell.wpt ? reftestStatus(results, cell.id, e.key) : survey.engines?.[e.key]?.cells?.[cell.id] != null ? "observed" : "not-run",
-      ]),
-    );
-  }
-  const tested = cells.filter((c) => c.wpt).length;
-  const diverge = cells
-    .filter((c) => c.wpt && Object.values(perCell[c.address]).includes("pass") && Object.values(perCell[c.address]).includes("fail"))
-    .map((c) => c.address)
-    .sort();
+  const rowsC = compare(manifest, results, survey);
+  const verdict = Object.fromEntries(rowsC.map((r) => [r.address, r.per]));
+  const state = Object.fromEntries(rowsC.map((r) => [r.address, r.state]));
+  const list = (st) => rowsC.filter((r) => r.state === st).map((r) => r.address);
+  const [same, fail, differ] = [list("same"), list("fail"), list("differ")];
+  const untested = cells.filter((c) => !c.wpt).length;
 
   const out = [];
-  const divTxt = diverge.length
-    ? ` &middot; <strong>${diverge.length} cell${diverge.length !== 1 ? "s" : ""} where the engines disagree with each other</strong> (${esc(diverge.join(", "))})`
-    : "";
   out.push(
-    `<p class="matrix-count">${cells.length} cells: ${tested} with a WPT test the spec can decide, ${cells.length - tested} the spec leaves open (observed only)${divTxt}</p>`,
+    `<p class="matrix-count">${cells.length} cells: <strong>${same.length} interoperable</strong> (all three engines render the same allowed thing) &middot; ` +
+      `<strong class="c-fail">${fail.length} failing</strong> (${esc(fail.join(", "))}: an engine renders what the spec forbids) &middot; ` +
+      `<strong class="c-differ">${differ.length} diverging</strong> (${esc(differ.join(", "))}: the spec allows several outcomes and the engines chose differently)` +
+      `${untested ? `. ${untested} cells have no WPT test and are only measured` : ""}.</p>`,
   );
   out.push(
     '<pre class="face-block"><code>@font-face {\n  font-family: "Oblique Test";\n  src: url(Cairo.var.subset.ttf);  /* real Cairo, slnt -11..11, wght 200..1000 */\n  font-style: <em>&lt;column&gt;</em>;\n}</code></pre>',
@@ -166,15 +154,14 @@ function renderMatrix(manifest, results, survey, versions) {
     out.push(`<tr><th scope="row"><span class="row-num">${esc(row.address)}</span> <code>${lines}</code></th>`);
     for (const col of columns) {
       const cell = byAddr[`${col.address}${row.address}`];
-      const res = perCell[cell.address];
       const url = TEST_URL_BASE + (cell.wpt ? cell.files[0] : "matrix.manifest.json");
       // every cell says what the reference expects on one line, then what the engines did
       const line = cell.spec;
       const spec = `<span class="spec ${line.decided ? "spec-decided" : "spec-open"}" title="${esc(cell.why.join("; "))}">${line.decided ? "spec:" : "spec*:"} ${esc(line.text)}</span>`;
       out.push(
-        `<td class="status-${cellStatus(cell, res)}"><span class="cell-addr">${esc(cell.address)}</span>` +
+        `<td class="status-${state[cell.address]}"><span class="cell-addr">${esc(cell.address)}</span>` +
           `<a class="specimen-link" href="${esc(url)}" title="${esc(cell.id)}">${specimen(manifest, cell)}</a>` +
-          `<div class="cell-tags">${spec}${engineLines(engineView(cell, results, verdict))}</div></td>`,
+          `<div class="cell-tags">${spec}${engineLines(engineView(cell, verdict, state[cell.address]), state[cell.address])}</div></td>`,
       );
     }
     out.push("</tr>");
@@ -182,12 +169,13 @@ function renderMatrix(manifest, results, survey, versions) {
   out.push("</tbody></table></div>");
   out.push(
     '<ul class="legend">' +
-      '<li><span class="b-badge pass"></span> pass</li>' +
-      '<li><span class="b-badge fail"></span> fail</li>' +
-      '<li><span class="b-badge observed"></span> observed: no test, the spec allows several outcomes</li>' +
+      '<li><span class="b-badge pass"></span> pass: allowed, and all three engines render the same</li>' +
+      '<li><span class="b-badge fail"></span> fail: the spec forbids what it rendered</li>' +
+      '<li><span class="b-badge differ"></span> differ: each is allowed, but the engines chose differently (not interoperable)</li>' +
+      '<li><span class="b-badge pass untested"></span> dashed: no WPT test, measured only</li>' +
       '<li><span class="b-badge unknown"></span> not run</li>' +
-      '<li class="legend-note">Each engine line is what it rendered; three rings on one line means all three did the same. A red ring on an untested cell means what it did is outside what the spec allows. ' +
-      '<strong>spec:</strong> the spec decides, one rendering. <strong>spec*:</strong> it allows any of these. ' +
+      '<li class="legend-note">Each engine line is what it rendered; three rings on one line means all three did the same. ' +
+      '<strong>spec:</strong> the spec decides, one rendering. <strong>spec*:</strong> it allows several outcomes, so a test can only forbid some of them. ' +
       '<code>slnt -11</code> is an 11&deg; forward slant (CSS angle and <code>slnt</code> have opposite signs), <code>slnt 0</code> is upright, ' +
       '<code>synth</code> is a synthesized skew (<code>~14&deg;</code> its angle), <code>+ synth</code> is one stacked on the axis. Click a specimen for its test file.</li>' +
       "</ul>",
@@ -203,52 +191,71 @@ function renderMatrix(manifest, results, survey, versions) {
 const cellClass = (pass, total) => (total === 0 ? "none" : pass === total ? "all" : pass === 0 ? "zero" : "some");
 const pct = (pass, total) => (total ? `${Math.round((100 * pass) / total)}%` : "");
 
-/** one row of the results grid: a description and one cell per engine */
-const gridRow = (first, engineCells, cls = "") =>
-  `<div class="rrow ${cls}"><div class="rdesc">${first}</div>${engineCells.map((c) => `<div class="rcell ${c.cls}">${c.html}</div>`).join("")}</div>`;
+/** one row of the results grid: a description, one cell per engine, then the interop cell */
+const gridRow = (first, cells, cls = "") =>
+  `<div class="rrow ${cls}"><div class="rdesc">${first}</div>${cells.map((c) => `<div class="rcell ${c.cls}">${c.html}</div>`).join("")}</div>`;
+
+const BLANK = { cls: "none", html: "" };
+const interopCell = (state) =>
+  state === "same" ? { cls: "all", html: "same" }
+  : state === "differ" ? { cls: "differ", html: "differs" }
+  : state === "fail" ? { cls: "zero", html: "fail" }
+  : { cls: "none", html: "&ndash;" };
 
 /**
  * The results, in the shape wpt.fyi uses: a row per @font-face descriptor with passes over tests for each
- * engine, opening to the tests behind it, a group Z for the hand-written tests, then a total with a percentage.
- * Only cells with a WPT test count; the ones the spec leaves open are listed, never scored.
+ * engine, opening to the cells behind it, a group Z for the hand-written tests, then a total with a percentage.
+ * The engine columns score WPT tests (a pass may be a loose one). The Interop column scores every cell and is
+ * stricter: all three engines must render the same allowed thing, so a cell where the spec allows several
+ * outcomes and the engines chose differently is not interoperable even though each engine passes.
  */
 function renderResults(manifest, results, survey) {
-  const verdict = Object.fromEntries(compare(manifest, results, survey).map((r) => [r.address, r.per]));
+  const rowsC = compare(manifest, results, survey);
+  const verdict = Object.fromEntries(rowsC.map((r) => [r.address, r.per]));
+  const state = Object.fromEntries(rowsC.map((r) => [r.address, r.state]));
   const passed = (id, key) => reftestStatus(results, id, key) === "pass";
   const total = Object.fromEntries(ENGINES.map((e) => [e.key, { pass: 0, n: 0 }]));
+  const interop = { same: 0, n: 0 };
   const out = [];
   out.push(
-    `<div class="rgrid"><div class="rrow rhead"><div class="rdesc">Description</div>${ENGINES.map((e) => `<div class="rcell"><img class="hlogo" src="/browsers/${e.id}.svg" alt="">${esc(e.label)}</div>`).join("")}</div>`,
+    `<div class="rgrid"><div class="rrow rhead"><div class="rdesc">Description</div>${ENGINES.map((e) => `<div class="rcell"><img class="hlogo" src="/browsers/${e.id}.svg" alt="">${esc(e.label)}</div>`).join("")}<div class="rcell">Interop</div></div>`,
   );
 
   for (const col of manifest.columns) {
-    const tested = manifest.cells.filter((c) => c.column === col.slug && c.wpt);
-    const open = manifest.cells.filter((c) => c.column === col.slug && !c.wpt);
+    const all = manifest.cells.filter((c) => c.column === col.slug);
+    const tested = all.filter((c) => c.wpt);
     const frac = ENGINES.map((e) => {
       const pass = tested.filter((c) => passed(c.id, e.key)).length;
       total[e.key].pass += pass;
       total[e.key].n += tested.length;
       return { cls: cellClass(pass, tested.length), html: `${pass} / ${tested.length}`, pass };
     });
-    const anyFail = frac.some((f) => f.cls !== "all");
-    const lines = tested
+    const same = all.filter((c) => state[c.address] === "same").length;
+    interop.same += same;
+    interop.n += all.length;
+    const sumCells = [...frac, { cls: cellClass(same, all.length), html: `${same} / ${all.length}` }];
+    const anyBad = sumCells.some((f) => f.cls !== "all");
+    const lines = all
       .map((c) => {
         const row = manifest.rows.find((r) => r.slug === c.row);
+        const st = state[c.address];
         const cells = ENGINES.map((e) => {
-          const ok = passed(c.id, e.key);
-          const did = !ok ? `<span class="did">${esc(verdict[c.address][e.key].label ?? "")}</span>` : "";
-          return { cls: ok ? "all" : "zero", html: `${ok ? "pass" : "fail"}${did}` };
+          const v = verdict[c.address][e.key];
+          const what = esc(v.label ?? "not run");
+          if (!c.wpt) return { cls: st === "differ" ? "differ" : "none", html: `<span class="did did-obs">${what}</span>` };
+          if (!passed(c.id, e.key)) return { cls: "zero", html: `fail<span class="did">${what}</span>` };
+          return st === "differ" ? { cls: "differ", html: `pass<span class="did did-differ">${what}</span>` } : { cls: "all", html: "pass" };
         });
-        const desc = `<a class="addr" href="${esc(TEST_URL_BASE + c.files[0])}">${esc(c.address)}</a> <code>${esc(row.lines.join(" "))}</code> <span class="spec ${c.spec.decided ? "spec-decided" : "spec-open"}">${c.spec.decided ? "spec:" : "spec*:"} ${esc(c.spec.text)}</span>`;
-        return gridRow(desc, cells, "rtest");
+        const link = c.wpt ? `<a class="addr" href="${esc(TEST_URL_BASE + c.files[0])}">${esc(c.address)}</a>` : `<span class="addr">${esc(c.address)}</span>`;
+        const desc = `${link} <code>${esc(row.lines.join(" "))}</code> <span class="spec ${c.spec.decided ? "spec-decided" : "spec-open"}">${c.spec.decided ? "spec:" : "spec*:"} ${esc(c.spec.text)}</span>${c.wpt ? "" : ' <span class="notest">no test</span>'}`;
+        return gridRow(desc, [...cells, interopCell(st)], "rtest");
       })
       .join("");
-    const note = open.length ? `<div class="rnote">Not scored, the spec leaves them open: ${open.map((c) => esc(c.address)).join(", ")}</div>` : "";
     out.push(
-      `<details class="rgroup"${anyFail ? " open" : ""}><summary>${gridRow(`<span class="addr">${esc(col.address)}</span> <span class="col-name">${esc(col.name)}</span> <code>${esc(col.code)}</code>`, frac, "rsum")}</summary>${lines}${note}</details>`,
+      `<details class="rgroup"${anyBad ? " open" : ""}><summary>${gridRow(`<span class="addr">${esc(col.address)}</span> <span class="col-name">${esc(col.name)}</span> <code>${esc(col.code)}</code>`, sumCells, "rsum")}</summary>${lines}</details>`,
     );
   }
-  // group Z: the hand-written tests, which are not cells of the grid
+  // group Z: the hand-written tests, which are not cells of the grid (no interop score: nothing is compared)
   const z = manifest.standalone ?? [];
   if (z.length) {
     const frac = ENGINES.map((e) => {
@@ -263,18 +270,21 @@ function renderResults(manifest, results, survey) {
           const ok = passed(t.id, e.key);
           return { cls: ok ? "all" : "zero", html: ok ? "pass" : "fail" };
         });
-        return gridRow(`<a class="addr" href="${esc(TEST_URL_BASE + t.id + ".html")}">${esc(t.address)}</a> ${esc(t.name)}`, cells, "rtest");
+        return gridRow(`<a class="addr" href="${esc(TEST_URL_BASE + t.id + ".html")}">${esc(t.address)}</a> ${esc(t.name)}`, [...cells, BLANK], "rtest");
       })
       .join("");
     out.push(
-      `<details class="rgroup"${frac.some((f) => f.cls !== "all") ? " open" : ""}><summary>${gridRow(`<span class="addr">Z</span> <span class="col-name">Standalone tests</span> <code>hand-written, not cells of the grid</code>`, frac, "rsum")}</summary>${lines}</details>`,
+      `<details class="rgroup"${frac.some((f) => f.cls !== "all") ? " open" : ""}><summary>${gridRow(`<span class="addr">Z</span> <span class="col-name">Standalone tests</span> <code>hand-written, not cells of the grid</code>`, [...frac, BLANK], "rsum")}</summary>${lines}</details>`,
     );
   }
   out.push(
-    gridRow("<strong>Total</strong>", ENGINES.map((e) => {
-      const t = total[e.key];
-      return { cls: cellClass(t.pass, t.n), html: `<strong>${t.pass} / ${t.n}</strong> &middot; ${pct(t.pass, t.n)}` };
-    }), "rtotal"),
+    gridRow("<strong>Total</strong>", [
+      ...ENGINES.map((e) => {
+        const t = total[e.key];
+        return { cls: cellClass(t.pass, t.n), html: `<strong>${t.pass} / ${t.n}</strong> &middot; ${pct(t.pass, t.n)}` };
+      }),
+      { cls: cellClass(interop.same, interop.n), html: `<strong>${interop.same} / ${interop.n}</strong> &middot; ${pct(interop.same, interop.n)}` },
+    ], "rtotal"),
   );
   out.push("</div>");
   return out.join("");
