@@ -70,13 +70,12 @@ export function resolveVariation(match, request, font) {
         // italic on an auto face is genuinely open: 5.2's italic steps never set slnt, the
         // face is a normal one, and "not required to distinguish italic from oblique" would
         // map italic 1 onto oblique 11deg. Upright, a synthesized skew and the axis all fit.
+        // The only angle 5.2 gives for italic is that 11deg; the 14deg default belongs to a bare
+        // `oblique` keyword. (An oblique request only reaches here on a font with no slnt axis,
+        // where the only outcome is upright.)
         assumptions.push("auto-italic: no step applies slnt for an italic request (5.2); UAs may map italic to oblique 11deg");
         allowed.push(UPRIGHT);
-        if (request.kind === "oblique") allowed.push(slntOutcome(request.angle, font));
-        else {
-          allowed.push(slntOutcome(ITALIC_AS_OBLIQUE_ANGLE, font));
-          allowed.push(slntOutcome(DEFAULT_OBLIQUE_ANGLE, font));
-        }
+        if (request.kind === "italic") allowed.push(slntOutcome(ITALIC_AS_OBLIQUE_ANGLE, font));
       }
     } else if (st.kind === "italic") {
       if (font.ital) {

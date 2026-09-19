@@ -129,3 +129,10 @@ test("italic + oblique-only against a face with a real oblique range: the range 
   const on = expected({ faces: [{ id: "f", descriptor: "oblique -11deg 11deg" }], font, request: "italic", ...oo, resolutions: { obliqueOnlyDemotesRealObliqueFaces: true } });
   assert.deepEqual(keys(on), ["slnt=0"]);
 });
+
+test("italic on an auto face maps to 11deg at most, never the 14deg keyword default", () => {
+  const wideFont = { slnt: [-20, 20], ital: null };
+  const e = expected({ faces: [{ id: "f", descriptor: undefined }], font: wideFont, request: "italic" });
+  assert.deepEqual(keys(e), ["slnt=-11", "slnt=0", "synth"]);
+  assert.equal(e.status, "constrained");
+});
