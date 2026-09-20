@@ -24,11 +24,11 @@
     },
     {
       "address": "B",
-      "slug": "oblwide",
-      "name": "Wider range",
-      "descriptor": "oblique -20deg 20deg",
-      "code": "@font-face { font-style: oblique -20deg 20deg; }",
-      "note": "Declared oblique, wider than the font's range"
+      "slug": "oblbreak",
+      "name": "Past the break-point",
+      "descriptor": "oblique -14deg 14deg",
+      "code": "@font-face { font-style: oblique -14deg 14deg; }",
+      "note": "Declared oblique past CSS's 14deg break-point: the smallest range that reaches beyond the font's own limit (11) and still contains every angle CSS can imply (14deg for bare oblique, 11deg for italic). Ranges are inclusive, so rows 2, 3 and 6 probe the boundary exactly."
     },
     {
       "address": "C",
