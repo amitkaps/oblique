@@ -3,7 +3,7 @@
 What the tests show and what is still open. Chrome 153.0.8010.48, Firefox 156.0, Safari 27.0
 (macOS 15.8). The grid is 6 `@font-face` descriptors (A to F) by 9 use-site requests (1 to 9) on the
 Cairo `OBLIQUE` subset (`slnt` -11..11); a cell is written `A2` (column A, row 2). Columns: A the font's own range
-`oblique -11deg 11deg`, B a wider range `oblique -20deg 20deg`, C a narrow, one-sided range `oblique 0deg 10deg`,
+`oblique -11deg 11deg`, B past CSS's break-point `oblique -14deg 14deg`, C a narrow, one-sided range `oblique 0deg 10deg`,
 D bare `oblique`, E `normal`, F `auto` (descriptor omitted). Rows: 1 `normal`, 2 `italic`, 3 `oblique`,
 4 `oblique 11deg`, 5 `oblique 5deg`, 6 `oblique 45deg`, 7 `oblique -5deg`, 8 `italic` with
 `font-synthesis-style: none`, 9 `oblique` with `font-synthesis: none`.
@@ -13,7 +13,9 @@ Scope: oblique and `slnt`. Italic fonts (an `ital` axis, an italic-declared face
 `slnt` font it is resolved through the oblique branch.
 
 Results, over the same 56 items in every column (54 cells and 2 standalone tests): Chrome 50 (89%), Firefox 56 (100%),
-Safari 50 (89%). A pass can be loose, so the site also scores **interop**: an item counts only when all three engines
+Safari 50 (89%). The counts are unchanged by the move of column B from `oblique -20deg 20deg` to
+`oblique -14deg 14deg` on 2026-09-20: all 9 B cells pass in all three engines at either range. A pass can be loose,
+so the site also scores **interop**: an item counts only when all three engines
 render the same allowed thing. That is 44 of 56 (79%). Six cells fail (A2, A3, A6, C2, C3, C6) and six are amber: each
 engine is allowed, but they chose differently (E4, E5, E6, E7, F2, F8). Two cells (F2, F8) have no WPT test, because
 nothing in them can fail; they count as conforming for an engine that rendered anything.
@@ -42,14 +44,18 @@ The range columns tell the trigger apart:
 |---|---|---|
 | A: the font's own range, `-11deg 11deg` | rows 2, 3, 6 | `normal`, `oblique 11deg`, `5deg`, `-5deg`, synthesis off |
 | C: narrow and one-sided, `0deg 10deg` | the same rows: 2, 3, 6 | the same, including `oblique -5deg`, which clamps to upright |
-| B: wider than the font, `-20deg 20deg` | none | all 9 rows, in all three engines |
+| B: past the break-point, `-14deg 14deg` | none | all 9 rows, in all three engines |
 
 - **It is not the descriptor clamp.** In column C `oblique 11deg` is outside the range yet passes, while `italic` (which
   means 14deg), bare `oblique` and `oblique 45deg` fail. Requests up to the font's own limit (11) pass; requests past it
   fail, unless the descriptor reaches beyond the font's limit. Column C repeats column A's failures with different
   numbers (`slnt -10`), and its one new probe, a negative request clamped to the range's edge (C7), passes everywhere.
-- **Declaring a range wider than the font's own avoids the stacked skew in all three engines.** This is the practical
-  workaround. It rests on the 54 measured cells per engine, not on reading Chrome's or WebKit's source.
+- **Declaring a range that reaches past the font's own limit avoids the stacked skew in all three engines.** This is
+  the practical workaround. It rests on the measured cells, not on reading Chrome's or WebKit's source. The range
+  need not be generous: column B declared `-20deg 20deg` until 2026-09-20 and now declares `-14deg 14deg`, the
+  smallest range that clears the font's own limit (11) and still contains the 14deg CSS implies for bare `oblique`.
+  Ranges are inclusive, and rows 2, 3 and 6 sit exactly on that boundary: all three engines treat it inclusively and
+  all 9 rows pass at either range, so 14deg is enough and the slack at 20deg bought nothing.
 - Rows 8 and 9 repeat rows 2 and 3 with `font-synthesis-style: none` / `font-synthesis: none` and pass everywhere, so
   the failure is the synthetic skew on top of the axis and nothing else.
 

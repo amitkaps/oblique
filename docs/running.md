@@ -32,8 +32,12 @@ After any change under `tests/`, `wpt-sync` (or any `wpt-*` task, which sync fir
 `results/browser-matrix.md` is this repo's own runs, one row per test and engine. `scripts/record-results.py`
 (wpt) and `scripts/safari-replay.py --record` (Safari) write it through `scripts/results_file.py`, never by hand:
 recording a test again replaces its row, and rows for tests that no longer exist are dropped (git keeps the
-history). `results/survey.json` holds the measured lean per cell per engine. The site reads both at build time and
-fails the build if the manifest, the files on disk and the recorded results disagree.
+history). `results/survey.json` holds the measured lean per cell per engine, in CSS pixels: screenshots arrive in
+device pixels, so each engine's are divided by the scale measured from the screenshot itself (its width over
+`window.innerWidth`, snapped to the nearest half) and that `scale` is recorded beside the version. Without it a run
+on a 2x display doubles every lean and `compare` reads the doubling as a synthetic skew stacked on the axis.
+`--engines safari` surveys one engine and merges it into the rows already recorded for the others. The site reads
+both at build time and fails the build if the manifest, the files on disk and the recorded results disagree.
 
 ## Chrome and Firefox
 
