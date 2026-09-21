@@ -45,7 +45,7 @@ const esc = (s) =>
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#x27;");
 
-const isTestFile = (n) => n.endsWith(".html") && !/-(ref|notref)\.html$/.test(n);
+const isTestFile = (n) => n.endsWith(".html") && !n.endsWith("-ref.html");
 
 function verifyMatrix(manifest, results) {
   const { columns, rows, cells } = manifest;
@@ -62,12 +62,12 @@ function verifyMatrix(manifest, results) {
     if (!existsSync(join(TESTS_DIR, `${t.id}.html`))) throw new Error(`site: standalone test ${t.id} (${t.address}) is missing`);
     if (!results[t.id]) throw new Error(`site: ${t.id} (${t.address}) has no row in results/browser-matrix.md: run and record it first`);
   }
-  const onDisk = new Set(readdirSync(TESTS_DIR).filter((n) => n.startsWith("matrix-") && isTestFile(n)).map((n) => n.slice(0, -5)));
-  const expected = new Set(cells.filter((c) => c.wpt).map((c) => c.id));
+  const onDisk = new Set(readdirSync(TESTS_DIR).filter((n) => n.startsWith("font-style-match-") && isTestFile(n)).map((n) => n.slice(0, -5)));
+  const expected = new Set([...cells.filter((c) => c.wpt).map((c) => c.id), ...(manifest.standalone ?? []).map((t) => t.id)]);
   const extra = [...onDisk].filter((n) => !expected.has(n));
   const missing = [...expected].filter((n) => !onDisk.has(n));
   if (extra.length || missing.length)
-    throw new Error(`site: matrix-* tests on disk disagree with the manifest: extra ${extra}, missing ${missing}`);
+    throw new Error(`site: font-style-match-* tests on disk disagree with the manifest: extra ${extra}, missing ${missing}`);
 }
 
 const reftestStatus = (results, id, key) => {

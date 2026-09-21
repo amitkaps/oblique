@@ -5,7 +5,7 @@ rendering (docs/running.md): ~20 of 44 tests reported FAIL
 although a direct screenshot of the test and its reference is pixel-identical,
 and it PASSED a test that really fails; 5 more flipped between two identical
 runs. This script does what a reftest runner does, without wptrunner in the
-way: load the test, wait for the `reftest-wait` class to clear, screenshot,
+way: load the test, wait for web fonts to load, screenshot,
 load each reference the same way, compare pixels exactly.
 
   rel="match"     passes only if the two screenshots are identical
@@ -56,6 +56,13 @@ def wd(method, path, body=None, timeout=120):
 
 def screenshot(session, page):
     wd("POST", f"/session/{session}/url", {"url": f"http://localhost:{HTTP_PORT}/{page}"})
+    # The tests carry no reftest-wait (WPT's harness waits for web fonts itself), so do the same here:
+    # wait for document.fonts.ready, then for any reftest-wait a test may still set.
+    wd("POST", f"/session/{session}/execute/async", {
+        "script": "const done = arguments[arguments.length - 1];"
+                  "document.fonts.ready.then(() => requestAnimationFrame(() => requestAnimationFrame(() => done(true))));",
+        "args": [],
+    })
     deadline = time.time() + 10
     while time.time() < deadline:
         waiting = wd("POST", f"/session/{session}/execute/sync", {
@@ -79,7 +86,7 @@ def test_pages():
     """(test id, page path relative to TESTS_DIR, [(rel, ref path relative to TESTS_DIR)])"""
     pages = []
     for path in sorted(TESTS_DIR.glob("*.html")):
-        if "-ref" in path.stem or "-notref" in path.stem:
+        if path.stem.endswith("-ref"):
             continue
         links = re.findall(r'<link rel="(match|mismatch)" href="([^"]+)"', path.read_text())
         if links:
@@ -104,7 +111,7 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--reps", type=int, default=3)
     ap.add_argument("--record", action="store_true", help="record stable results in results/browser-matrix.md")
-    ap.add_argument("--prefix", default="", help="only replay tests whose id starts with this (e.g. matrix-)")
+    ap.add_argument("--prefix", default="", help="only replay tests whose id starts with this (e.g. font-style-match-obl)")
     ap.add_argument("--tests", default="", help="only replay these test ids (comma separated)")
     args = ap.parse_args()
 

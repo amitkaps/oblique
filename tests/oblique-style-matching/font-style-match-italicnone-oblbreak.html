@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="utf-8">
+<title>CSS Test: font-style: oblique -14deg 14deg + font-style: italic; font-synthesis-style: none;</title>
+<!--
+  @font-face font-style: oblique -14deg 14deg, request "italic". The reference algorithm permits: slnt -11.
+  selected face face (stage: italic: oblique >= 11deg ascending, then < 11deg descending)
+  italic request on an oblique face: the applied value is the stage's closest value (7.2), clamped to the descriptor, then to the font
+  no synthesis: font-synthesis-style: none forbids synthesis
+  The request also sets font-synthesis-style: none;
+-->
+<link rel="help" href="https://drafts.csswg.org/css-fonts-4/#font-style-matching">
+<link rel="help" href="https://drafts.csswg.org/css-fonts-4/#font-synthesis-style">
+<link rel="match" href="font-style-match-slnt-11-ref.html">
+<meta name="assert"
+  content="A face declared 'font-style: oblique -14deg 14deg', requested with 'font-style: italic; font-synthesis-style: none;', must render like one of: slnt -11.">
+<link rel="stylesheet" href="font-style-match.css">
+<style>
+  @font-face {
+    font-family: "Cairo Var OBLIQUE";
+    src: url('resources/Cairo.var.subset.ttf');
+    font-style: oblique -14deg 14deg;
+  }
+  .test {
+    font-family: "Cairo Var OBLIQUE";
+    font-size: 8em;
+  }
+</style>
+
+<p class="test" style="font-style: italic; font-synthesis-style: none;">I</p>

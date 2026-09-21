@@ -150,19 +150,19 @@
   "standalone": [
     {
       "address": "Z1",
-      "id": "standalone-auto-keyword-equals-omitted",
+      "id": "font-style-match-auto-keyword-equals-omitted",
       "name": "font-style: auto renders exactly like an omitted descriptor"
     },
     {
       "address": "Z2",
-      "id": "standalone-backslant-normal-fallback",
+      "id": "font-style-match-backslant-normal-fallback",
       "name": "normal against a backslant-only face (oblique -20deg -5deg) falls back to slnt 5"
     }
   ],
   "cells": [
     {
       "address": "A1",
-      "id": "matrix-normal-oblrange",
+      "id": "font-style-match-normal-oblrange",
       "row": "normal",
       "column": "oblrange",
       "request": "normal",
@@ -201,13 +201,13 @@
       ],
       "wpt": true,
       "files": [
-        "matrix-normal-oblrange.html",
-        "matrix-normal-oblrange-slnt0-ref.html"
+        "font-style-match-normal-oblrange.html",
+        "font-style-match-slnt0-ref.html"
       ]
     },
     {
       "address": "B1",
-      "id": "matrix-normal-oblbreak",
+      "id": "font-style-match-normal-oblbreak",
       "row": "normal",
       "column": "oblbreak",
       "request": "normal",
@@ -246,13 +246,13 @@
       ],
       "wpt": true,
       "files": [
-        "matrix-normal-oblbreak.html",
-        "matrix-normal-oblbreak-slnt0-ref.html"
+        "font-style-match-normal-oblbreak.html",
+        "font-style-match-slnt0-ref.html"
       ]
     },
     {
       "address": "C1",
-      "id": "matrix-normal-oblonesided",
+      "id": "font-style-match-normal-oblonesided",
       "row": "normal",
       "column": "oblonesided",
       "request": "normal",
@@ -291,13 +291,13 @@
       ],
       "wpt": true,
       "files": [
-        "matrix-normal-oblonesided.html",
-        "matrix-normal-oblonesided-slnt0-ref.html"
+        "font-style-match-normal-oblonesided.html",
+        "font-style-match-slnt0-ref.html"
       ]
     },
     {
       "address": "D1",
-      "id": "matrix-normal-oblique",
+      "id": "font-style-match-normal-oblique",
       "row": "normal",
       "column": "oblique",
       "request": "normal",
@@ -336,13 +336,13 @@
       ],
       "wpt": true,
       "files": [
-        "matrix-normal-oblique.html",
-        "matrix-normal-oblique-slnt-11-ref.html"
+        "font-style-match-normal-oblique.html",
+        "font-style-match-slnt-11-ref.html"
       ]
     },
     {
       "address": "E1",
-      "id": "matrix-normal-normal",
+      "id": "font-style-match-normal-normal",
       "row": "normal",
       "column": "normal",
       "request": "normal",
@@ -381,13 +381,13 @@
       ],
       "wpt": true,
       "files": [
-        "matrix-normal-normal.html",
-        "matrix-normal-normal-slnt0-ref.html"
+        "font-style-match-normal-normal.html",
+        "font-style-match-slnt0-ref.html"
       ]
     },
     {
       "address": "F1",
-      "id": "matrix-normal-auto",
+      "id": "font-style-match-normal-auto",
       "row": "normal",
       "column": "auto",
       "request": "normal",
@@ -426,13 +426,13 @@
       ],
       "wpt": true,
       "files": [
-        "matrix-normal-auto.html",
-        "matrix-normal-auto-slnt0-ref.html"
+        "font-style-match-normal-auto.html",
+        "font-style-match-slnt0-ref.html"
       ]
     },
     {
       "address": "A2",
-      "id": "matrix-italic-oblrange",
+      "id": "font-style-match-italic-oblrange",
       "row": "italic",
       "column": "oblrange",
       "request": "italic",
@@ -472,13 +472,13 @@
       ],
       "wpt": true,
       "files": [
-        "matrix-italic-oblrange.html",
-        "matrix-italic-oblrange-slnt-11-ref.html"
+        "font-style-match-italic-oblrange.html",
+        "font-style-match-slnt-11-ref.html"
       ]
     },
     {
       "address": "B2",
-      "id": "matrix-italic-oblbreak",
+      "id": "font-style-match-italic-oblbreak",
       "row": "italic",
       "column": "oblbreak",
       "request": "italic",
@@ -518,13 +518,13 @@
       ],
       "wpt": true,
       "files": [
-        "matrix-italic-oblbreak.html",
-        "matrix-italic-oblbreak-slnt-11-ref.html"
+        "font-style-match-italic-oblbreak.html",
+        "font-style-match-slnt-11-ref.html"
       ]
     },
     {
       "address": "C2",
-      "id": "matrix-italic-oblonesided",
+      "id": "font-style-match-italic-oblonesided",
       "row": "italic",
       "column": "oblonesided",
       "request": "italic",
@@ -564,13 +564,13 @@
       ],
       "wpt": true,
       "files": [
-        "matrix-italic-oblonesided.html",
-        "matrix-italic-oblonesided-slnt-10-ref.html"
+        "font-style-match-italic-oblonesided.html",
+        "font-style-match-slnt-10-ref.html"
       ]
     },
     {
       "address": "D2",
-      "id": "matrix-italic-oblique",
+      "id": "font-style-match-italic-oblique",
       "row": "italic",
       "column": "oblique",
       "request": "italic",
@@ -610,13 +610,13 @@
       ],
       "wpt": true,
       "files": [
-        "matrix-italic-oblique.html",
-        "matrix-italic-oblique-slnt-11-ref.html"
+        "font-style-match-italic-oblique.html",
+        "font-style-match-slnt-11-ref.html"
       ]
     },
     {
       "address": "E2",
-      "id": "matrix-italic-normal",
+      "id": "font-style-match-italic-normal",
       "row": "italic",
       "column": "normal",
       "request": "italic",
@@ -660,13 +660,13 @@
       ],
       "wpt": true,
       "files": [
-        "matrix-italic-normal.html",
-        "matrix-italic-normal-slnt-11-notref.html"
+        "font-style-match-italic-normal.html",
+        "font-style-match-slnt-11-ref.html"
       ]
     },
     {
       "address": "F2",
-      "id": "matrix-italic-auto",
+      "id": "font-style-match-italic-auto",
       "row": "italic",
       "column": "auto",
       "request": "italic",
@@ -713,7 +713,7 @@
     },
     {
       "address": "A3",
-      "id": "matrix-oblique-oblrange",
+      "id": "font-style-match-oblique-oblrange",
       "row": "oblique",
       "column": "oblrange",
       "request": "oblique",
@@ -753,13 +753,13 @@
       ],
       "wpt": true,
       "files": [
-        "matrix-oblique-oblrange.html",
-        "matrix-oblique-oblrange-slnt-11-ref.html"
+        "font-style-match-oblique-oblrange.html",
+        "font-style-match-slnt-11-ref.html"
       ]
     },
     {
       "address": "B3",
-      "id": "matrix-oblique-oblbreak",
+      "id": "font-style-match-oblique-oblbreak",
       "row": "oblique",
       "column": "oblbreak",
       "request": "oblique",
@@ -799,13 +799,13 @@
       ],
       "wpt": true,
       "files": [
-        "matrix-oblique-oblbreak.html",
-        "matrix-oblique-oblbreak-slnt-11-ref.html"
+        "font-style-match-oblique-oblbreak.html",
+        "font-style-match-slnt-11-ref.html"
       ]
     },
     {
       "address": "C3",
-      "id": "matrix-oblique-oblonesided",
+      "id": "font-style-match-oblique-oblonesided",
       "row": "oblique",
       "column": "oblonesided",
       "request": "oblique",
@@ -845,13 +845,13 @@
       ],
       "wpt": true,
       "files": [
-        "matrix-oblique-oblonesided.html",
-        "matrix-oblique-oblonesided-slnt-10-ref.html"
+        "font-style-match-oblique-oblonesided.html",
+        "font-style-match-slnt-10-ref.html"
       ]
     },
     {
       "address": "D3",
-      "id": "matrix-oblique-oblique",
+      "id": "font-style-match-oblique-oblique",
       "row": "oblique",
       "column": "oblique",
       "request": "oblique",
@@ -891,13 +891,13 @@
       ],
       "wpt": true,
       "files": [
-        "matrix-oblique-oblique.html",
-        "matrix-oblique-oblique-slnt-11-ref.html"
+        "font-style-match-oblique-oblique.html",
+        "font-style-match-slnt-11-ref.html"
       ]
     },
     {
       "address": "E3",
-      "id": "matrix-oblique-normal",
+      "id": "font-style-match-oblique-normal",
       "row": "oblique",
       "column": "normal",
       "request": "oblique",
@@ -941,13 +941,13 @@
       ],
       "wpt": true,
       "files": [
-        "matrix-oblique-normal.html",
-        "matrix-oblique-normal-slnt-11-notref.html"
+        "font-style-match-oblique-normal.html",
+        "font-style-match-slnt-11-ref.html"
       ]
     },
     {
       "address": "F3",
-      "id": "matrix-oblique-auto",
+      "id": "font-style-match-oblique-auto",
       "row": "oblique",
       "column": "auto",
       "request": "oblique",
@@ -987,13 +987,13 @@
       ],
       "wpt": true,
       "files": [
-        "matrix-oblique-auto.html",
-        "matrix-oblique-auto-slnt-11-ref.html"
+        "font-style-match-oblique-auto.html",
+        "font-style-match-slnt-11-ref.html"
       ]
     },
     {
       "address": "A4",
-      "id": "matrix-obl11-oblrange",
+      "id": "font-style-match-obl11-oblrange",
       "row": "obl11",
       "column": "oblrange",
       "request": "oblique 11deg",
@@ -1033,13 +1033,13 @@
       ],
       "wpt": true,
       "files": [
-        "matrix-obl11-oblrange.html",
-        "matrix-obl11-oblrange-slnt-11-ref.html"
+        "font-style-match-obl11-oblrange.html",
+        "font-style-match-slnt-11-ref.html"
       ]
     },
     {
       "address": "B4",
-      "id": "matrix-obl11-oblbreak",
+      "id": "font-style-match-obl11-oblbreak",
       "row": "obl11",
       "column": "oblbreak",
       "request": "oblique 11deg",
@@ -1079,13 +1079,13 @@
       ],
       "wpt": true,
       "files": [
-        "matrix-obl11-oblbreak.html",
-        "matrix-obl11-oblbreak-slnt-11-ref.html"
+        "font-style-match-obl11-oblbreak.html",
+        "font-style-match-slnt-11-ref.html"
       ]
     },
     {
       "address": "C4",
-      "id": "matrix-obl11-oblonesided",
+      "id": "font-style-match-obl11-oblonesided",
       "row": "obl11",
       "column": "oblonesided",
       "request": "oblique 11deg",
@@ -1125,13 +1125,13 @@
       ],
       "wpt": true,
       "files": [
-        "matrix-obl11-oblonesided.html",
-        "matrix-obl11-oblonesided-slnt-10-ref.html"
+        "font-style-match-obl11-oblonesided.html",
+        "font-style-match-slnt-10-ref.html"
       ]
     },
     {
       "address": "D4",
-      "id": "matrix-obl11-oblique",
+      "id": "font-style-match-obl11-oblique",
       "row": "obl11",
       "column": "oblique",
       "request": "oblique 11deg",
@@ -1171,13 +1171,13 @@
       ],
       "wpt": true,
       "files": [
-        "matrix-obl11-oblique.html",
-        "matrix-obl11-oblique-slnt-11-ref.html"
+        "font-style-match-obl11-oblique.html",
+        "font-style-match-slnt-11-ref.html"
       ]
     },
     {
       "address": "E4",
-      "id": "matrix-obl11-normal",
+      "id": "font-style-match-obl11-normal",
       "row": "obl11",
       "column": "normal",
       "request": "oblique 11deg",
@@ -1221,13 +1221,13 @@
       ],
       "wpt": true,
       "files": [
-        "matrix-obl11-normal.html",
-        "matrix-obl11-normal-slnt-11-notref.html"
+        "font-style-match-obl11-normal.html",
+        "font-style-match-slnt-11-ref.html"
       ]
     },
     {
       "address": "F4",
-      "id": "matrix-obl11-auto",
+      "id": "font-style-match-obl11-auto",
       "row": "obl11",
       "column": "auto",
       "request": "oblique 11deg",
@@ -1267,13 +1267,13 @@
       ],
       "wpt": true,
       "files": [
-        "matrix-obl11-auto.html",
-        "matrix-obl11-auto-slnt-11-ref.html"
+        "font-style-match-obl11-auto.html",
+        "font-style-match-slnt-11-ref.html"
       ]
     },
     {
       "address": "A5",
-      "id": "matrix-obl5-oblrange",
+      "id": "font-style-match-obl5-oblrange",
       "row": "obl5",
       "column": "oblrange",
       "request": "oblique 5deg",
@@ -1313,13 +1313,13 @@
       ],
       "wpt": true,
       "files": [
-        "matrix-obl5-oblrange.html",
-        "matrix-obl5-oblrange-slnt-5-ref.html"
+        "font-style-match-obl5-oblrange.html",
+        "font-style-match-slnt-5-ref.html"
       ]
     },
     {
       "address": "B5",
-      "id": "matrix-obl5-oblbreak",
+      "id": "font-style-match-obl5-oblbreak",
       "row": "obl5",
       "column": "oblbreak",
       "request": "oblique 5deg",
@@ -1359,13 +1359,13 @@
       ],
       "wpt": true,
       "files": [
-        "matrix-obl5-oblbreak.html",
-        "matrix-obl5-oblbreak-slnt-5-ref.html"
+        "font-style-match-obl5-oblbreak.html",
+        "font-style-match-slnt-5-ref.html"
       ]
     },
     {
       "address": "C5",
-      "id": "matrix-obl5-oblonesided",
+      "id": "font-style-match-obl5-oblonesided",
       "row": "obl5",
       "column": "oblonesided",
       "request": "oblique 5deg",
@@ -1405,13 +1405,13 @@
       ],
       "wpt": true,
       "files": [
-        "matrix-obl5-oblonesided.html",
-        "matrix-obl5-oblonesided-slnt-5-ref.html"
+        "font-style-match-obl5-oblonesided.html",
+        "font-style-match-slnt-5-ref.html"
       ]
     },
     {
       "address": "D5",
-      "id": "matrix-obl5-oblique",
+      "id": "font-style-match-obl5-oblique",
       "row": "obl5",
       "column": "oblique",
       "request": "oblique 5deg",
@@ -1451,13 +1451,13 @@
       ],
       "wpt": true,
       "files": [
-        "matrix-obl5-oblique.html",
-        "matrix-obl5-oblique-slnt-11-ref.html"
+        "font-style-match-obl5-oblique.html",
+        "font-style-match-slnt-11-ref.html"
       ]
     },
     {
       "address": "E5",
-      "id": "matrix-obl5-normal",
+      "id": "font-style-match-obl5-normal",
       "row": "obl5",
       "column": "normal",
       "request": "oblique 5deg",
@@ -1506,14 +1506,14 @@
       ],
       "wpt": true,
       "files": [
-        "matrix-obl5-normal.html",
-        "matrix-obl5-normal-slnt-11-notref.html",
-        "matrix-obl5-normal-slnt-5-notref.html"
+        "font-style-match-obl5-normal.html",
+        "font-style-match-slnt-11-ref.html",
+        "font-style-match-slnt-5-ref.html"
       ]
     },
     {
       "address": "F5",
-      "id": "matrix-obl5-auto",
+      "id": "font-style-match-obl5-auto",
       "row": "obl5",
       "column": "auto",
       "request": "oblique 5deg",
@@ -1553,13 +1553,13 @@
       ],
       "wpt": true,
       "files": [
-        "matrix-obl5-auto.html",
-        "matrix-obl5-auto-slnt-5-ref.html"
+        "font-style-match-obl5-auto.html",
+        "font-style-match-slnt-5-ref.html"
       ]
     },
     {
       "address": "A6",
-      "id": "matrix-obl45-oblrange",
+      "id": "font-style-match-obl45-oblrange",
       "row": "obl45",
       "column": "oblrange",
       "request": "oblique 45deg",
@@ -1599,13 +1599,13 @@
       ],
       "wpt": true,
       "files": [
-        "matrix-obl45-oblrange.html",
-        "matrix-obl45-oblrange-slnt-11-ref.html"
+        "font-style-match-obl45-oblrange.html",
+        "font-style-match-slnt-11-ref.html"
       ]
     },
     {
       "address": "B6",
-      "id": "matrix-obl45-oblbreak",
+      "id": "font-style-match-obl45-oblbreak",
       "row": "obl45",
       "column": "oblbreak",
       "request": "oblique 45deg",
@@ -1645,13 +1645,13 @@
       ],
       "wpt": true,
       "files": [
-        "matrix-obl45-oblbreak.html",
-        "matrix-obl45-oblbreak-slnt-11-ref.html"
+        "font-style-match-obl45-oblbreak.html",
+        "font-style-match-slnt-11-ref.html"
       ]
     },
     {
       "address": "C6",
-      "id": "matrix-obl45-oblonesided",
+      "id": "font-style-match-obl45-oblonesided",
       "row": "obl45",
       "column": "oblonesided",
       "request": "oblique 45deg",
@@ -1691,13 +1691,13 @@
       ],
       "wpt": true,
       "files": [
-        "matrix-obl45-oblonesided.html",
-        "matrix-obl45-oblonesided-slnt-10-ref.html"
+        "font-style-match-obl45-oblonesided.html",
+        "font-style-match-slnt-10-ref.html"
       ]
     },
     {
       "address": "D6",
-      "id": "matrix-obl45-oblique",
+      "id": "font-style-match-obl45-oblique",
       "row": "obl45",
       "column": "oblique",
       "request": "oblique 45deg",
@@ -1737,13 +1737,13 @@
       ],
       "wpt": true,
       "files": [
-        "matrix-obl45-oblique.html",
-        "matrix-obl45-oblique-slnt-11-ref.html"
+        "font-style-match-obl45-oblique.html",
+        "font-style-match-slnt-11-ref.html"
       ]
     },
     {
       "address": "E6",
-      "id": "matrix-obl45-normal",
+      "id": "font-style-match-obl45-normal",
       "row": "obl45",
       "column": "normal",
       "request": "oblique 45deg",
@@ -1787,13 +1787,13 @@
       ],
       "wpt": true,
       "files": [
-        "matrix-obl45-normal.html",
-        "matrix-obl45-normal-slnt-11-notref.html"
+        "font-style-match-obl45-normal.html",
+        "font-style-match-slnt-11-ref.html"
       ]
     },
     {
       "address": "F6",
-      "id": "matrix-obl45-auto",
+      "id": "font-style-match-obl45-auto",
       "row": "obl45",
       "column": "auto",
       "request": "oblique 45deg",
@@ -1833,13 +1833,13 @@
       ],
       "wpt": true,
       "files": [
-        "matrix-obl45-auto.html",
-        "matrix-obl45-auto-slnt-11-ref.html"
+        "font-style-match-obl45-auto.html",
+        "font-style-match-slnt-11-ref.html"
       ]
     },
     {
       "address": "A7",
-      "id": "matrix-oblm5-oblrange",
+      "id": "font-style-match-oblm5-oblrange.tentative",
       "row": "oblm5",
       "column": "oblrange",
       "request": "oblique -5deg",
@@ -1881,13 +1881,13 @@
       ],
       "wpt": true,
       "files": [
-        "matrix-oblm5-oblrange.html",
-        "matrix-oblm5-oblrange-slnt5-ref.html"
+        "font-style-match-oblm5-oblrange.tentative.html",
+        "font-style-match-slnt5-ref.html"
       ]
     },
     {
       "address": "B7",
-      "id": "matrix-oblm5-oblbreak",
+      "id": "font-style-match-oblm5-oblbreak.tentative",
       "row": "oblm5",
       "column": "oblbreak",
       "request": "oblique -5deg",
@@ -1929,13 +1929,13 @@
       ],
       "wpt": true,
       "files": [
-        "matrix-oblm5-oblbreak.html",
-        "matrix-oblm5-oblbreak-slnt5-ref.html"
+        "font-style-match-oblm5-oblbreak.tentative.html",
+        "font-style-match-slnt5-ref.html"
       ]
     },
     {
       "address": "C7",
-      "id": "matrix-oblm5-oblonesided",
+      "id": "font-style-match-oblm5-oblonesided.tentative",
       "row": "oblm5",
       "column": "oblonesided",
       "request": "oblique -5deg",
@@ -1977,13 +1977,13 @@
       ],
       "wpt": true,
       "files": [
-        "matrix-oblm5-oblonesided.html",
-        "matrix-oblm5-oblonesided-slnt0-ref.html"
+        "font-style-match-oblm5-oblonesided.tentative.html",
+        "font-style-match-slnt0-ref.html"
       ]
     },
     {
       "address": "D7",
-      "id": "matrix-oblm5-oblique",
+      "id": "font-style-match-oblm5-oblique.tentative",
       "row": "oblm5",
       "column": "oblique",
       "request": "oblique -5deg",
@@ -2025,13 +2025,13 @@
       ],
       "wpt": true,
       "files": [
-        "matrix-oblm5-oblique.html",
-        "matrix-oblm5-oblique-slnt-11-ref.html"
+        "font-style-match-oblm5-oblique.tentative.html",
+        "font-style-match-slnt-11-ref.html"
       ]
     },
     {
       "address": "E7",
-      "id": "matrix-oblm5-normal",
+      "id": "font-style-match-oblm5-normal.tentative",
       "row": "oblm5",
       "column": "normal",
       "request": "oblique -5deg",
@@ -2082,14 +2082,14 @@
       ],
       "wpt": true,
       "files": [
-        "matrix-oblm5-normal.html",
-        "matrix-oblm5-normal-slnt-11-notref.html",
-        "matrix-oblm5-normal-slnt5-notref.html"
+        "font-style-match-oblm5-normal.tentative.html",
+        "font-style-match-slnt-11-ref.html",
+        "font-style-match-slnt5-ref.html"
       ]
     },
     {
       "address": "F7",
-      "id": "matrix-oblm5-auto",
+      "id": "font-style-match-oblm5-auto.tentative",
       "row": "oblm5",
       "column": "auto",
       "request": "oblique -5deg",
@@ -2131,13 +2131,13 @@
       ],
       "wpt": true,
       "files": [
-        "matrix-oblm5-auto.html",
-        "matrix-oblm5-auto-slnt5-ref.html"
+        "font-style-match-oblm5-auto.tentative.html",
+        "font-style-match-slnt5-ref.html"
       ]
     },
     {
       "address": "A8",
-      "id": "matrix-italicnone-oblrange",
+      "id": "font-style-match-italicnone-oblrange",
       "row": "italicnone",
       "column": "oblrange",
       "request": "italic",
@@ -2177,13 +2177,13 @@
       ],
       "wpt": true,
       "files": [
-        "matrix-italicnone-oblrange.html",
-        "matrix-italicnone-oblrange-slnt-11-ref.html"
+        "font-style-match-italicnone-oblrange.html",
+        "font-style-match-slnt-11-ref.html"
       ]
     },
     {
       "address": "B8",
-      "id": "matrix-italicnone-oblbreak",
+      "id": "font-style-match-italicnone-oblbreak",
       "row": "italicnone",
       "column": "oblbreak",
       "request": "italic",
@@ -2223,13 +2223,13 @@
       ],
       "wpt": true,
       "files": [
-        "matrix-italicnone-oblbreak.html",
-        "matrix-italicnone-oblbreak-slnt-11-ref.html"
+        "font-style-match-italicnone-oblbreak.html",
+        "font-style-match-slnt-11-ref.html"
       ]
     },
     {
       "address": "C8",
-      "id": "matrix-italicnone-oblonesided",
+      "id": "font-style-match-italicnone-oblonesided",
       "row": "italicnone",
       "column": "oblonesided",
       "request": "italic",
@@ -2269,13 +2269,13 @@
       ],
       "wpt": true,
       "files": [
-        "matrix-italicnone-oblonesided.html",
-        "matrix-italicnone-oblonesided-slnt-10-ref.html"
+        "font-style-match-italicnone-oblonesided.html",
+        "font-style-match-slnt-10-ref.html"
       ]
     },
     {
       "address": "D8",
-      "id": "matrix-italicnone-oblique",
+      "id": "font-style-match-italicnone-oblique",
       "row": "italicnone",
       "column": "oblique",
       "request": "italic",
@@ -2315,13 +2315,13 @@
       ],
       "wpt": true,
       "files": [
-        "matrix-italicnone-oblique.html",
-        "matrix-italicnone-oblique-slnt-11-ref.html"
+        "font-style-match-italicnone-oblique.html",
+        "font-style-match-slnt-11-ref.html"
       ]
     },
     {
       "address": "E8",
-      "id": "matrix-italicnone-normal",
+      "id": "font-style-match-italicnone-normal",
       "row": "italicnone",
       "column": "normal",
       "request": "italic",
@@ -2361,13 +2361,13 @@
       ],
       "wpt": true,
       "files": [
-        "matrix-italicnone-normal.html",
-        "matrix-italicnone-normal-slnt0-ref.html"
+        "font-style-match-italicnone-normal.html",
+        "font-style-match-slnt0-ref.html"
       ]
     },
     {
       "address": "F8",
-      "id": "matrix-italicnone-auto",
+      "id": "font-style-match-italicnone-auto",
       "row": "italicnone",
       "column": "auto",
       "request": "italic",
@@ -2410,7 +2410,7 @@
     },
     {
       "address": "A9",
-      "id": "matrix-oblnone-oblrange",
+      "id": "font-style-match-oblnone-oblrange",
       "row": "oblnone",
       "column": "oblrange",
       "request": "oblique",
@@ -2450,13 +2450,13 @@
       ],
       "wpt": true,
       "files": [
-        "matrix-oblnone-oblrange.html",
-        "matrix-oblnone-oblrange-slnt-11-ref.html"
+        "font-style-match-oblnone-oblrange.html",
+        "font-style-match-slnt-11-ref.html"
       ]
     },
     {
       "address": "B9",
-      "id": "matrix-oblnone-oblbreak",
+      "id": "font-style-match-oblnone-oblbreak",
       "row": "oblnone",
       "column": "oblbreak",
       "request": "oblique",
@@ -2496,13 +2496,13 @@
       ],
       "wpt": true,
       "files": [
-        "matrix-oblnone-oblbreak.html",
-        "matrix-oblnone-oblbreak-slnt-11-ref.html"
+        "font-style-match-oblnone-oblbreak.html",
+        "font-style-match-slnt-11-ref.html"
       ]
     },
     {
       "address": "C9",
-      "id": "matrix-oblnone-oblonesided",
+      "id": "font-style-match-oblnone-oblonesided",
       "row": "oblnone",
       "column": "oblonesided",
       "request": "oblique",
@@ -2542,13 +2542,13 @@
       ],
       "wpt": true,
       "files": [
-        "matrix-oblnone-oblonesided.html",
-        "matrix-oblnone-oblonesided-slnt-10-ref.html"
+        "font-style-match-oblnone-oblonesided.html",
+        "font-style-match-slnt-10-ref.html"
       ]
     },
     {
       "address": "D9",
-      "id": "matrix-oblnone-oblique",
+      "id": "font-style-match-oblnone-oblique",
       "row": "oblnone",
       "column": "oblique",
       "request": "oblique",
@@ -2588,13 +2588,13 @@
       ],
       "wpt": true,
       "files": [
-        "matrix-oblnone-oblique.html",
-        "matrix-oblnone-oblique-slnt-11-ref.html"
+        "font-style-match-oblnone-oblique.html",
+        "font-style-match-slnt-11-ref.html"
       ]
     },
     {
       "address": "E9",
-      "id": "matrix-oblnone-normal",
+      "id": "font-style-match-oblnone-normal",
       "row": "oblnone",
       "column": "normal",
       "request": "oblique",
@@ -2634,13 +2634,13 @@
       ],
       "wpt": true,
       "files": [
-        "matrix-oblnone-normal.html",
-        "matrix-oblnone-normal-slnt0-ref.html"
+        "font-style-match-oblnone-normal.html",
+        "font-style-match-slnt0-ref.html"
       ]
     },
     {
       "address": "F9",
-      "id": "matrix-oblnone-auto",
+      "id": "font-style-match-oblnone-auto",
       "row": "oblnone",
       "column": "auto",
       "request": "oblique",
@@ -2680,8 +2680,8 @@
       ],
       "wpt": true,
       "files": [
-        "matrix-oblnone-auto.html",
-        "matrix-oblnone-auto-slnt-11-ref.html"
+        "font-style-match-oblnone-auto.html",
+        "font-style-match-slnt-11-ref.html"
       ]
     }
   ]

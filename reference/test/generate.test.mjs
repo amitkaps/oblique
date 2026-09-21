@@ -6,7 +6,7 @@ import assert from "node:assert/strict";
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { generate } from "../src/wpt.mjs";
-import { loadMatrix, TESTS_DIR, cells } from "../src/cases.mjs";
+import { loadMatrix, TESTS_DIR, PREFIX, cells } from "../src/cases.mjs";
 
 test("committed files equal the generator's output", () => {
   const { files } = generate(loadMatrix());
@@ -14,7 +14,8 @@ test("committed files equal the generator's output", () => {
     assert.ok(existsSync(join(TESTS_DIR, name)), `missing ${name}: run \`node src/cli.mjs generate\``);
     assert.equal(readFileSync(join(TESTS_DIR, name), "utf8"), content, `${name} is stale`);
   }
-  const stale = readdirSync(TESTS_DIR).filter((n) => /^matrix-/.test(n) && !files.has(n));
+  const handWritten = new Set(loadMatrix().standalone.flatMap((t) => [`${t.id}.html`, `${t.id}-ref.html`]));
+  const stale = readdirSync(TESTS_DIR).filter((n) => n.startsWith(`${PREFIX}-`) && !handWritten.has(n) && !files.has(n));
   assert.deepEqual(stale, []);
 });
 
@@ -30,7 +31,7 @@ test("addresses are unique, column letter + row number", () => {
 test("every generated reftest has at least one reference, and the refs it links exist", () => {
   const { files } = generate(loadMatrix());
   for (const [name, content] of files) {
-    if (!name.endsWith(".html") || /-(not)?ref\.html$/.test(name)) continue;
+    if (!name.endsWith(".html") || /-ref\.html$/.test(name)) continue;
     const links = [...content.matchAll(/<link rel="(?:match|mismatch)" href="([^"]+)"/g)].map((m) => m[1]);
     assert.ok(links.length > 0, name);
     for (const l of links) assert.ok(files.has(l), `${name} links ${l}`);
@@ -39,7 +40,7 @@ test("every generated reftest has at least one reference, and the refs it links 
 
 test("no generated test sets font-synthesis, except the rows whose point is that setting", () => {
   const matrix = loadMatrix();
-  const setsSynthesis = matrix.rows.filter((r) => /synthesis/.test(r.extraCss ?? "")).map((r) => `matrix-${r.slug}-`);
+  const setsSynthesis = matrix.rows.filter((r) => /synthesis/.test(r.extraCss ?? "")).map((r) => `${PREFIX}-${r.slug}-`);
   const { files } = generate(matrix);
   for (const [name, content] of files) {
     if (!name.endsWith(".html") || setsSynthesis.some((p) => name.startsWith(p))) continue;

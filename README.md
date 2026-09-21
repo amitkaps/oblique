@@ -16,7 +16,7 @@ reference/cases/matrix.json   6 @font-face descriptors (A-F) x 9 use-site reques
         |
 reference/                    JS implementation of the CSS Fonts 4 matching rules: what may each cell render?
         |  mise run generate
-tests/oblique-style-matching/ WPT reftests, one per cell the spec can decide (matrix-*)
+tests/oblique-style-matching/ WPT reftests, one per cell the spec can decide (font-style-match-*)
         |
 Chrome, Firefox (wpt run) + Safari (safaridriver)  ->  results/browser-matrix.md
         |
@@ -53,8 +53,8 @@ Setup, the Safari method, and gotchas: [docs/running.md](docs/running.md). All t
 | Path | What |
 |---|---|
 | `reference/` | the reference implementation, its tests, the saved spec text ([README](reference/README.md)) |
-| `tests/oblique-style-matching/matrix-*.html` | generated reftests and manifest; never edited by hand |
-| `tests/oblique-style-matching/standalone-*.html` | 2 hand-written tests: `auto` equals an omitted descriptor, and a backslant-only face for `normal` |
+| `tests/oblique-style-matching/font-style-match-*.html` | generated reftests, their shared references, and `matrix.manifest.json`; never edited by hand |
+| `tests/oblique-style-matching/font-style-match-{auto-keyword-equals-omitted,backslant-normal-fallback}.html` | 2 hand-written tests: `auto` equals an omitted descriptor, and a backslant-only face for `normal` |
 | `tests/oblique-style-matching/resources/` | the one font (Cairo subset) and the script that builds it |
 | `results/` | `browser-matrix.md` (recorded runs), `survey.json` (measured lean per cell) |
 | `site/` | the page: `index.html`, `style.css`, `render.mjs` (a Vite plugin that renders the grid) |
