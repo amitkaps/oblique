@@ -14,7 +14,7 @@ description = "Unit tests for the reference implementation (and that generated t
 run = "pnpm test"
 
 [tasks.generate]
-description = "Regenerate the matrix-* tests in tests/oblique-style-matching/ from reference/cases/matrix.json"
+description = "Regenerate the font-style-match-* tests in tests/oblique-style-matching/ from reference/cases/matrix.json"
 run = "pnpm generate"
 
 [tasks.compare]
@@ -31,7 +31,7 @@ run = "scripts/sync-tests-to-wpt.sh"
 
 [tasks.wpt-lint]
 description = "wpt lint on the test folder"
-run = "scripts/sync-tests-to-wpt.sh && cd .wpt && ./wpt lint css/css-fonts/variable-oblique-interop/oblique-style-matching/"
+run = "scripts/sync-tests-to-wpt.sh && cd .wpt && ./wpt lint css/css-fonts/matching/font-style/"
 
 [tasks.wpt-chrome]
 description = "Run the tests in Chrome via wpt and record the results"

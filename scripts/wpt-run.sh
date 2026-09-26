@@ -18,7 +18,7 @@ echo "cryptography<=48.0.1" > "$constraints"
 export PIP_CONSTRAINT="$constraints"
 
 report="../results/latest-$engine.json"
-folder=css/css-fonts/variable-oblique-interop/
+folder=css/css-fonts/matching/font-style/
 cd .wpt
 rm -f "$report"
 # wpt exits nonzero when any test fails, and failures are the data here: record whatever it

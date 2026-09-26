@@ -150,12 +150,12 @@
   "standalone": [
     {
       "address": "Z1",
-      "id": "standalone-auto-keyword-equals-omitted",
+      "id": "font-style-match-auto-keyword-equals-omitted",
       "name": "font-style: auto renders exactly like an omitted descriptor"
     },
     {
       "address": "Z2",
-      "id": "standalone-backslant-normal-fallback",
+      "id": "font-style-match-backslant-normal-fallback",
       "name": "normal against a backslant-only face (oblique -20deg -5deg) falls back to slnt 5"
     }
   ]

@@ -77,7 +77,7 @@ def probe_html(manifest, cell):
     desc = f"\n    font-style: {cell['descriptor']};" if cell["descriptor"] else ""
     style = f' style="{cell["css"]}"' if cell["css"] else ""
     return f"""<!DOCTYPE html><html class="reftest-wait"><meta charset="utf-8">
-<link rel="stylesheet" href="oblique-matching.css">
+<link rel="stylesheet" href="font-style-match.css">
 <style>@font-face {{ font-family: "probe"; src: url('{font['file']}');{desc} }}
 .test {{ font-family: "probe"; font-size: {font['fontSize']}; }}</style>
 <script>document.fonts.ready.then(() => document.documentElement.classList.remove('reftest-wait'));</script>
@@ -157,7 +157,7 @@ def main():
     # same layout as tests/oblique-style-matching/: probes at the top, font in resources/
     (tmp / "resources").mkdir()
     shutil.copy(TESTS_DIR / "resources" / Path(manifest["font"]["file"]).name, tmp / "resources")
-    shutil.copy(TESTS_DIR / "oblique-matching.css", tmp / "oblique-matching.css")
+    shutil.copy(TESTS_DIR / "font-style-match.css", tmp / "font-style-match.css")
     for cell in manifest["cells"]:
         (tmp / f"probe-{cell['id']}.html").write_text(probe_html(manifest, cell))
 

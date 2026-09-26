@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="utf-8">
+<title>CSS Test: font-style: normal + font-style: italic; font-synthesis-style: none;</title>
+<!--
+  @font-face font-style: normal, request "italic". The reference algorithm permits: slnt 0.
+  selected face face (stage: italic: oblique <= 0 descending)
+  normal face: descriptor replaces the font data's style (4.4); applied value clamped to [0,0]
+  no synthesis: font-synthesis-style: none forbids synthesis
+  The request also sets font-synthesis-style: none;
+-->
+<link rel="help" href="https://drafts.csswg.org/css-fonts-4/#font-style-matching">
+<link rel="help" href="https://drafts.csswg.org/css-fonts-4/#font-synthesis-style">
+<link rel="match" href="font-style-match-slnt0-ref.html">
+<meta name="assert"
+  content="A face declared 'font-style: normal', requested with 'font-style: italic; font-synthesis-style: none;', must render like one of: slnt 0.">
+<link rel="stylesheet" href="font-style-match.css">
+<style>
+  @font-face {
+    font-family: "Cairo Var OBLIQUE";
+    src: url('resources/Cairo.var.subset.ttf');
+    font-style: normal;
+  }
+  .test {
+    font-family: "Cairo Var OBLIQUE";
+    font-size: 8em;
+  }
+</style>
+
+<p class="test" style="font-style: italic; font-synthesis-style: none;">I</p>

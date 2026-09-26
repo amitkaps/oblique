@@ -38,7 +38,7 @@ axis), one `@font-face` rule, one element. Measurements are the lean of the capi
 at its default (`auto`) except where noted. Each row below is also a reftest.
 
 Grid, per-engine results and the reference implementation of §5.2: <https://oblique.amitkaps.com> ·
-<https://github.com/amitkaps/oblique>. Tests: `tests/oblique-style-matching/matrix-*.html`.
+<https://github.com/amitkaps/oblique>. Tests: `tests/oblique-style-matching/font-style-match-*.html`.
 
 ## Gap 1: the face's descriptor is `normal`
 

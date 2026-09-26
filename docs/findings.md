@@ -172,8 +172,8 @@ Editor's Draft text has not caught up with either (`RESOLUTIONS` in `reference/s
 ## Standalone tests (group Z)
 
 Two hand-written tests in `tests/oblique-style-matching/` sit under the results table, on the same Cairo font. Z1,
-`standalone-auto-keyword-equals-omitted`, checks that `font-style: auto` and an omitted descriptor render identically
-(passes on all three engines). Z2, `standalone-backslant-normal-fallback`, checks the third step of the `normal` branch:
+`font-style-match-auto-keyword-equals-omitted`, checks that `font-style: auto` and an omitted descriptor render identically
+(passes on all three engines). Z2, `font-style-match-backslant-normal-fallback`, checks the third step of the `normal` branch:
 against a face declared `oblique -20deg -5deg`, `normal` lands on `slnt 5` (passes on all three engines). Neither is
 a column: Z1 would repeat column F, and a backslant column would put every forward request on the same value.
 
@@ -203,4 +203,4 @@ a column: Z1 would repeat column F, and a backslant column would put every forwa
    - `auto` semantics: does italic on an `auto` face use the font's own range?
    - The 14deg-versus-11deg italic slope, and the meaning of `oblique-only` (#9390).
 6. **Upstreaming.** No WPT PR is open. `tests/oblique-style-matching/` is the single folder that would be
-   proposed.
+   proposed, as `css/css-fonts/matching/font-style/`.

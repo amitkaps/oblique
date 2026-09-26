@@ -8,7 +8,7 @@ mise run install                     # once: pnpm install (vite)
 
 # the reference implementation and the generated tests
 mise run test                        # unit tests (53)
-mise run generate                    # regenerate the matrix-* tests from reference/cases/matrix.json
+mise run generate                    # regenerate the font-style-match-* tests from reference/cases/matrix.json
 mise run compare                     # expected vs recorded browser results
 
 # WPT (a sparse checkout in .wpt/, gitignored)
@@ -25,7 +25,11 @@ mise run site                        # build into dist/
 ```
 
 After any change under `tests/`, `wpt-sync` (or any `wpt-*` task, which sync first) refreshes `.wpt/`.
-`generate` rewrites every `matrix-*` file and the manifest; never edit those by hand. The `standalone-*` tests are hand-written.
+`generate` rewrites every `font-style-match-*` file except the two hand-written tests (`auto-keyword-equals-omitted`,
+`backslant-normal-fallback`, and their `-ref`), plus the manifest; never edit those by hand.
+
+`wpt-sync` mirrors `tests/oblique-style-matching/` to `.wpt/css/css-fonts/matching/font-style/`, the folder proposed upstream.
+Everything in it ships (including the WPT-facing `README.md`) except `matrix.manifest.json`, which is this repo's bookkeeping.
 
 ## Results files
 
@@ -58,7 +62,7 @@ between identical runs. The cause inside wptrunner was not isolated; a loading r
 correct with both loading patterns).
 
 `mise run safari` (`scripts/safari-replay.py`) does what a reftest runner does through `safaridriver`
-directly: load the test, wait for `reftest-wait` to clear, screenshot, load each reference, compare pixels
+directly: load the test, wait for web fonts to load, screenshot, load each reference, compare pixels
 exactly (`match` must be identical, every `mismatch` must differ). It repeats three times and records a
 result only if every repetition agrees. Recorded rows say "no (safaridriver automation)" in the `real_device`
 column: desktop Safari through `safaridriver`, not a physical device. Its screenshots carry a dark line in the

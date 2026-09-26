@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="utf-8">
+<title>CSS Test: font-style: oblique 0deg 10deg + font-style: oblique 11deg;</title>
+<!--
+  @font-face font-style: oblique 0deg 10deg, request "oblique 11deg". The reference algorithm permits: slnt -10.
+  selected face face (stage: oblique 11: nearest oblique (above ascending, then below descending))
+  oblique face [0, 10]: closest matching value 10, clamped to the descriptor, then to the font
+  no synthesis: an oblique face exists (2.3)
+  font-synthesis is left at its default: a matched request must not be synthesized.
+-->
+<link rel="help" href="https://drafts.csswg.org/css-fonts-4/#font-style-matching">
+<link rel="help" href="https://drafts.csswg.org/css-fonts-4/#font-synthesis-style">
+<link rel="match" href="font-style-match-slnt-10-ref.html">
+<meta name="assert"
+  content="A face declared 'font-style: oblique 0deg 10deg', requested with 'font-style: oblique 11deg;', must render like one of: slnt -10.">
+<link rel="stylesheet" href="font-style-match.css">
+<style>
+  @font-face {
+    font-family: "Cairo Var OBLIQUE";
+    src: url('resources/Cairo.var.subset.ttf');
+    font-style: oblique 0deg 10deg;
+  }
+  .test {
+    font-family: "Cairo Var OBLIQUE";
+    font-size: 8em;
+  }
+</style>
+
+<p class="test" style="font-style: oblique 11deg;">I</p>

@@ -1,53 +1,50 @@
-# oblique-style-matching
+# font-style matching with a variable `slnt` font
 
-The single folder that would be proposed to WPT (`css/css-fonts/variable-oblique-interop/`). No PR is open.
-This README is not copied into `.wpt/`.
+Tests for how a `font-style` request (`normal`, `italic`, `oblique`, `oblique <angle>`) is matched against an
+`@font-face` `font-style` descriptor, and how the result is applied to a variable font's `slnt` axis:
+[CSS Fonts 4, font style matching](https://drafts.csswg.org/css-fonts-4/#font-style-matching) and
+[`font-synthesis-style`](https://drafts.csswg.org/css-fonts-4/#font-synthesis-style).
 
-```
-matrix-*.html           52 generated reftests (and their -ref / -notref files), never edited by hand
-matrix.manifest.json    what the reference expects for every cell, generated with them
-standalone-*.html       2 hand-written tests (see below)
-resources/              the one font (Cairo subset, with a .headers sidecar for WPT) and the script that builds it
-oblique-matching.css    shared fixed-size layout, so pixel diffs do not depend on font metrics
-```
+## How a test reads
 
-## The matrix
+Every test declares one face from `resources/Cairo.var.subset.ttf` (family name "Cairo Var OBLIQUE") with one
+`font-style` descriptor, then draws the capital `I` with one `font-style` request. A reference draws the same glyph
+from a plain face with the axis pinned, `font-variation-settings: 'slnt' N`, which wins over any style-derived
+variation (CSS Fonts 4 7.2), so no reference depends on the matching under test. References are shared: a test links
+one or more of `font-style-match-slnt{N}-ref.html` as `match` (any one may match) or `mismatch` (all must differ).
 
-Columns are the `@font-face` `font-style` descriptor: A the font's own range `oblique -11deg 11deg`, B a wider range
-`oblique -20deg 20deg`, C a narrow, one-sided range `oblique 0deg 10deg`, D bare `oblique`, E `normal`, F `auto`
-(omitted). Rows are the use-site request: 1 `normal`, 2 `italic`, 3 `oblique`, 4 `oblique 11deg`,
-5 `oblique 5deg`, 6 `oblique 45deg`, 7 `oblique -5deg`, 8 `italic` with `font-synthesis-style: none`,
-9 `oblique` with `font-synthesis: none`. A cell is `A2`; its file is
-`matrix-{row slug}-{column slug}.html` (`matrix-italic-oblrange.html`). Every cell uses `resources/Cairo.var.subset.ttf`
-and the capital `I`.
+Where the spec allows several outcomes, for example a synthesized oblique, the test only forbids what the spec
+forbids (`mismatch` references). Where the spec is silent there is no test.
 
-`reference/` decides what each cell may render and `mise run generate` writes the files. Each cell is one of:
+## File names
 
-- **specified**: one outcome, one `match` reference.
-- **constrained**: several outcomes, or synthesis, are allowed; the test forbids only what the spec forbids
-  (several `match` references, or `mismatch` references).
-- **unspecified**: no file; the spec is silent, so the cell is only measured (`scripts/survey.py`).
+`font-style-match-{request}-{descriptor}.html`
 
-References are plain faces with the axis pinned through `font-variation-settings`, so they never depend on the
-descriptor under test. Only rows 8 and 9 set `font-synthesis`; that is their point. Results and what they mean:
-[../../docs/findings.md](../../docs/findings.md).
+| request | use-site declaration | | descriptor | `@font-face` declaration |
+|---|---|---|---|---|
+| `normal` | `font-style: normal` | | `oblrange` | `oblique -11deg 11deg` (the font's own range) |
+| `italic` | `font-style: italic` | | `oblbreak` | `oblique -14deg 14deg` (past the 14deg default of bare `oblique`) |
+| `oblique` | `font-style: oblique` | | `oblonesided` | `oblique 0deg 10deg` |
+| `obl11` | `font-style: oblique 11deg` | | `oblique` | `oblique` (no range) |
+| `obl5` | `font-style: oblique 5deg` | | `normal` | `normal` |
+| `obl45` | `font-style: oblique 45deg` (beyond every range) | | `auto` | omitted (the initial value, `auto`) |
+| `oblm5` | `font-style: oblique -5deg` | | | |
+| `italicnone` | `italic` with `font-synthesis-style: none` | | | |
+| `oblnone` | `oblique` with `font-synthesis: none` | | | |
 
-## Standalone tests
+`*.tentative.html` (the `oblm5` requests) depends on how a negative angle maps to `slnt`, which the spec words only as
+"negated values and opposite directions".
 
-Shown as group Z at the bottom of the site's results. Each quotes the CSS Fonts 4 clause it checks and uses the same
-Cairo font.
+`font-style-match-auto-keyword-equals-omitted` and `font-style-match-backslant-normal-fallback` are single tests, not
+part of the grid: `font-style: auto` in `@font-face` renders exactly like an omitted descriptor, and `normal` against a
+face declared `oblique -20deg -5deg` falls back to -5deg (`slnt 5`).
 
-| Test | Claim |
-|---|---|
-| `standalone-auto-keyword-equals-omitted` (Z1) | `font-style: auto` renders exactly like an omitted descriptor (4.4: `auto` is the initial value), for seven requests. Holds even where the spec is open. Not a column: it would repeat column F |
-| `standalone-backslant-normal-fallback` (Z2) | `normal` against a face declared `oblique -20deg -5deg`: no oblique value >= 0 and no italic face, so the third step of the `normal` branch picks -5deg, which is `slnt 5`. Not a column: every forward request would land on the same value |
+## Font
 
-## resources/
+`resources/Cairo.var.subset.ttf` is Cairo (SIL OFL 1.1, no Reserved Font Name) subset to the letters of `OBLIQUE` by
+`tools/build-cairo-subset.sh`, the way `css/css-fonts/variations/resources/Inter.var.subset.ttf` is made. Axes: `slnt`
+-11..11 and `wght` 200..1000, no `ital`. Cairo is used instead of Inter because Inter's `slnt` axis (-10..0) is
+one-sided, so it cannot show forward against backward slants or a range that crosses 0. Italic fonts (an `ital` axis)
+are out of scope; italic fallback is covered elsewhere in css-fonts.
 
-`Cairo.var.subset.ttf` is real Cairo (SIL OFL 1.1, no Reserved Font Name) subset to the letters of `OBLIQUE` by
-`build-cairo-subset.sh`, the way WPT subsets Inter for its own tests. `slnt` -11..11, `wght` 200..1000, no `ital`;
-both axes and all layout and variation tables kept.
-
-Italic fonts (an `ital` axis, an italic-declared face) are out of scope: no open-source font has both an `ital` axis
-and a `slnt` axis, and WPT already covers italic fallback. The purpose-built fonts and the tests that used them are
-in git history before commit `3666786`.
+`font-style-match.css` gives the tests a fixed-size, margin-free layout so pixel diffs do not depend on font metrics.

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="utf-8">
+<title>Reference: the font-style descriptor omitted</title>
+<link rel="stylesheet" href="font-style-match.css">
+<style>
+  @font-face {
+    font-family: "Cairo Var OBLIQUE";
+    src: url('resources/Cairo.var.subset.ttf');
+  }
+  .test {
+    font-family: "Cairo Var OBLIQUE";
+    font-size: 4em;
+    display: inline-block;
+    margin: 0 0.3em;
+  }
+</style>
+
+<p class="test" style="font-style: normal">I</p>
+<p class="test" style="font-style: italic">I</p>
+<p class="test" style="font-style: oblique">I</p>
+<p class="test" style="font-style: oblique 5deg">I</p>
+<p class="test" style="font-style: oblique 45deg">I</p>
+<p class="test" style="font-style: oblique -5deg">I</p>
+<p class="test"><em>I</em></p>

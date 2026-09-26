@@ -12,9 +12,10 @@ cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
 ./scripts/setup-wpt.sh >/dev/null
 
-dest=.wpt/css/css-fonts/variable-oblique-interop/oblique-style-matching
+dest=.wpt/css/css-fonts/matching/font-style
 mkdir -p "$dest"
-rsync -a --delete --exclude README.md --exclude '__pycache__' --exclude '*.pyc' \
+# matrix.manifest.json is this repo's own bookkeeping (the site and the survey read it), not a WPT file.
+rsync -a --delete --exclude matrix.manifest.json --exclude '__pycache__' --exclude '*.pyc' \
   tests/oblique-style-matching/ "$dest/"
 
 echo "sync-tests-to-wpt: mirrored to $dest ($(find "$dest" -name '*.html' | wc -l | tr -d ' ') html files)"

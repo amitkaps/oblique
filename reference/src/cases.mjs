@@ -9,6 +9,9 @@ export const ROOT = join(fileURLToPath(new URL(".", import.meta.url)), "..", "..
 export const TESTS_DIR = join(ROOT, "tests", "oblique-style-matching");
 export const MATRIX_JSON = join(ROOT, "reference", "cases", "matrix.json");
 
+/** Every generated test and reference starts with this; it keeps names unique across WPT's css/ tree. */
+export const PREFIX = "font-style-match";
+
 export function loadMatrix(path = MATRIX_JSON) {
   return JSON.parse(readFileSync(path, "utf8"));
 }
@@ -29,9 +32,12 @@ export function cells(matrix) {
         synthesis: row.synthesis ?? {},
         resolutions: matrix.resolutions,
       });
+      // A test that leans on an assumption the spec text does not make is `.tentative` (WPT file-name flag).
+      const tentative = exp.assumptions.length > 0 && exp.plan.match.length + exp.plan.mismatch.length > 0;
       out.push({
         address: `${col.address}${row.address}`,
-        id: `matrix-${row.slug}-${col.slug}`,
+        id: `${PREFIX}-${row.slug}-${col.slug}${tentative ? ".tentative" : ""}`,
+        tentative,
         row,
         col,
         css: useSiteCss(row),
